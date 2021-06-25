@@ -9,7 +9,10 @@ from pathlib import Path
 
 # Import internal modules and libraries.
 from config import fname, SUBJECTS
+
+# Import tasks
 import create_bids_root
+import bidsify_subject
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -37,11 +40,45 @@ def task_create_bids_root():
     Create the root of our bids dataset. We'll finish BIDSifiying the data when we add our individual subjects to the dataset.
     """
     return dict(
-        task_dep=['check'],
+        actions=[(create_bids_root.main, (fname.bids_dir))],
+        task_dep=["check"],
         file_dep=["create_bids_root.py"],
         targets=[fname.bids_description],
-        actions=[(create_bids_root.main, [fname.bids_root])]
     )
+
+
+def task_bidsify_subject():
+    """
+    Convert all subjects to BIDS format.
+
+    We'll need this for fMRIPrep. Also, when we submit our dataset to the NIH, they'll want it in BIDS format.
+    """
+    for subject in SUBJECTS:
+        sources = dict(
+            eeg=fname.raw_eeg(subject=subject, eeg_type="eeg"),
+            vhdr=fname.raw_eeg(subject=subject, eeg_type="vhdr"),
+            vmrk=fname.raw_eeg(subject=subject, eeg_type="vmrk"),
+            dat=fname.raw_dat(subject=subject),
+            func=fname.raw_func(subject=subject),
+            anat=fname.raw_func(subject=subject),
+        )
+        targets = dict(
+            anat=fname.bids_anat(subject=subject),
+            eeg=fname.bids_eeg(subject=subject, eeg_type="eeg"),
+            vmrk=fname.bids_eeg(subject=subject, eeg_type="vmrk"),
+            vhdr=fname.bids_eeg(subject=subject, eeg_type="vhdr"),
+            func_json=fname.bids_func_json(subject=subject),
+            func=fname.bids_func(subject=subject),
+            events=fname.bids_events(subject=subject),
+            dat=fname.bids_dat(subject=subject),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(bidsify_subject.main, (sources, targets))],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
 
 
 # This example task executes a single analysis script for each subject, giving

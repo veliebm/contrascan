@@ -52,12 +52,25 @@ fname.add("raw_subject_dir", "{raw_data_dir}/subjects-complete/sub-{subject}")
 fname.add("fmriprep_subject_dir", "{raw_data_dir}/fmriprep/sub-{subject}/fmriprep")
 fname.add("brainvision_dir", "{raw_data_dir}/brainvision/EXPORT")
 
-# Processed data directories.
+# Processed data directory.
 fname.add("processed_data_dir", "./processed")
 
 # Task: Create BIDS root.
-fname.add("bids_root", "{processed_data_dir}/bids")
-fname.add("bids_description", "{bids_root}/dataset_description.json")
+fname.add("bids_dir", "{processed_data_dir}/bids")
+fname.add("bids_description", "{bids_dir}/dataset_description.json")
+
+# Task: Bidsify subjects.
+fname.add("raw_eeg", "{raw_subject_dir}/contrascan_{subject}.{eeg_type}")
+fname.add("raw_dat", "{raw_subject_dir}/SFcontrascan_{subject}.dat")
+fname.add("raw_func", "{raw_subject_dir}/Keil_{subject}_EPI_2s_Gain.nii")
+fname.add("raw_anat", "{raw_subject_dir}/Keil_{subject}_sT1W_3D_FFE_SAG.nii")
+fname.add("bids_dat", "{bids_dir}/sourcedata/sub-{subject}_task-contrascan.dat")
+fname.add("bids_subject_dir", "{bids_dir}/sub-{subject}")
+fname.add("bids_anat", "{bids_subject_dir}/anat/sub-{subject}_T1w.nii")
+fname.add("bids_eeg", "{bids_subject_dir}/eeg/sub-{subject}_task-contrascan_eeg.{eeg_type}")
+fname.add("bids_func_json", "{bids_subject_dir}/func/sub-{subject}_task-contrascan_bold.json")
+fname.add("bids_func", "{bids_subject_dir}/func/sub-{subject}_task-contrascan_bold.nii")
+fname.add("bids_events", "{bids_subject_dir}/func/sub-{subject}_task-contrascan_events.tsv")
 
 # The data files that are used and produced by the analysis steps
 fname.add("output", "{processed_data_dir}/output-{subject}.txt")
