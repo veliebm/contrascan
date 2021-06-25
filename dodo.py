@@ -62,22 +62,3 @@ def task_example_summary():
         targets=[fname.grand_average],
         actions=['python 01_grand_average.py'],
     )
-
-
-def task_figures():
-    """Make all figures. Each figure is a sub-task."""
-    # Make figure 1
-    yield dict(
-        name='figure_example1',
-        file_dep=['figure_example1.py'],
-        targets=[fname.figure1],
-        actions=['python figure_example1.py'],
-    )
-
-    # Make figure 2
-    yield dict(
-        name='figure_grand_average',
-        file_dep=[fname.grand_average, 'figure_grand_average.py'],
-        targets=[fname.figure_grand_average],
-        actions=['python figure_grand_average.py'],
-    )
