@@ -1,6 +1,7 @@
 figures
 processed
 reports
+data
 __pycache__
 *.pyc
 .doit*
