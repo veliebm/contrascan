@@ -1,6 +1,7 @@
 processed
 data
 __pycache__
+.vscode
 *.pyc
 *.json
 .doit*
