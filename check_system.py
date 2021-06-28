@@ -25,8 +25,6 @@ if not os.path.exists(fname.raw_data_dir):
 
 # Make sure the output directories exist
 os.makedirs(fname.processed_data_dir, exist_ok=True)
-os.makedirs(fname.figures_dir, exist_ok=True)
-os.makedirs(fname.reports_dir, exist_ok=True)
 
 # Prints some information about the system
 import mne
