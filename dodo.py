@@ -6,13 +6,15 @@ All the filenames are defined in config.py
 """
 # Import external modules and libraries.
 from pathlib import Path
+from typing import Dict
 
 # Import internal modules and libraries.
-from config import fname, SUBJECTS
+from config import fname, SUBJECTS, n_jobs
 
 # Import tasks
 import create_bids_root
 import bidsify_subject
+import afniproc
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -20,13 +22,16 @@ DOIT_CONFIG = dict(
     # screen.
     verbosity=2,
 
+    # Tell doit to use all processors I've said this machine has.
+    num_process=n_jobs,
+
     # When the user executes "doit list", list the tasks in the order they are
     # defined in this file, instead of alphabetically.
     sort='definition',
 )
 
 
-def task_check():
+def task_check() -> Dict:
     """Check the system dependencies."""
     return dict(
         file_dep=['check_system.py'],
@@ -35,7 +40,7 @@ def task_check():
     )
 
 
-def task_create_bids_root():
+def task_create_bids_root() -> Dict:
     """
     Create the root of our bids dataset. We'll finish BIDSifiying the data when we add our individual subjects to the dataset.
     """
@@ -47,7 +52,7 @@ def task_create_bids_root():
     )
 
 
-def task_bidsify_subject():
+def task_bidsify_subject() -> Dict:
     """
     Convert all subjects to BIDS format.
 
@@ -55,18 +60,18 @@ def task_bidsify_subject():
     """
     for subject in SUBJECTS:
         sources = dict(
-            eeg=fname.raw_eeg(subject=subject, eeg_type="eeg"),
-            vhdr=fname.raw_eeg(subject=subject, eeg_type="vhdr"),
-            vmrk=fname.raw_eeg(subject=subject, eeg_type="vmrk"),
+            eeg=fname.raw_eeg(subject=subject),
+            vhdr=fname.raw_vhdr(subject=subject),
+            vmrk=fname.raw_vmrk(subject=subject),
             dat=fname.raw_dat(subject=subject),
             func=fname.raw_func(subject=subject),
             anat=fname.raw_func(subject=subject),
         )
         targets = dict(
             anat=fname.bids_anat(subject=subject),
-            eeg=fname.bids_eeg(subject=subject, eeg_type="eeg"),
-            vmrk=fname.bids_eeg(subject=subject, eeg_type="vmrk"),
-            vhdr=fname.bids_eeg(subject=subject, eeg_type="vhdr"),
+            eeg=fname.bids_eeg(subject=subject),
+            vmrk=fname.bids_vmrk(subject=subject),
+            vhdr=fname.bids_vhdr(subject=subject),
             func_json=fname.bids_func_json(subject=subject),
             func=fname.bids_func(subject=subject),
             events=fname.bids_events(subject=subject),
@@ -76,6 +81,43 @@ def task_bidsify_subject():
         yield dict(
             name=subject,
             actions=[(bidsify_subject.main, (sources, targets))],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+
+def task_afniproc() -> Dict:
+    """
+    Run afni_proc.py to preprocess and deconvolve our subjects.
+
+    This is the base of our pipeline. We'll use the outputs of afni_proc.py for our more advanced analyses.
+    """
+    for subject in SUBJECTS:
+        sources = dict(
+            vmrk=fname.bids_vmrk(subject=subject),
+            func=fname.bids_func(subject=subject),
+            anat=fname.bids_anat(subject=subject),
+        )
+        targets = dict(
+            log=fname.afniproc_log(subject=subject),
+            command=fname.afniproc_command(subject=subject),
+            deconvolved=fname.afniproc_deconvolved(subject=subject),
+            irf=fname.afniproc_irf(subject=subject),
+            anat=fname.afniproc_anat(subject=subject),
+        )
+
+        kwargs = dict(
+            vmrk_path=sources["vmrk"],
+            func_path=sources["func"],
+            anat_path=sources["anat"],
+            out_dir=fname.afniproc_subject_dir(subject=subject),
+            subject_id=subject,
+            remove_first_trs=1,
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(afniproc.main, (), kwargs)],
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
