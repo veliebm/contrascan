@@ -56,6 +56,9 @@ fname.add("brainvision_dir", "{raw_data_dir}/brainvision/EXPORT")
 # Processed data directory.
 fname.add("processed_data_dir", "./processed")
 
+# task_check:
+fname.add("system_check", "./system_check.txt")
+
 # task_create_bids_root:
 fname.add("bids_dir", "{processed_data_dir}/bids")
 fname.add("bids_description", "{bids_dir}/dataset_description.json")
@@ -85,10 +88,3 @@ fname.add("afniproc_command", "{afniproc_subject_dir}/proc.{subject}")
 fname.add("afniproc_deconvolved", "{afniproc_subject_dir}/{subject}.results/stats.{subject}+tlrc.HEAD")
 fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}+tlrc.HEAD")
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
-
-# The data files that are used and produced by the analysis steps
-fname.add("output", "{processed_data_dir}/output-{subject}.txt")
-fname.add("grand_average", "{processed_data_dir}/grand_average.txt")
-
-# File produced by check_system.py
-fname.add("system_check", "./system_check.txt")
