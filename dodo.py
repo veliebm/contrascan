@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Do-it script to execute the entire pipeline using the doit tool:
 http://pydoit.org
@@ -15,6 +16,7 @@ from config import fname, SUBJECTS, n_jobs
 import create_bids_root
 import bidsify_subject
 import afniproc
+import convert_eeg
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -45,7 +47,7 @@ def task_create_bids_root() -> Dict:
     Create the root of our bids dataset. We'll finish BIDSifiying the data when we add our individual subjects to the dataset.
     """
     return dict(
-        actions=[(create_bids_root.main, (fname.bids_dir))],
+        actions=[(create_bids_root.main, [fname.bids_dir])],
         task_dep=["check"],
         file_dep=["create_bids_root.py"],
         targets=[fname.bids_description],
@@ -80,7 +82,7 @@ def task_bidsify_subject() -> Dict:
 
         yield dict(
             name=subject,
-            actions=[(bidsify_subject.main, (sources, targets))],
+            actions=[(bidsify_subject.main, [sources, targets])],
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
@@ -117,11 +119,36 @@ def task_afniproc() -> Dict:
 
         yield dict(
             name=subject,
-            actions=[(afniproc.main, (), kwargs)],
+            actions=[(afniproc.main, [], kwargs)],
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
 
+
+def task_convert_eeg() -> Dict:
+    """
+    Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
+    """
+    for subject in SUBJECTS:
+        sources = dict(
+            brainvision_path=fname.brainvision_eeg(subject=subject),
+        )
+        targets = dict(
+            converted_path=fname.converted_eeg(subject=subject),
+        )
+        kwargs = dict(
+            brainvision_dir=fname.brainvision_dir,
+            brainvision_name = Path(sources["brainvision_path"]).name,
+            converted_path = targets["converted_path"],
+            setname = f"sub-{subject}",
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(convert_eeg.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
 
 # This example task executes a single analysis script for each subject, giving
 # the subject as a command line parameter to the script.

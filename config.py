@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 ===========
 Config file
@@ -22,12 +23,11 @@ host = getfqdn()  # Hostname of the machine running the scripts
 if user == "csea":
     # CSEA desktop
     raw_data_dir = "./data"
-    n_jobs = 12  # The CSEA desktop has 12 logical processors
+    n_jobs = 10  # The CSEA desktop has 12 logical processors, but I only want to use 10. Gotta save some for other jobs.
 else:
     # Defaults
     raw_data_dir = "./data"
     n_jobs = 1
-print(f"Using {n_jobs} cores")
 
 # For BLAS to use the right amount of cores
 os.environ["OMP_NUM_THREADS"] = str(n_jobs)
@@ -88,3 +88,8 @@ fname.add("afniproc_command", "{afniproc_subject_dir}/proc.{subject}")
 fname.add("afniproc_deconvolved", "{afniproc_subject_dir}/{subject}.results/stats.{subject}+tlrc.HEAD")
 fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}+tlrc.HEAD")
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
+
+# task_convert_eeg
+fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
+fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
+fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artifact Correction.vhdr")
