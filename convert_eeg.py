@@ -15,7 +15,7 @@ def main(brainvision_dir: PathLike, brainvision_name: str, converted_path: PathL
     out_dir = Path(converted_path).parent
     out_dir.mkdir(exist_ok=True, parents=True)
 
-    matlab_function = f"convert_brainvision('{brainvision_dir}', '{brainvision_name}', '{converted_path}', '{setname}'); exit;"
+    matlab_function = f"convert_eeg('{brainvision_dir}', '{brainvision_name}', '{converted_path}', '{setname}'); exit;"
     run_matlab_function(matlab_function, debug=True)
 
 def run_matlab_function(matlab_function: str, debug=False) -> None:

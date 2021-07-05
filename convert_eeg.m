@@ -3,7 +3,7 @@
 % Created 6/28/21 by Benjamin Velie.
 % ---------------------------------------------------------
 
-function convert_brainvision(in_dir, in_filename, out_path, setname)
+function convert_eeg(in_dir, in_filename, out_path, setname)
     % Convert a subject from BrainVision format to EEGLAB format.
     [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
     EEG = eeg_checkset( EEG );
