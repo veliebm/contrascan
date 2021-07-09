@@ -53,7 +53,7 @@ def run_afni_proc(subject_id: str, path_to_anat: PathLike, path_to_func: PathLik
         -cost lpc+ZZ
         -giant_move
         -check_flip
-        -tlrc_base MNI152_2009_template.nii.gz
+        -tlrc_base TT_N27+tlrc
         -tlrc_NL_warp
         -volreg_align_to MIN_OUTLIER
         -volreg_align_e2a
