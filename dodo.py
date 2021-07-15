@@ -17,6 +17,7 @@ import create_bids_root
 import bidsify_subject
 import afniproc
 import convert_eeg
+import trim_func_images
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -125,6 +126,36 @@ def task_afniproc() -> Dict:
         )
 
 
+def task_trim_func_images() -> Dict:
+    """
+    Truncate our functional images to begin when the first stimulus was presented.
+
+    Necessary for correlating the functional images with our EEG data.
+    We got the stimulus presentation times from the afniproc results.
+    """
+    for subject in SUBJECTS:
+        sources = dict(
+            onsets=fname.afniproc_onsets(subject=subject),
+            func=fname.afniproc_func(subject=subject),
+        )
+        targets = dict(
+            trimmed_func=fname.trimmed_func(subject=subject)
+        )
+
+        kwargs = dict(
+            onsets_path=sources["onsets"],
+            func_path=sources["func"],
+            out_prefix="".join(targets["trimmed_func"].split("+")[:-1]),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(trim_func_images.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+
 def task_convert_eeg() -> Dict:
     """
     Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
@@ -149,6 +180,23 @@ def task_convert_eeg() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+
+
+def _print_dict(dictionary: Dict, name: str=None) -> None:
+    """
+    Prints a dictionary and whether its paths exist.
+
+    Useful for debugging.
+    """
+    if name:
+        print(name)
+    for key, value in dictionary.items():
+        path = Path(value)
+        exists = path.exists()
+        exists_str = "exists" if exists else "doesn't exist"
+        print(f"{key}  :  {value}  :  {exists_str}")
+    print()
+
 
 # This example task executes a single analysis script for each subject, giving
 # the subject as a command line parameter to the script.

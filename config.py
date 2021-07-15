@@ -6,7 +6,6 @@ Config file
 
 Configuration parameters for the study.
 """
-
 import os
 import getpass
 from socket import getfqdn
@@ -23,7 +22,7 @@ host = getfqdn()  # Hostname of the machine running the scripts
 if user == "csea":
     # CSEA desktop
     raw_data_dir = "./data"
-    n_jobs = 10  # The CSEA desktop has 12 logical processors, but I only want to use 10. Gotta save some for other jobs.
+    n_jobs = 4  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
 else:
     # Defaults
     raw_data_dir = "./data"
@@ -88,6 +87,12 @@ fname.add("afniproc_command", "{afniproc_subject_dir}/proc.{subject}")
 fname.add("afniproc_deconvolved", "{afniproc_subject_dir}/{subject}.results/stats.{subject}+tlrc.HEAD")
 fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}+tlrc.HEAD")
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
+
+# task_trim_func_images:
+fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
+fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
+fname.add("afniproc_onsets", "{afniproc_subject_dir}/onsets.tsv")
+fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
 
 # task_convert_eeg
 fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
