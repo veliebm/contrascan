@@ -8,7 +8,6 @@ veliebm@gmail.com
 # Import external libraries and modules.
 from os import PathLike
 from pathlib import Path
-from typing import Dict, List
 import subprocess
 
 # Import CSEA libraries and modules.
