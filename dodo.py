@@ -68,7 +68,7 @@ def task_bidsify_subject() -> Dict:
             vmrk=fname.raw_vmrk(subject=subject),
             dat=fname.raw_dat(subject=subject),
             func=fname.raw_func(subject=subject),
-            anat=fname.raw_func(subject=subject),
+            anat=fname.raw_anat(subject=subject),
         )
         targets = dict(
             anat=fname.bids_anat(subject=subject),
