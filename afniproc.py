@@ -61,8 +61,6 @@ def run_afni_proc(subject_id: str, path_to_anat: PathLike, path_to_func: PathLik
         -blur_size 4.0
         -regress_stim_labels stim
         -regress_basis CSPLINzero(0,18,10)
-        -regress_opts_3dD
-        -jobs 4
         -regress_motion_per_run
         -regress_censor_motion 0.3
         -regress_censor_outliers 0.05
