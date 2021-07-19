@@ -132,6 +132,8 @@ def task_align_afniproc_irfs() -> Dict:
     Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
 
     Note that the aligned IRFs appear in the afniproc dir, not the alignment template dir.
+    Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
+    for one subject, then apply the transformation to all the others.
     """
     sources = [fname.afniproc_irf(subject=subject) for subject in SUBJECTS]
     sources += [
