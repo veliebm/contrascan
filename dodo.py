@@ -21,6 +21,7 @@ import trim_func_images
 import align
 import resample
 import smooth
+import scale
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -209,6 +210,31 @@ def task_smooth_fmriprep() -> Dict:
         yield dict(
             name=subject,
             actions=[(smooth.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
+
+def task_scale_fmriprep() -> Dict:
+    """
+    Scale our smoothed fMRIPrep images.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.fmriprep_smoothed(subject=subject)
+        ]
+        targets = [
+            fname.fmriprep_scaled(subject=subject)
+        ]
+
+        kwargs = dict(
+            image=fname.fmriprep_smoothed(subject=subject),
+            prefix=get_prefix(fname.fmriprep_scaled(subject=subject)),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(scale.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
