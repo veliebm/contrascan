@@ -19,6 +19,7 @@ import afniproc
 import convert_eeg
 import trim_func_images
 import align
+import resample
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -132,6 +133,8 @@ def task_align_afniproc_irfs() -> Dict:
     Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
 
     Note that the aligned IRFs appear in the afniproc dir, not the alignment template dir.
+    I'm aware that this is quirky, but it's convenient.
+
     Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
     for one subject, then apply the transformation to all the others.
     """
@@ -155,6 +158,33 @@ def task_align_afniproc_irfs() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+
+
+def task_resample_afniproc_irfs() -> Dict:
+    """
+    Resample our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.atlas_template,
+            fname.afniproc_aligned_irf(subject=subject)
+        ]
+        targets = [
+            fname.afniproc_resampled_irf(subject=subject)
+        ]
+
+        kwargs = dict(
+            from_image=fname.afniproc_aligned_irf(subject=subject),
+            to_image=fname.atlas_template,
+            to_prefix=get_prefix(fname.afniproc_resampled_irf(subject=subject)),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 
 
 def task_trim_func_images() -> Dict:
@@ -227,3 +257,26 @@ def _print_dict(dictionary: Dict, name: str=None) -> None:
         exists_str = "exists" if exists else "doesn't exist"
         print(f"{key}  :  {value}  :  {exists_str}")
     print()
+
+
+def get_prefix(filename: str) -> str:
+    """
+    Returns the prefix of an AFNI file. (Everything before the final "+".)
+    """
+    return "".join(filename.split("+")[:-1])
+
+
+def get_view(filename: str) -> str:
+    """
+    Returns the view of an AFNI file. (Everything after the final "+".)
+    """
+    return filename.split("+")[-1]
+
+
+def add_suffix(filename: str, suffix: str) -> str:
+    """
+    Adds a suffix to the end of an AFNI filename.
+    """
+    prefix = get_prefix(filename)
+    view = get_view(filename)
+    return prefix + suffix + "+" + view
