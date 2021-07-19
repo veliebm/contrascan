@@ -99,6 +99,10 @@ fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/ires
 # task_resample_afniproc_irfs:
 fname.add("afniproc_resampled_irf", "{processed_data_dir}/afniproc_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
 
+# task_smooth_fmriprep:
+fname.add("fmriprep_func", "{fmriprep_subject_dir}/sub-{subject}/func/sub-{subject}_task-gabor_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz")
+fname.add("fmriprep_smoothed", "{processed_data_dir}/fmriprep_smoothed/sub-{subject}_func_smoothed+tlrc.HEAD")
+
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
 fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")

@@ -20,6 +20,7 @@ import convert_eeg
 import trim_func_images
 import align
 import resample
+import smooth
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -182,6 +183,32 @@ def task_resample_afniproc_irfs() -> Dict:
         yield dict(
             name=subject,
             actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
+
+def task_smooth_fmriprep() -> Dict:
+    """
+    Smooth our fMRIPrep images.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.fmriprep_func(subject=subject)
+        ]
+
+        targets = [
+            fname.fmriprep_smoothed(subject=subject)
+        ]
+
+        kwargs = dict(
+            image=fname.fmriprep_func(subject=subject),
+            prefix=get_prefix(fname.fmriprep_smoothed(subject=subject)),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(smooth.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
