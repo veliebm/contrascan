@@ -18,6 +18,7 @@ import bidsify_subject
 import afniproc
 import convert_eeg
 import trim_func_images
+import align
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -124,6 +125,34 @@ def task_afniproc() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+
+
+def task_align_afniproc_irfs() -> Dict:
+    """
+    Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
+
+    Note that the aligned IRFs appear in the afniproc dir, not the alignment template dir.
+    """
+    sources = [fname.afniproc_irf(subject=subject) for subject in SUBJECTS]
+    sources += [
+        fname.atlas_template,
+        fname.afniproc_template,
+    ]
+
+    targets = [fname.afniproc_aligned_irf(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        from_images=[fname.afniproc_irf(subject=subject) for subject in SUBJECTS],
+        from_template=fname.afniproc_template,
+        to_template=fname.atlas_template,
+        to_dir=fname.afniproc_alignment_dir,
+    )
+
+    return dict(
+        actions=[(align.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 
 def task_trim_func_images() -> Dict:

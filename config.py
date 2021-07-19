@@ -10,6 +10,7 @@ import os
 import getpass
 from socket import getfqdn
 from fnames import FileNames
+from pathlib import Path
 
 ###############################################################################
 # Determine which user is running the scripts on which machine and set the path
@@ -37,6 +38,33 @@ os.environ["OMP_NUM_THREADS"] = str(n_jobs)
 
 # All subjects for whom our analysis can actually work.
 SUBJECTS = "104 106 107 108 109 110 111 112 113 115 116 117 120 121 122 123 124 125".split()
+
+
+##############################################################################
+# Functions we'll use with our paths.
+
+def get_prefix(filename: str) -> str:
+    """
+    Returns the prefix of an AFNI file. (Everything before the final "+".)
+    """
+    return "".join(filename.split("+")[:-1])
+
+
+def get_view(filename: str) -> str:
+    """
+    Returns the view of an AFNI file. (Everything after the final "+".)
+    """
+    return filename.split("+")[-1]
+
+
+def add_suffix(filename: str, suffix: str) -> str:
+    """
+    Adds a suffix to the end of an AFNI filename.
+    """
+    prefix = get_prefix(filename)
+    view = get_view(filename)
+    return prefix + suffix + "+" + view
+
 
 ###############################################################################
 # Templates for filenames
@@ -87,6 +115,12 @@ fname.add("afniproc_command", "{afniproc_subject_dir}/proc.{subject}")
 fname.add("afniproc_deconvolved", "{afniproc_subject_dir}/{subject}.results/stats.{subject}+tlrc.HEAD")
 fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}+tlrc.HEAD")
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
+
+# task_align_afniproc_irfs:
+fname.add("atlas_template", "{raw_data_dir}/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz")
+fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
+fname.add("afniproc_alignment_dir", "{processed_data_dir}/afniproc_alignment")
+fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}_aligned+tlrc.HEAD")
 
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
