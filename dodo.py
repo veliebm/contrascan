@@ -304,6 +304,33 @@ def task_align_fmriprep_irfs() -> Dict:
     )
 
 
+def task_resample_fmriprep_irfs() -> Dict:
+    """
+    Resample our IRFs to the space of the Kastner cortex masks so we may compare them with our afniproc IRFs.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.atlas_template,
+            fname.fmriprep_aligned_irf(subject=subject)
+        ]
+        targets = [
+            fname.fmriprep_resampled_irf(subject=subject)
+        ]
+
+        kwargs = dict(
+            from_image=fname.fmriprep_aligned_irf(subject=subject),
+            to_image=fname.atlas_template,
+            to_prefix=get_prefix(fname.fmriprep_resampled_irf(subject=subject)),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
+
 def task_trim_func_images() -> Dict:
     """
     Truncate our functional images to begin when the first stimulus was presented.

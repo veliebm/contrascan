@@ -118,6 +118,9 @@ fname.add("fmriprep_template", "{raw_data_dir}/misc/tpl-MNI152NLin2009cAsym_res-
 fname.add("fmriprep_alignment_dir", "{processed_data_dir}/fmriprep_alignment")
 fname.add("fmriprep_aligned_irf", "{fmriprep_deconvolve_dir}/sub-{subject}_IRF_aligned+tlrc.HEAD")
 
+# task_resample_fmriprep_irfs:
+fname.add("fmriprep_resampled_irf", "{processed_data_dir}/fmriprep_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
+
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
 fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
