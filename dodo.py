@@ -272,6 +272,38 @@ def task_deconvolve_fmriprep() -> Dict:
         )
 
 
+def task_align_fmriprep_irfs() -> Dict:
+    """
+    Align our fMRIPrep IRFs to the space of the Kastner cortex masks so we may compare them with afni_proc's IRFs.
+
+    Note that the aligned IRFs appear in the fMRIPrep IRF dir, not the alignment template dir.
+    I'm aware that this is quirky, but it's convenient.
+
+    Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
+    for one subject, then apply the transformation to all the others.
+    """
+    sources = [fname.fmriprep_irf(subject=subject) for subject in SUBJECTS]
+    sources += [
+        fname.atlas_template,
+        fname.fmriprep_template,
+    ]
+
+    targets = [fname.fmriprep_aligned_irf(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        from_images=[fname.fmriprep_irf(subject=subject) for subject in SUBJECTS],
+        from_template=fname.fmriprep_template,
+        to_template=fname.atlas_template,
+        to_dir=fname.fmriprep_alignment_dir,
+    )
+
+    return dict(
+        actions=[(align.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+
+
 def task_trim_func_images() -> Dict:
     """
     Truncate our functional images to begin when the first stimulus was presented.

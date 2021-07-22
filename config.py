@@ -113,6 +113,11 @@ fname.add("fmriprep_irf", "{fmriprep_deconvolve_dir}/sub-{subject}_IRF+tlrc.HEAD
 fname.add("fmriprep_regressors_dir", "{fmriprep_deconvolve_dir}/regressors")
 fname.add("regressors_tsv", "{fmriprep_subject_dir}/sub-{subject}/func/sub-{subject}_task-gabor_desc-confounds_timeseries.tsv")
 
+# task_align_fmriprep_irfs:
+fname.add("fmriprep_template", "{raw_data_dir}/misc/tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz")
+fname.add("fmriprep_alignment_dir", "{processed_data_dir}/fmriprep_alignment")
+fname.add("fmriprep_aligned_irf", "{fmriprep_deconvolve_dir}/sub-{subject}_IRF_aligned+tlrc.HEAD")
+
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
 fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
