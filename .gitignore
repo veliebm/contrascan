@@ -2,6 +2,9 @@ processed
 data
 __pycache__
 .vscode
+.REML_cmd
+.xmat.1D
+3dDeconvolve.err
 *.pyc
 *.json
 .doit*
