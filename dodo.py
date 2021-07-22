@@ -22,6 +22,7 @@ import align
 import resample
 import smooth
 import scale
+import deconvolve
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -235,6 +236,37 @@ def task_scale_fmriprep() -> Dict:
         yield dict(
             name=subject,
             actions=[(scale.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
+
+def task_deconvolve_fmriprep() -> Dict:
+    """
+    Deconvolve our scaled fMRIPrep images.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.fmriprep_scaled(subject=subject),
+        ]
+        targets = [
+            fname.fmriprep_deconvolved(subject=subject),
+            fname.fmriprep_irf(subject=subject),
+        ]
+
+        kwargs = dict(
+            regressors_tsv=fname.regressors_tsv(subject=subject),
+            regressors_dir=fname.fmriprep_regressors_dir(subject=subject),
+            deconvolved_prefix=get_prefix(fname.fmriprep_deconvolved(subject=subject)),
+            IRF_prefix=get_prefix(fname.fmriprep_irf(subject=subject)),
+            func_path=fname.fmriprep_scaled(subject=subject),
+            events_tsv=fname.bids_events(subject=subject),
+            events_dir=fname.fmriprep_deconvolve_dir(subject=subject)
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(deconvolve.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
