@@ -10,7 +10,6 @@ import os
 import getpass
 from socket import getfqdn
 from fnames import FileNames
-from pathlib import Path
 
 ###############################################################################
 # Determine which user is running the scripts on which machine and set the path
