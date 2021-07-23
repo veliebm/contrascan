@@ -7,7 +7,7 @@ All the filenames are defined in config.py
 """
 # Import external modules and libraries.
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Iterable
 
 # Import internal modules and libraries.
 from config import fname, SUBJECTS, n_jobs
@@ -153,6 +153,31 @@ def task_align_func_images() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_resample_func_images() -> Dict:
+    """
+    Resample our afniproc func images to the space of the Kastner cortex masks.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.atlas_template,
+            fname.aligned_func(subject=subject)
+        ]
+        targets = [
+            fname.resampled_func(subject=subject)
+        ]
+
+        kwargs = dict(
+            from_image=fname.aligned_func(subject=subject),
+            to_image=fname.atlas_template,
+            to_prefix=get_prefix(fname.resampled_func(subject=subject)),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 def task_trim_func_images() -> Dict:
     """
     Truncate our functional images to begin when the first stimulus was presented.
@@ -417,19 +442,19 @@ def task_ttest_fmriprep_vs_afniproc() -> Dict:
         )
 
 # Helper functions.
-def _print_dict(dictionary: Dict, name: str=None) -> None:
+def _print_paths(paths: Iterable, name: str=None) -> None:
     """
-    Prints a dictionary and whether its paths exist.
+    Prints an iterable and whether its paths exist.
 
     Useful for debugging.
     """
     if name:
         print(name)
-    for key, value in dictionary.items():
-        path = Path(value)
+    for path in paths:
+        path = Path(path)
         exists = path.exists()
         exists_str = "exists" if exists else "doesn't exist"
-        print(f"{key}  :  {value}  :  {exists_str}")
+        print(f"{path}  :  {exists_str}")
     print()
 def get_prefix(filename: str) -> str:
     """

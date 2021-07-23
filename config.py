@@ -93,7 +93,10 @@ fname.add("afniproc_preprocessed_func", "{afniproc_subject_dir}/{subject}.result
 # task_align_func_images:
 fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
 fname.add("alignment_dir", "{processed_data_dir}/alignment")
-fname.add("aligned_func", "{alignment_dir}/all_runs.{subject}_aligned+tlrc.HEAD")
+fname.add("aligned_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}_aligned+tlrc.HEAD")
+
+# task_resample_func_images:
+fname.add("resampled_func", "{processed_data_dir}/resample/sub-{subject}_func_resampled+tlrc.HEAD")
 
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
