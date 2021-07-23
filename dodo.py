@@ -23,6 +23,7 @@ import resample
 import smooth
 import scale
 import deconvolve
+import ttest_2_groups
 
 # Configuration for the "doit" tool.
 DOIT_CONFIG = dict(
@@ -326,6 +327,30 @@ def task_resample_fmriprep_irfs() -> Dict:
         yield dict(
             name=subject,
             actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
+
+def task_ttest_fmriprep_vs_afniproc() -> Dict:
+    """
+    ttest IRFs of fMRIPrep vs afniproc so we may find the TRUE pipeline of kings.
+    """
+    sources = [fname.fmriprep_resampled_irf(subject=subject) for subject in SUBJECTS]
+    sources += [fname.afniproc_resampled_irf(subject=subject) for subject in SUBJECTS]
+
+    for subbrick in range(1, 9):
+        targets = [fname.ttest_result(subbrick=subbrick)]
+
+        kwargs = dict(
+            list_a=[fname.fmriprep_resampled_irf(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
+            list_b=[fname.afniproc_resampled_irf(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
+            prefix=get_prefix(fname.ttest_result(subbrick=subbrick)),
+        )
+
+        yield dict(
+            name=f"subbrick {subbrick}",
+            actions=[(ttest_2_groups.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
