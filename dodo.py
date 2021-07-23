@@ -105,6 +105,7 @@ def task_afniproc() -> Dict:
             deconvolved=fname.afniproc_deconvolved(subject=subject),
             irf=fname.afniproc_irf(subject=subject),
             anat=fname.afniproc_anat(subject=subject),
+            preprocessed_func=fname.afniproc_preprocessed_func(subject=subject)
         )
 
         kwargs = dict(
@@ -122,6 +123,36 @@ def task_afniproc() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+def task_align_func_images() -> Dict:
+    """
+    Align our preprocessed functional images to the space of the Kastner cortex masks.
+
+    Note that the aligned images appear in the afniproc dir, not the alignment template dir.
+    I'm aware that this is quirky, but it's convenient.
+
+    Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
+    for one subject, then apply the transformation to all the others.
+    """
+    sources = [fname.afniproc_preprocessed_func(subject=subject) for subject in SUBJECTS]
+    sources += [
+        fname.atlas_template,
+        fname.afniproc_template,
+    ]
+
+    targets = [fname.aligned_func(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        from_images=[fname.afniproc_preprocessed_func(subject=subject) for subject in SUBJECTS],
+        from_template=fname.afniproc_template,
+        to_template=fname.atlas_template,
+        to_dir=fname.alignment_dir,
+    )
+
+    return dict(
+        actions=[(align.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 def task_trim_func_images() -> Dict:
     """
     Truncate our functional images to begin when the first stimulus was presented.

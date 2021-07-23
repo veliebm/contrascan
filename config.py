@@ -88,6 +88,12 @@ fname.add("afniproc_command", "{afniproc_subject_dir}/proc.{subject}")
 fname.add("afniproc_deconvolved", "{afniproc_subject_dir}/{subject}.results/stats.{subject}+tlrc.HEAD")
 fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}+tlrc.HEAD")
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
+fname.add("afniproc_preprocessed_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
+
+# task_align_func_images:
+fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
+fname.add("alignment_dir", "{processed_data_dir}/alignment")
+fname.add("aligned_func", "{alignment_dir}/all_runs.{subject}_aligned+tlrc.HEAD")
 
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
@@ -108,7 +114,6 @@ fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artif
 
 # task_align_afniproc_irfs:
 fname.add("atlas_template", "{raw_data_dir}/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz")
-fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
 fname.add("afniproc_alignment_dir", "{processed_data_dir}/afniproc_alignment")
 fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}_aligned+tlrc.HEAD")
 
