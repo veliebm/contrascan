@@ -40,7 +40,7 @@ SUBJECTS = "104 106 107 108 109 110 111 112 113 115 116 117 120 121 122 123 124 
 
 
 ###############################################################################
-# Templates for filenames
+# Templates for filenames part of our main analysis.
 #
 # This part of the config file uses the FileNames class. It provides a small
 # wrapper around string.format() to keep track of a list of filenames.
@@ -89,6 +89,23 @@ fname.add("afniproc_deconvolved", "{afniproc_subject_dir}/{subject}.results/stat
 fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}+tlrc.HEAD")
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
 
+# task_trim_func_images:
+fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
+fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
+fname.add("afniproc_onsets", "{afniproc_subject_dir}/onsets.tsv")
+fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
+
+# task_convert_eeg
+fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
+fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
+fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artifact Correction.vhdr")
+
+
+###################################################################
+# Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
+# 
+# Researchers outside our lab don't need to play with any of these.
+
 # task_align_afniproc_irfs:
 fname.add("atlas_template", "{raw_data_dir}/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz")
 fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
@@ -122,14 +139,3 @@ fname.add("fmriprep_resampled_irf", "{processed_data_dir}/fmriprep_resample/sub-
 
 # task_ttest_fmriprep_vs_afniproc:
 fname.add("ttest_result", "{processed_data_dir}/fmriprep_vs_afniproc_ttests/subbrick-{subbrick}_seta-fmriprep_setb-afniproc_ttest+tlrc.HEAD")
-
-# task_trim_func_images:
-fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
-fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
-fname.add("afniproc_onsets", "{afniproc_subject_dir}/onsets.tsv")
-fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
-
-# task_convert_eeg
-fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
-fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
-fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artifact Correction.vhdr")

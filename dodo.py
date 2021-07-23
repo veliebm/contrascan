@@ -25,21 +25,19 @@ import scale
 import deconvolve
 import ttest_2_groups
 
-# Configuration for the "doit" tool.
+# Configuration for the pydoit tool.
 DOIT_CONFIG = dict(
-    # While running scripts, output everything the script is printing to the
-    # screen.
+    # While running scripts, output everything the script is printing to the screen.
     verbosity=2,
 
     # Tell doit to use all processors I've said this machine has.
     num_process=n_jobs,
 
-    # When the user executes "doit list", list the tasks in the order they are
-    # defined in this file, instead of alphabetically.
+    # When the user executes "doit list", list the tasks in the order they are defined in this file, instead of alphabetically.
     sort='definition',
 )
 
-
+# Tasks to run our analysis.
 def task_check() -> Dict:
     """Check the system dependencies."""
     return dict(
@@ -47,8 +45,6 @@ def task_check() -> Dict:
         targets=[fname.system_check],
         actions=['python check_system.py']
     )
-
-
 def task_create_bids_root() -> Dict:
     """
     Create the root of our bids dataset. We'll finish BIDSifiying the data when we add our individual subjects to the dataset.
@@ -59,8 +55,6 @@ def task_create_bids_root() -> Dict:
         file_dep=["create_bids_root.py"],
         targets=[fname.bids_description],
     )
-
-
 def task_bidsify_subject() -> Dict:
     """
     Convert all subjects to BIDS format.
@@ -93,8 +87,6 @@ def task_bidsify_subject() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
-
-
 def task_afniproc() -> Dict:
     """
     Run afni_proc.py to preprocess and deconvolve our subjects.
@@ -130,8 +122,60 @@ def task_afniproc() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+def task_trim_func_images() -> Dict:
+    """
+    Truncate our functional images to begin when the first stimulus was presented.
 
+    Necessary for correlating the functional images with our EEG data.
+    We got the stimulus presentation times from the afniproc results.
+    """
+    for subject in SUBJECTS:
+        sources = dict(
+            onsets=fname.afniproc_onsets(subject=subject),
+            func=fname.afniproc_func(subject=subject),
+        )
+        targets = dict(
+            trimmed_func=fname.trimmed_func(subject=subject)
+        )
 
+        kwargs = dict(
+            onsets_path=sources["onsets"],
+            func_path=sources["func"],
+            out_prefix="".join(targets["trimmed_func"].split("+")[:-1]),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(trim_func_images.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+def task_convert_eeg() -> Dict:
+    """
+    Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
+    """
+    for subject in SUBJECTS:
+        sources = dict(
+            brainvision_path=fname.brainvision_eeg(subject=subject),
+        )
+        targets = dict(
+            converted_path=fname.converted_eeg(subject=subject),
+        )
+        kwargs = dict(
+            brainvision_dir=fname.brainvision_dir,
+            brainvision_name = Path(sources["brainvision_path"]).name,
+            converted_path = targets["converted_path"],
+            setname = f"sub-{subject}",
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(convert_eeg.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+# Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
     """
     Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
@@ -162,8 +206,6 @@ def task_align_afniproc_irfs() -> Dict:
         file_dep=sources,
         targets=targets,
     )
-
-
 def task_resample_afniproc_irfs() -> Dict:
     """
     Resample our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
@@ -189,8 +231,6 @@ def task_resample_afniproc_irfs() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-
-
 def task_smooth_fmriprep() -> Dict:
     """
     Smooth our fMRIPrep images.
@@ -215,8 +255,6 @@ def task_smooth_fmriprep() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-
-
 def task_scale_fmriprep() -> Dict:
     """
     Scale our smoothed fMRIPrep images.
@@ -240,8 +278,6 @@ def task_scale_fmriprep() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-
-
 def task_deconvolve_fmriprep() -> Dict:
     """
     Deconvolve our scaled fMRIPrep images.
@@ -271,8 +307,6 @@ def task_deconvolve_fmriprep() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-
-
 def task_align_fmriprep_irfs() -> Dict:
     """
     Align our fMRIPrep IRFs to the space of the Kastner cortex masks so we may compare them with afni_proc's IRFs.
@@ -303,8 +337,6 @@ def task_align_fmriprep_irfs() -> Dict:
         file_dep=sources,
         targets=targets,
     )
-
-
 def task_resample_fmriprep_irfs() -> Dict:
     """
     Resample our IRFs to the space of the Kastner cortex masks so we may compare them with our afniproc IRFs.
@@ -330,8 +362,6 @@ def task_resample_fmriprep_irfs() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-
-
 def task_ttest_fmriprep_vs_afniproc() -> Dict:
     """
     ttest IRFs of fMRIPrep vs afniproc so we may find the TRUE pipeline of kings.
@@ -355,63 +385,7 @@ def task_ttest_fmriprep_vs_afniproc() -> Dict:
             targets=targets,
         )
 
-
-def task_trim_func_images() -> Dict:
-    """
-    Truncate our functional images to begin when the first stimulus was presented.
-
-    Necessary for correlating the functional images with our EEG data.
-    We got the stimulus presentation times from the afniproc results.
-    """
-    for subject in SUBJECTS:
-        sources = dict(
-            onsets=fname.afniproc_onsets(subject=subject),
-            func=fname.afniproc_func(subject=subject),
-        )
-        targets = dict(
-            trimmed_func=fname.trimmed_func(subject=subject)
-        )
-
-        kwargs = dict(
-            onsets_path=sources["onsets"],
-            func_path=sources["func"],
-            out_prefix="".join(targets["trimmed_func"].split("+")[:-1]),
-        )
-
-        yield dict(
-            name=subject,
-            actions=[(trim_func_images.main, [], kwargs)],
-            file_dep=list(sources.values()),
-            targets=list(targets.values()),
-        )
-
-
-def task_convert_eeg() -> Dict:
-    """
-    Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
-    """
-    for subject in SUBJECTS:
-        sources = dict(
-            brainvision_path=fname.brainvision_eeg(subject=subject),
-        )
-        targets = dict(
-            converted_path=fname.converted_eeg(subject=subject),
-        )
-        kwargs = dict(
-            brainvision_dir=fname.brainvision_dir,
-            brainvision_name = Path(sources["brainvision_path"]).name,
-            converted_path = targets["converted_path"],
-            setname = f"sub-{subject}",
-        )
-
-        yield dict(
-            name=subject,
-            actions=[(convert_eeg.main, [], kwargs)],
-            file_dep=list(sources.values()),
-            targets=list(targets.values()),
-        )
-
-
+# Helper functions.
 def _print_dict(dictionary: Dict, name: str=None) -> None:
     """
     Prints a dictionary and whether its paths exist.
@@ -426,22 +400,16 @@ def _print_dict(dictionary: Dict, name: str=None) -> None:
         exists_str = "exists" if exists else "doesn't exist"
         print(f"{key}  :  {value}  :  {exists_str}")
     print()
-
-
 def get_prefix(filename: str) -> str:
     """
     Returns the prefix of an AFNI file. (Everything before the final "+".)
     """
     return "".join(filename.split("+")[:-1])
-
-
 def get_view(filename: str) -> str:
     """
     Returns the view of an AFNI file. (Everything after the final "+".)
     """
     return filename.split("+")[-1]
-
-
 def add_suffix(filename: str, suffix: str) -> str:
     """
     Adds a suffix to the end of an AFNI filename.
