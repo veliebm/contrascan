@@ -300,6 +300,31 @@ def task_preprocess_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_prepare_to_segment_eeg() -> Dict:
+    """
+    Write a JSON file that will be read later by a MatLab script I wrote to segment our preprocessed EEG files.
+    """
+    sources = [fname.preprocessed_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.segmenteeg_json]
+
+    data = []
+    for subject in SUBJECTS:
+        data.append(dict(
+            in_name=fname.preprocessed_eeg(subject=subject),
+            in_directory=fname.preprocesseeg_dir,
+            out_directory=fname.segmenteeg_dir,
+        ))
+
+    kwargs = dict(
+        out_path=fname.segmenteeg_json,
+        data=data,
+    )
+
+    return dict(
+        actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
