@@ -139,6 +139,9 @@ fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
 fname.add("preprocesseeg_dir", "{processed_data_dir}/preprocesseeg")
 fname.add("preprocesseeg_json", "{preprocesseeg_dir}/parameters.json")
 
+# task_preprocess_eeg:
+fname.add("preprocessed_eeg", "{preprocesseeg_dir}/sub-{subject}_eeg.set")
+
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
 # 
