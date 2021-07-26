@@ -209,27 +209,25 @@ def task_trim_func_images() -> Dict:
 def task_convert_eeg() -> Dict:
     """
     Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
-    """
-    for subject in SUBJECTS:
-        sources = dict(
-            brainvision_path=fname.brainvision_eeg(subject=subject),
-        )
-        targets = dict(
-            converted_path=fname.converted_eeg(subject=subject),
-        )
-        kwargs = dict(
-            brainvision_dir=fname.brainvision_dir,
-            brainvision_name = Path(sources["brainvision_path"]).name,
-            converted_path = targets["converted_path"],
-            setname = f"sub-{subject}",
-        )
 
-        yield dict(
-            name=subject,
-            actions=[(convert_eeg.main, [], kwargs)],
-            file_dep=list(sources.values()),
-            targets=list(targets.values()),
-        )
+    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    We must convert all subjects in one glorious blaze!
+    Sigh.
+    """
+    sources = [fname.brainvision_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.converted_eeg(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        brainvision_dir=fname.brainvision_dir,
+        brainvision_name = Path(fname.brainvision_eeg(subject=subject)).name,
+        converted_path = fname.converted_eeg(subject=subject),
+        setname = f"sub-{subject}",
+    )
+    return dict(
+        actions=[(convert_eeg.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
