@@ -263,8 +263,9 @@ def task_prepare_to_preprocess_eeg() -> Dict:
     data = []
     for subject in SUBJECTS:
         data.append(dict(
+            subject=subject,
             components_to_remove=COMPONENTS_TO_REMOVE[subject],
-            in_file=fname.converted_eeg(subject=subject),
+            in_file=Path(fname.converted_eeg(subject=subject)).name,
             in_directory=fname.converteeg_dir,
             out_directory=fname.preprocesseeg_dir,
         ))
@@ -276,6 +277,26 @@ def task_prepare_to_preprocess_eeg() -> Dict:
 
     return dict(
         actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_preprocess_eeg() -> Dict:
+    """
+    Preprocess our EEG files.
+
+    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    We must do all subjects in one glorious blaze!
+    Sigh.
+    """
+    sources = [fname.preprocesseeg_json]
+    targets = [fname.preprocessed_eeg(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        path_to_script="preprocess_eegs.m",
+    )
+
+    return dict(
+        actions=[(matlab.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )
