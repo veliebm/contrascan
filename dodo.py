@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Dict, Iterable
 
 # Import internal modules and libraries.
-from config import fname, SUBJECTS, n_jobs
+from config import fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE
 
 # Import tasks
 import create_bids_root
@@ -209,7 +209,7 @@ def task_trim_func_images() -> Dict:
         )
 def task_prepare_to_convert_eeg() -> Dict:
     """
-    Write a JSON file that will be read by our MatLab script.
+    Write a JSON file that will be read later by a MatLab script I wrote to convert EEG files.
     """
     sources = [fname.brainvision_eeg(subject=subject) for subject in SUBJECTS]
     targets = [fname.converteeg_json]
@@ -250,6 +250,32 @@ def task_convert_eeg() -> Dict:
 
     return dict(
         actions=[(matlab.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_prepare_to_preprocess_eeg() -> Dict:
+    """
+    Write a JSON file that will be read later by a MatLab script I wrote to preprocess EEG files.
+    """
+    sources = [fname.converted_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.preprocesseeg_json]
+
+    data = []
+    for subject in SUBJECTS:
+        data.append(dict(
+            components_to_remove=COMPONENTS_TO_REMOVE[subject],
+            in_file=fname.converted_eeg(subject=subject),
+            in_directory=fname.converteeg_dir,
+            out_directory=fname.preprocesseeg_dir,
+        ))
+
+    kwargs = dict(
+        out_path=fname.preprocesseeg_json,
+        data=data,
+    )
+
+    return dict(
+        actions=[(write_json.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )

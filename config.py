@@ -38,6 +38,29 @@ os.environ["OMP_NUM_THREADS"] = str(n_jobs)
 # All subjects for whom our analysis can actually work.
 SUBJECTS = "104 106 107 108 109 110 111 112 113 115 116 117 120 121 122 123 124 125".split()
 
+# Which ICA components to remove for each subject.
+COMPONENTS_TO_REMOVE = {
+    "102": [13],
+    "104": [3, 4, 5, 6],
+    "106": [1, 2, 4, 5, 6],
+    "107": [2, 4, 5],
+    "108": [2, 4, 10],
+    "109": [2, 6, 15],
+    "110": [2, 3, 9],
+    "111": [2],
+    "112": [4],
+    "113": [2, 6, 11, 20, 24],
+    "115": [3, 5, 6, 13, 14],
+    "116": [5, 6, 7, 12],
+    "117": [2, 3, 4, 9],
+    "120": [1, 4, 6, 10],
+    "121": [1, 3, 6, 7, 12, 13],
+    "122": [5, 6, 7, 14, 20, 23],
+    "123": [3, 16, 27],
+    "124": [3, 10, 22],
+    "125": [2, 5, 6, 10],
+    "126": [1, 4, 9, 28]
+}
 
 ###############################################################################
 # Templates for filenames part of our main analysis.
@@ -112,6 +135,9 @@ fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artif
 # task_convert_eeg:
 fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
 
+# task_prepare_to_preprocess_eeg:
+fname.add("preprocesseeg_dir", "{processed_data_dir}/preprocesseeg")
+fname.add("preprocesseeg_json", "{preprocesseeg_dir}/parameters.json")
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
