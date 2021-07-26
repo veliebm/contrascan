@@ -310,7 +310,7 @@ def task_prepare_to_segment_eeg() -> Dict:
     data = []
     for subject in SUBJECTS:
         data.append(dict(
-            in_name=fname.preprocessed_eeg(subject=subject),
+            in_name=Path(fname.preprocessed_eeg(subject=subject)).name,
             in_directory=fname.preprocesseeg_dir,
             out_directory=fname.segmenteeg_dir,
         ))
@@ -322,6 +322,26 @@ def task_prepare_to_segment_eeg() -> Dict:
 
     return dict(
         actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_segment_eeg() -> Dict:
+    """
+    Segment our preprocessed EEG files.
+
+    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    We must do all subjects in one glorious blaze!
+    Sigh.
+    """
+    sources = [fname.segmenteeg_json]
+    targets = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        path_to_script="segment_eegs.m",
+    )
+
+    return dict(
+        actions=[(matlab.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )
