@@ -16,7 +16,7 @@ from config import fname, SUBJECTS, n_jobs
 import create_bids_root
 import bidsify_subject
 import afniproc
-import convert_eeg
+import matlab
 import trim_func_images
 import align
 import resample
@@ -233,7 +233,6 @@ def task_prepare_to_convert_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
-
 def task_convert_eeg() -> Dict:
     """
     Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
@@ -242,13 +241,15 @@ def task_convert_eeg() -> Dict:
     We must convert all subjects in one glorious blaze!
     Sigh.
     """
-    sources = [fname.brainvision_eeg(subject=subject) for subject in SUBJECTS]
+    sources = [fname.converteeg_json]
     targets = [fname.converted_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict()
-    
+    kwargs = dict(
+        path_to_script="convert_eegs.m",
+    )
+
     return dict(
-        actions=[(convert_eeg.main, [], kwargs)],
+        actions=[(matlab.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )
