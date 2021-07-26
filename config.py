@@ -104,10 +104,13 @@ fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
 fname.add("afniproc_onsets", "{afniproc_subject_dir}/onsets.tsv")
 fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
 
-# task_convert_eeg
+# task_prepare_to_convert_eeg:
 fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
-fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
+fname.add("converteeg_json", "{converteeg_dir}/parameters.json")
 fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artifact Correction.vhdr")
+
+# task_convert_eeg:
+fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
 
 
 ###################################################################

@@ -24,6 +24,7 @@ import smooth
 import scale
 import deconvolve
 import ttest_2_groups
+import write_json
 
 # Configuration for the pydoit tool.
 DOIT_CONFIG = dict(
@@ -206,6 +207,33 @@ def task_trim_func_images() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+def task_prepare_to_convert_eeg() -> Dict:
+    """
+    Write a JSON file that will be read by our MatLab script.
+    """
+    sources = [fname.brainvision_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.converteeg_json]
+
+    data = []
+    for subject in SUBJECTS:
+        data.append(dict(
+            brainvision_dir=fname.brainvision_dir,
+            brainvision_name=Path(fname.brainvision_eeg(subject=subject)).name,
+            converted_path=fname.converted_eeg(subject=subject),
+            setname=f"sub-{subject}",
+        ))
+
+    kwargs = dict(
+        out_path=fname.converteeg_json,
+        data=data,
+    )
+
+    return dict(
+        actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+
 def task_convert_eeg() -> Dict:
     """
     Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
@@ -217,12 +245,8 @@ def task_convert_eeg() -> Dict:
     sources = [fname.brainvision_eeg(subject=subject) for subject in SUBJECTS]
     targets = [fname.converted_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        brainvision_dir=fname.brainvision_dir,
-        brainvision_name = Path(fname.brainvision_eeg(subject=subject)).name,
-        converted_path = fname.converted_eeg(subject=subject),
-        setname = f"sub-{subject}",
-    )
+    kwargs = dict()
+    
     return dict(
         actions=[(convert_eeg.main, [], kwargs)],
         file_dep=sources,
