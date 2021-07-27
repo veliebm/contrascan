@@ -160,6 +160,10 @@ fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 fname.add("movingmovingwindoweeg_dir", "{processed_data_dir}/movingmovingwindoweeg")
 fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.json")
 
+# task_moving_moving_window_eeg:
+fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.amp.at")
+
+
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
 # 

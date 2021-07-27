@@ -410,10 +410,11 @@ def task_prepare_to_moving_moving_window_eeg() -> Dict:
 
     data = []
     for subject in SUBJECTS:
+        out_path = Path(fname.moving_moving_windowed_eeg(subject=subject))
         data.append(dict(
-            subject=subject,
             in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
             in_dir=fname.trimeeg_dir,
+            out_stem=str(out_path.parent / out_path.stem),
         ))
 
     kwargs = dict(
@@ -423,6 +424,26 @@ def task_prepare_to_moving_moving_window_eeg() -> Dict:
 
     return dict(
         actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_moving_moving_window_eeg() -> Dict:
+    """
+    Run a moving moving window analysis on our trimmed, preprocessed EEG files.
+
+    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    We must do all subjects in one glorious blaze!
+    Sigh.
+    """
+    sources = [fname.movingmovingwindoweeg_json]
+    targets = [fname.moving_moving_windowed_eeg(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        path_to_script="moving_moving_window_eegs.m",
+    )
+
+    return dict(
+        actions=[(matlab.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )
