@@ -162,6 +162,7 @@ fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.
 
 # task_moving_moving_window_eeg:
 fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.amp.at")
+fname.add("out_tsv_name", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.tsv")
 
 
 ###################################################################

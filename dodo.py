@@ -415,6 +415,7 @@ def task_prepare_to_moving_moving_window_eeg() -> Dict:
             in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
             in_dir=fname.trimeeg_dir,
             out_stem=str(out_path.parent / out_path.name.split(".")[0]),
+            out_tsv_name=fname.out_tsv_name(subject=subject),
         ))
 
     kwargs = dict(
