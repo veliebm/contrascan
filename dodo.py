@@ -38,6 +38,7 @@ DOIT_CONFIG = dict(
     sort='definition',
 )
 
+
 # Tasks to run our analysis.
 def task_check() -> Dict:
     """Check the system dependencies."""
@@ -357,7 +358,7 @@ def task_prepare_to_trim_eeg() -> Dict:
     for subject in SUBJECTS:
         data.append(dict(
             subject=subject,
-            time_delta=0,
+            time_delta=8,
             in_filename=Path(fname.preprocessed_eeg(subject=subject)).name,
             in_dir=fname.preprocesseeg_dir,
             out_dir=fname.trimeeg_dir,
@@ -393,6 +394,7 @@ def task_trim_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
@@ -603,6 +605,7 @@ def task_ttest_fmriprep_vs_afniproc() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+
 
 # Helper functions.
 def _print_paths(paths: Iterable, name: str=None) -> None:
