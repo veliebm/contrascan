@@ -39,7 +39,7 @@ DOIT_CONFIG = dict(
 )
 
 
-# Tasks to run our analysis.
+# General tasks.
 def task_check() -> Dict:
     """Check the system dependencies."""
     return dict(
@@ -89,6 +89,9 @@ def task_bidsify_subject() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+
+
+# fMRI-only tasks.
 def task_afniproc() -> Dict:
     """
     Run afni_proc.py to preprocess and deconvolve our subjects.
@@ -208,6 +211,9 @@ def task_trim_func_images() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
+
+
+# EEG-only tasks.
 def task_prepare_to_convert_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script I wrote to convert EEG files.
@@ -358,7 +364,7 @@ def task_prepare_to_trim_eeg() -> Dict:
     for subject in SUBJECTS:
         data.append(dict(
             subject=subject,
-            time_delta=8,
+            time_delta=-8,
             in_filename=Path(fname.preprocessed_eeg(subject=subject)).name,
             in_dir=fname.preprocesseeg_dir,
             out_dir=fname.trimeeg_dir,
