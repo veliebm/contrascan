@@ -358,7 +358,7 @@ def task_prepare_to_trim_eeg() -> Dict:
         data.append(dict(
             subject=subject,
             time_delta=0,
-            in_filename=fname.preprocessed_eeg(subject=subject),
+            in_filename=Path(fname.preprocessed_eeg(subject=subject)).name,
             in_dir=fname.preprocesseeg_dir,
             out_dir=fname.trimeeg_dir,
         ))
@@ -370,6 +370,26 @@ def task_prepare_to_trim_eeg() -> Dict:
 
     return dict(
         actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_trim_eeg() -> Dict:
+    """
+    Trim our preprocessed EEG files to the time at which the fMRI turned on.
+
+    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    We must do all subjects in one glorious blaze!
+    Sigh.
+    """
+    sources = [fname.trimeeg_json]
+    targets = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        path_to_script="trim_eegs.m",
+    )
+
+    return dict(
+        actions=[(matlab.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )

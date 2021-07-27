@@ -153,6 +153,9 @@ fname.add("segmented_eeg", "{segmenteeg_dir}/sub-{subject}_eeg.set")
 fname.add("trimeeg_dir", "{processed_data_dir}/trimeeg")
 fname.add("trimeeg_json", "{trimeeg_dir}/parameters.json")
 
+# task_segment_eeg:
+fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
+
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
 # 
