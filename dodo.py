@@ -345,6 +345,34 @@ def task_segment_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_prepare_to_trim_eeg() -> Dict:
+    """
+    Write a JSON file that will be read later by a MatLab script I wrote to trim our 
+    preprocessed EEG files to the time at which the fMRI turned on.
+    """
+    sources = [fname.preprocessed_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.trimeeg_json]
+
+    data = []
+    for subject in SUBJECTS:
+        data.append(dict(
+            subject=subject,
+            time_delta=0,
+            in_filename=fname.preprocessed_eeg(subject=subject),
+            in_dir=fname.preprocesseeg_dir,
+            out_dir=fname.trimeeg_dir,
+        ))
+
+    kwargs = dict(
+        out_path=fname.trimeeg_json,
+        data=data,
+    )
+
+    return dict(
+        actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
