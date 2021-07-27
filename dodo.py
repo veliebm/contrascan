@@ -400,6 +400,32 @@ def task_trim_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_prepare_to_moving_moving_window_eeg() -> Dict:
+    """
+    Write a JSON file that will be read later by a MatLab script we wrote to run
+    a moving moving window analysis. Welcome to the cutting edge!
+    """
+    sources = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.movingmovingwindoweeg_json]
+
+    data = []
+    for subject in SUBJECTS:
+        data.append(dict(
+            subject=subject,
+            in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
+            in_dir=fname.trimeeg_dir,
+        ))
+
+    kwargs = dict(
+        out_path=fname.movingmovingwindoweeg_json,
+        data=data,
+    )
+
+    return dict(
+        actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 
 # Tasks to test afniproc vs fmriprep.
