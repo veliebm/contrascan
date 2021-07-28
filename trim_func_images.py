@@ -8,7 +8,6 @@ Created on 7/6/2021 by Ben Velie.
 
 # Standard Python modules.
 from os import PathLike
-from pathlib import Path
 import subprocess
 
 def main(onsets_path: PathLike, func_path: PathLike, out_prefix: PathLike) -> None:
@@ -17,6 +16,13 @@ def main(onsets_path: PathLike, func_path: PathLike, out_prefix: PathLike) -> No
     """
     new_start_volume = _get_volume(_get_start_time(onsets_path))
 
+    truncate_volumes(func_path, new_start_volume, out_prefix)
+
+
+def main2(new_start_volume: int, func_path: PathLike, out_prefix: PathLike) -> None:
+    """
+    Truncate our images! But this time, using a start volume rather than adjusting the image to some onsets.
+    """
     truncate_volumes(func_path, new_start_volume, out_prefix)
 
 
@@ -37,7 +43,7 @@ def _get_volume(time_in_seconds: float) -> int:
     return int((time_in_seconds - time_in_seconds % 2) / 2)
 
 
-def truncate_volumes(func_path: PathLike, new_start_volume: int, out_prefix: PathLike) -> Path:
+def truncate_volumes(func_path: PathLike, new_start_volume: int, out_prefix: PathLike):
     """
     Removes volumes from the beginning of a 4D image. Returns the path to the .HEAD outfile.
     """

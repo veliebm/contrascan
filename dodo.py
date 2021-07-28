@@ -450,6 +450,35 @@ def task_moving_moving_window_eeg() -> Dict:
     )
 
 
+# fMRI/EEG correlation tasks.
+def task_trim_func_images_again() -> Dict:
+    """
+    Trim func images one last time so we can correlate the BOLD response with EEG signal.
+    """
+    for subject in SUBJECTS:
+
+        sources = [fname.trimmed_func(subject=subject)]
+
+        for volumes_to_remove in range(1, 4):
+
+            targets = [
+                fname.final_func(subject=subject, start_volume=volumes_to_remove),
+            ]
+
+            kwargs = dict(
+                new_start_volume=volumes_to_remove,
+                func_path=fname.trimmed_func(subject=subject),
+                out_prefix=get_prefix(fname.final_func(subject=subject, start_volume=volumes_to_remove)),
+            )
+
+            yield dict(
+                name=f"sub-{subject}_startvolume-{volumes_to_remove}",
+                actions=[(trim_func_images.main2, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
+
+
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
     """
