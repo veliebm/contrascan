@@ -25,6 +25,7 @@ import scale
 import deconvolve
 import ttest_2_groups
 import write_json
+import correlate_eeg_fmri
 
 # Configuration for the pydoit tool.
 DOIT_CONFIG = dict(
@@ -477,7 +478,33 @@ def task_trim_func_images_again() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_correlate_eeg_fmri() -> Dict:
+    """
+    This is it! Huzzah! Correlate our EEG and fMRI data across the whole brain.
+    """
+    for subject in SUBJECTS:
+        for start_volume in range(1, 4):
 
+            sources = [
+                fname.final_func(subject=subject, start_volume=start_volume),
+                fname.out_tsv_name(subject=subject),
+            ]
+            targets = [
+                fname.correlation_image(subject=subject, start_volume=start_volume),
+            ]
+
+            kwargs = dict(
+                in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
+                in_eeg_path=fname.out_tsv_name(subject=subject),
+                out_image_path=fname.correlation_image(subject=subject, start_volume=start_volume),
+            )
+
+            yield dict(
+                name=f"sub-{subject}_startvolume-{start_volume}",
+                actions=[(correlate_eeg_fmri.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:

@@ -168,6 +168,10 @@ fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.
 fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.amp.at")
 fname.add("out_tsv_name", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.tsv")
 
+# task_correlate_eeg_fmri:
+fname.add("correlation_dir", "{processed_data_dir}/eeg_fmri_correlation")
+fname.add("correlation_image", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_correlation.nii")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
