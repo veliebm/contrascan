@@ -26,6 +26,7 @@ import deconvolve
 import ttest_2_groups
 import write_json
 import correlate_eeg_fmri
+import ttest
 
 # Configuration for the pydoit tool.
 DOIT_CONFIG = dict(
@@ -192,25 +193,25 @@ def task_trim_func_images() -> Dict:
     We got the stimulus presentation times from the afniproc results.
     """
     for subject in SUBJECTS:
-        sources = dict(
-            onsets=fname.afniproc_onsets(subject=subject),
-            func=fname.afniproc_func(subject=subject),
-        )
-        targets = dict(
-            trimmed_func=fname.trimmed_func(subject=subject)
-        )
+        sources = [
+            fname.afniproc_onsets(subject=subject),
+            fname.resampled_func(subject=subject),
+        ]
+        targets = [
+            fname.trimmed_func(subject=subject),
+        ]
 
         kwargs = dict(
-            onsets_path=sources["onsets"],
-            func_path=sources["func"],
-            out_prefix="".join(targets["trimmed_func"].split("+")[:-1]),
+            onsets_path=fname.afniproc_onsets(subject=subject),
+            func_path=fname.resampled_func(subject=subject),
+            out_prefix=get_prefix(fname.trimmed_func(subject=subject)),
         )
 
         yield dict(
             name=subject,
             actions=[(trim_func_images.main, [], kwargs)],
-            file_dep=list(sources.values()),
-            targets=list(targets.values()),
+            file_dep=sources,
+            targets=targets,
         )
 
 
@@ -505,6 +506,26 @@ def task_correlate_eeg_fmri() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_ttest_eeg_fmri_correlations() -> Dict:
+    """
+    ttest the correlations we calculated.
+    """
+    for start_volume in range(1, 4):
+        sources = [fname.correlation_image(subject=subject, start_volume=start_volume) for subject in SUBJECTS]
+        targets = [fname.correlations_ttest(start_volume=start_volume)]
+
+        kwargs = dict(
+            images=[fname.correlation_image(subject=subject, start_volume=start_volume) for subject in SUBJECTS],
+            prefix=get_prefix(fname.correlations_ttest(start_volume=start_volume)),
+        )
+
+        yield dict(
+            name=f"startvolume-{start_volume}",
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
