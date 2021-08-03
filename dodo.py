@@ -450,6 +450,30 @@ def task_moving_moving_window_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_prepare_to_freqtag_eeg() -> Dict:
+    """
+    Write a JSON file that will be read later by a MatLab script we wrote to run a frequency tagging analysis.
+    """
+    sources = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
+    targets = [fname.freqtageeg_json]
+
+    data = []
+    for subject in SUBJECTS:
+        data.append(dict(
+            in_eeg_name=Path(fname.segmented_eeg(subject=subject)).name,
+            in_eeg_dir=fname.segmenteeg_dir,
+        ))
+
+    kwargs = dict(
+        out_path=fname.freqtageeg_json,
+        data=data,
+    )
+
+    return dict(
+        actions=[(write_json.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 
 # fMRI/EEG correlation tasks.
