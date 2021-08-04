@@ -10,7 +10,7 @@ from os import PathLike
 import subprocess
 from pathlib import Path
 
-def main(image: PathLike, prefix: PathLike) -> None:
+def main(image: PathLike, fwhm: str, prefix: PathLike) -> None:
     """
     Smooth an image.
 
@@ -21,7 +21,7 @@ def main(image: PathLike, prefix: PathLike) -> None:
     
     args = f"""
         3dmerge
-        -1blur_fwhm 4.0
+        -1blur_fwhm {fwhm}
         -doall
         -prefix {prefix}
         {image}
