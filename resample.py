@@ -10,7 +10,7 @@ from os import PathLike
 import subprocess
 from pathlib import Path
 
-def main2(from_image: PathLike, to_image: PathLike, to_prefix: PathLike) -> None:
+def main(from_image: PathLike, to_image: PathLike, to_prefix: PathLike) -> None:
     """
     Resample an image to another image.
     """

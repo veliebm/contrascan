@@ -201,7 +201,7 @@ def task_resample_func_images() -> Dict:
 
         yield dict(
             name=subject,
-            actions=[(resample.main2, [], kwargs)],
+            actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
