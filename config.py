@@ -22,7 +22,7 @@ host = getfqdn()  # Hostname of the machine running the scripts
 if user == "csea":
     # CSEA desktop
     raw_data_dir = "./data"
-    n_jobs = 2  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
+    n_jobs = 4  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
 else:
     # Defaults
     raw_data_dir = "./data"
@@ -117,6 +117,9 @@ fname.add("afniproc_preprocessed_func", "{afniproc_subject_dir}/{subject}.result
 fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
 fname.add("alignment_dir", "{processed_data_dir}/alignment")
 fname.add("aligned_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}_aligned+tlrc.HEAD")
+
+# task_resample_template
+fname.add("resampled_template", "{processed_data_dir}/resampled_kastner/MNI152_T1_1mm_resampled+tlrc.HEAD")
 
 # task_resample_func_images:
 fname.add("resampled_func", "{processed_data_dir}/resample/sub-{subject}_func_resampled+tlrc.HEAD")

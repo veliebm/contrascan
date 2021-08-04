@@ -160,13 +160,33 @@ def task_align_func_images() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_resample_template() -> Dict:
+    """
+    The Kastner template is WAY too fine-grain. Smooth smooth smooth!
+    """
+    sources = [fname.atlas_template]
+    targets = [fname.resampled_template]
+
+    kwargs = dict(
+        from_image=fname.atlas_template,
+        to_prefix=get_prefix(fname.resampled_template),
+        dx="2.5",
+        dy="2.5",
+        dz="2.5",
+    )
+
+    return dict(
+        actions=[(resample.main2, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 def task_resample_func_images() -> Dict:
     """
     Resample our afniproc func images to the space of the Kastner cortex masks.
     """
     for subject in SUBJECTS:
         sources = [
-            fname.atlas_template,
+            fname.resampled_template,
             fname.aligned_func(subject=subject)
         ]
         targets = [
@@ -175,13 +195,13 @@ def task_resample_func_images() -> Dict:
 
         kwargs = dict(
             from_image=fname.aligned_func(subject=subject),
-            to_image=fname.atlas_template,
+            to_image=fname.resampled_template,
             to_prefix=get_prefix(fname.resampled_func(subject=subject)),
         )
 
         yield dict(
             name=subject,
-            actions=[(resample.main, [], kwargs)],
+            actions=[(resample.main2, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
@@ -588,7 +608,7 @@ def task_resample_afniproc_irfs() -> Dict:
     """
     for subject in SUBJECTS:
         sources = [
-            fname.atlas_template,
+            fname.resampled_template,
             fname.afniproc_aligned_irf(subject=subject)
         ]
         targets = [
@@ -597,13 +617,13 @@ def task_resample_afniproc_irfs() -> Dict:
 
         kwargs = dict(
             from_image=fname.afniproc_aligned_irf(subject=subject),
-            to_image=fname.atlas_template,
+            to_image=fname.resampled_template,
             to_prefix=get_prefix(fname.afniproc_resampled_irf(subject=subject)),
         )
 
         yield dict(
             name=subject,
-            actions=[(resample.main, [], kwargs)],
+            actions=[(resample.main2, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
@@ -622,6 +642,7 @@ def task_smooth_fmriprep() -> Dict:
 
         kwargs = dict(
             image=fname.fmriprep_func(subject=subject),
+            fwhm="4.0",
             prefix=get_prefix(fname.fmriprep_smoothed(subject=subject)),
         )
 
@@ -719,7 +740,7 @@ def task_resample_fmriprep_irfs() -> Dict:
     """
     for subject in SUBJECTS:
         sources = [
-            fname.atlas_template,
+            fname.resampled_template,
             fname.fmriprep_aligned_irf(subject=subject)
         ]
         targets = [
@@ -728,13 +749,13 @@ def task_resample_fmriprep_irfs() -> Dict:
 
         kwargs = dict(
             from_image=fname.fmriprep_aligned_irf(subject=subject),
-            to_image=fname.atlas_template,
+            to_image=fname.resampled_template,
             to_prefix=get_prefix(fname.fmriprep_resampled_irf(subject=subject)),
         )
 
         yield dict(
             name=subject,
-            actions=[(resample.main, [], kwargs)],
+            actions=[(resample.main2, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
