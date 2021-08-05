@@ -83,23 +83,3 @@ def get_all_amplitudes(eeg_amplitudes_path: PathLike) -> pandas.DataFrame:
     all_amplitudes.index *= 2
 
     return all_amplitudes
-
-
-def get_subject_info() -> Dict:
-    """
-    Parses the subject info YAML file and sorts it into usable data.
-    """
-    # Read the YAML file.
-    yaml_dict  = read_yaml("subjects.yaml")
-    subjects = []
-
-    # Attach to each subject her data.
-    for subject_id in yaml_dict["subjects"]:
-        record = {
-            "id": subject_id,
-            "func_path": Path(yaml_dict["fmri_images"].replace("{id}", str(subject_id))), # Replace {id} in the template path with the subject's ID.
-            "eeg_amplitudes_path": Path(yaml_dict["eeg_amplitudes"].replace("{id}", str(subject_id)))
-        }
-        subjects.append(record)
-
-    return subjects
