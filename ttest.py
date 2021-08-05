@@ -14,7 +14,7 @@ def main(images: List[PathLike], prefix: PathLike) -> None:
     """
     Runs 3dttest++ on 2 sets of images.
     """
-    args = f"3dttest++ -paired -prefix {prefix}".split()
+    args = f"3dttest++ -zskip 100% -prefix {prefix}".split()
     args += ["-setA"] + [f"{path}" for path in images]
 
     subprocess.run(args)

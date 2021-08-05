@@ -14,7 +14,7 @@ def main(list_a: List[PathLike], list_b: List[PathLike], prefix: PathLike) -> No
     """
     Runs 3dttest++ on 2 sets of images.
     """
-    args = f"3dttest++ -paired -prefix {prefix}".split()
+    args = f"3dttest++ -paired -zskip 100% -prefix {prefix}".split()
     args += ["-setA"] + [f"{path}" for path in list_a]
     args += ["-setB"] + [f"{path}" for path in list_b]
 
