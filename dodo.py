@@ -623,7 +623,7 @@ def task_resample_afniproc_irfs() -> Dict:
 
         yield dict(
             name=subject,
-            actions=[(resample.main2, [], kwargs)],
+            actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
@@ -755,7 +755,7 @@ def task_resample_fmriprep_irfs() -> Dict:
 
         yield dict(
             name=subject,
-            actions=[(resample.main2, [], kwargs)],
+            actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
         )
