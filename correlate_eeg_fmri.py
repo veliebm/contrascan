@@ -65,7 +65,7 @@ def convert_to_dataframe(func_image: nibabel.brikhead.AFNIImage, trim_volumes: i
     trimmed_func = func_image.dataobj[:,:,:,:trim_volumes]
 
     future_dataframe = {}
-    x_length, y_length, z_length, t_length = trimmed_func.shape
+    x_length, y_length, z_length, __ = trimmed_func.shape
     for x in range(x_length):
         for y in range(y_length):
             for z in range(z_length):
@@ -81,6 +81,5 @@ def get_all_amplitudes(eeg_amplitudes_path: PathLike) -> pandas.DataFrame:
     """
     all_amplitudes = pandas.read_csv(eeg_amplitudes_path, sep="\t", header=None).T
     all_amplitudes.columns += 1     # Make the channel numbers correspond to the MatLab channel numbers
-    all_amplitudes.index *= 2
 
     return all_amplitudes
