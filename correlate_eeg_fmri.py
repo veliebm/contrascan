@@ -8,7 +8,7 @@ Created 7/28/2021 by Ben Velie, veliebm@ufl.edu
 """
 # Import external libraries and modules.
 from os import PathLike
-from typing import Dict, Iterable
+from typing import Iterable
 from pathlib import Path
 import pandas
 import nibabel
@@ -21,7 +21,8 @@ def main(in_image_path: PathLike, in_eeg_path: PathLike, out_image_path: PathLik
 
     The Oz electrode is number 20 in MatLab.
     """
-    amplitudes = get_all_amplitudes(in_eeg_path)[20]
+    all_amplitudes = get_all_amplitudes(in_eeg_path)
+    amplitudes = all_amplitudes[20]
     func_image = nibabel.load(in_image_path)
     Path(out_image_path).parent.mkdir(exist_ok=True, parents=True)
     correlate_subject(func_image, amplitudes, out_image_path)
