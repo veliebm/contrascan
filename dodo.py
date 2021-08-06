@@ -534,6 +534,23 @@ def task_mean_mean_fft() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_mean_mean_hilbert() -> Dict:
+    """
+    Average the mean hilbert calculated for each subject. But this time, across ALL subjects!
+    """
+    sources = [fname.out_hilbert_path(subject=subject) for subject in SUBJECTS]
+    targets = [fname.mean_mean_hilbert]
+
+    kwargs = dict(
+        in_tsvs=[fname.out_hilbert_path(subject=subject) for subject in SUBJECTS],
+        out_tsv=fname.mean_mean_hilbert,
+    )
+
+    return dict(
+        actions=[(average_freqtags.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 
 # fMRI/EEG correlation tasks.
