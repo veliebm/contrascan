@@ -25,6 +25,7 @@ def main(in_image_path: PathLike, in_eeg_path: PathLike, out_image_path: PathLik
     amplitudes = all_amplitudes[20]
     func_image = nibabel.load(in_image_path)
     Path(out_image_path).parent.mkdir(exist_ok=True, parents=True)
+
     correlate_subject(func_image, amplitudes, out_image_path)
 
 
@@ -36,8 +37,9 @@ def correlate_subject(func_image: nibabel.brikhead.AFNIImage, data_to_correlate:
     """
 
     # Get func image as dataframe. Trim so it's the same length as our EEG time series. Keys = coordinates, values = series.
-    print(f"Building dataframe")
+    print(f"Converting func image into a DataFrame")
     func_dataframe = convert_to_dataframe(func_image, trim_volumes=len(data_to_correlate))
+    print(func_dataframe)
 
     # For each voxel, record correlation value.
     print("Running Spearman correlation")
@@ -79,7 +81,13 @@ def get_all_amplitudes(eeg_amplitudes_path: PathLike) -> pandas.DataFrame:
     """
     Returns the column of amplitudes for a channel from an eeg amplitudes tsv file.
     """
-    all_amplitudes = pandas.read_csv(eeg_amplitudes_path, sep="\t", header=None).T
+    all_amplitudes = pandas.read_table(
+        eeg_amplitudes_path,
+        sep="\t",
+        header=None,
+        index_col=False,
+    ).T
+    
     all_amplitudes.columns += 1     # Make the channel numbers correspond to the MatLab channel numbers
 
     return all_amplitudes
