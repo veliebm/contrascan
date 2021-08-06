@@ -496,6 +496,26 @@ def task_prepare_to_freqtag_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_freqtag_eeg() -> Dict:
+    """
+    Run a frequency tagging analysis!
+
+    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    We must do all subjects in one glorious blaze!
+    """
+    sources = [fname.freqtageeg_json]
+    targets = [fname.out_fft_path(subject=subject) for subject in SUBJECTS]
+    targets += [fname.out_hilbert_path(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        path_to_script="freqtag_pipeline.m",
+    )
+
+    return dict(
+        actions=[(matlab.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 
 # fMRI/EEG correlation tasks.
