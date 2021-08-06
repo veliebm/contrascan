@@ -169,6 +169,12 @@ fname.add("freqtageeg_json", "{freqtageeg_dir}/parameters.json")
 fname.add("out_fft_path", "{freqtageeg_dir}/sub-{subject}_mean_FFT.tsv")
 fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_mean_hilbert.tsv")
 
+# task_mean_mean_fft:
+fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/mean_mean_FFT.tsv")
+
+# task_mean_mean_hilbert:
+fname.add("mean_mean_hilbert", "{processed_data_dir}/mean_mean_hilbert/mean_mean_hilbert.tsv")
+
 # task_prepare_to_moving_moving_window_eeg:
 fname.add("movingmovingwindoweeg_dir", "{processed_data_dir}/movingmovingwindoweeg")
 fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.json")

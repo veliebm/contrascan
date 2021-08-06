@@ -27,6 +27,7 @@ import ttest_2_groups
 import write_json
 import correlate_eeg_fmri
 import ttest
+import average_freqtags
 
 # Configuration for the pydoit tool.
 DOIT_CONFIG = dict(
@@ -513,6 +514,23 @@ def task_freqtag_eeg() -> Dict:
 
     return dict(
         actions=[(matlab.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_mean_mean_fft() -> Dict:
+    """
+    Average the mean FFT calculated for each subject. But this time, across ALL subjects!
+    """
+    sources = [fname.out_fft_path(subject=subject) for subject in SUBJECTS]
+    targets = [fname.mean_mean_fft]
+
+    kwargs = dict(
+        in_tsvs=[fname.out_fft_path(subject=subject) for subject in SUBJECTS],
+        out_tsv=fname.mean_mean_fft,
+    )
+
+    return dict(
+        actions=[(average_freqtags.main, [], kwargs)],
         file_dep=sources,
         targets=targets,
     )
