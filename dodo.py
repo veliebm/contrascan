@@ -482,6 +482,8 @@ def task_prepare_to_freqtag_eeg() -> Dict:
         data.append(dict(
             in_eeg_name=Path(fname.segmented_eeg(subject=subject)).name,
             in_eeg_dir=fname.segmenteeg_dir,
+            out_fft_path=fname.out_fft_path(subject=subject),
+            out_hilbert_path=fname.out_hilbert_path(subject=subject),
         ))
 
     kwargs = dict(
