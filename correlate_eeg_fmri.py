@@ -39,7 +39,6 @@ def correlate_subject(func_image: nibabel.brikhead.AFNIImage, data_to_correlate:
     # Get func image as dataframe. Trim so it's the same length as our EEG time series. Keys = coordinates, values = series.
     print(f"Converting func image into a DataFrame")
     func_dataframe = convert_to_dataframe(func_image, trim_volumes=len(data_to_correlate))
-    print(func_dataframe)
 
     # For each voxel, record correlation value.
     print("Running Spearman correlation")
