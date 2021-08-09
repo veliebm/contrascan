@@ -191,6 +191,12 @@ fname.add("correlation_image", "{correlation_dir}/sub-{subject}_startvolume-{sta
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlations_ttest")
 fname.add("correlations_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
 
+# task_get_occipital_mask:
+fname.add("kastner_mask_dir", "{raw_data_dir}/misc/kastner_cortex_masks/subj_vol_all")
+fname.add("kastner_mask", "{kastner_mask_dir}/perc_VTPM_vol_roi{roi_number}_{hemisphere}h.nii.gz")
+fname.add("masks_dir", "{processed_data_dir}/masks")
+fname.add("occipital_pole_mask", "{masks_dir}/occipital_pole+tlrc.HEAD")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.

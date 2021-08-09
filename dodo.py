@@ -28,6 +28,8 @@ import write_json
 import correlate_eeg_fmri
 import ttest
 import average_freqtags
+import combine_masks
+
 
 # Configuration for the pydoit tool.
 DOIT_CONFIG = dict(
@@ -626,6 +628,28 @@ def task_ttest_eeg_fmri_correlations() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_get_occipital_mask() -> Dict:
+    """
+    Combine 2 Kastner masks to get 1 occipital pole mask. Now that's a steal!
+
+    Specifically, combines Kastner V2d and V3d.
+    """
+    sources = []
+    for hemisphere in "lr":
+        for roi_number in [4, 6]:
+            sources.append(fname.kastner_mask(roi_number=roi_number, hemisphere=hemisphere))
+    
+    targets = [fname.occipital_pole_mask]
+    
+    kwargs = dict(
+        in_masks=sources,
+        out_prefix=get_prefix(fname.occipital_pole_mask),
+    )
+    return dict(
+        actions=[(combine_masks.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
 
 
 # Tasks to test afniproc vs fmriprep.
