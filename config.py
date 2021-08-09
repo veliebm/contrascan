@@ -197,6 +197,9 @@ fname.add("kastner_mask", "{kastner_mask_dir}/perc_VTPM_vol_roi{roi_number}_{hem
 fname.add("masks_dir", "{processed_data_dir}/masks")
 fname.add("occipital_pole_mask", "{masks_dir}/occipital_pole+tlrc.HEAD")
 
+# task_get_calcarine_mask:
+fname.add("calcarine_mask", "{masks_dir}/calcarine+tlrc.HEAD")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.

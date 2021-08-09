@@ -630,9 +630,9 @@ def task_ttest_eeg_fmri_correlations() -> Dict:
         )
 def task_get_occipital_mask() -> Dict:
     """
-    Combine 2 Kastner masks to get 1 occipital pole mask. Now that's a steal!
+    Combine 4 Kastner masks to get 1 occipital pole mask. Now that's a steal!
 
-    Specifically, combines Kastner V2d and V3d.
+    Specifically, combines Kastner V2d and V3d L/R.
     """
     sources = []
     for hemisphere in "lr":
@@ -644,6 +644,27 @@ def task_get_occipital_mask() -> Dict:
     kwargs = dict(
         in_masks=sources,
         out_prefix=get_prefix(fname.occipital_pole_mask),
+    )
+    return dict(
+        actions=[(combine_masks.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_get_calcarine_mask() -> Dict:
+    """
+    Combine 2 Kastner masks to get 1 calcarine mask. Now that's a steal!
+
+    Specifically, combines Kastner V1v L/R.
+    """
+    sources = []
+    for hemisphere in "lr":
+        sources.append(fname.kastner_mask(roi_number=1, hemisphere=hemisphere))
+    
+    targets = [fname.calcarine_mask]
+    
+    kwargs = dict(
+        in_masks=sources,
+        out_prefix=get_prefix(fname.calcarine_mask),
     )
     return dict(
         actions=[(combine_masks.main, [], kwargs)],
