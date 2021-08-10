@@ -200,6 +200,9 @@ fname.add("occipital_pole_mask", "{masks_dir}/occipital_pole+tlrc.HEAD")
 # task_get_calcarine_mask:
 fname.add("calcarine_mask", "{masks_dir}/calcarine+tlrc.HEAD")
 
+# task_apply_masks:
+fname.add("correlations_ttest_masked", "{correlations_ttest_dir}/startvolume-{start_volume}_masked-{mask}_correlations_ttest+tlrc.HEAD")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.

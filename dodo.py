@@ -29,6 +29,7 @@ import correlate_eeg_fmri
 import ttest
 import average_freqtags
 import combine_masks
+import apply_mask
 
 
 # Configuration for the pydoit tool.
@@ -671,6 +672,34 @@ def task_get_calcarine_mask() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_apply_masks() -> Dict:
+    """
+    Apply masks to our correlation results.
+    """
+    masks = [
+        dict(name="calcarine", path=fname.calcarine_mask),
+        dict(name="occipital", path=fname.occipital_pole_mask),
+    ]
+
+    for start_volume in range(1, 4):
+        for mask in masks:
+            sources = [fname.correlations_ttest(start_volume=start_volume)]
+            sources += mask["path"]
+
+            targets = [fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"])]
+
+            kwargs = dict(
+                in_image=fname.correlations_ttest(start_volume=start_volume),
+                in_mask=mask["path"],
+                out_prefix=fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"]),
+            )
+
+            yield dict(
+                name=f"startvolume-{start_volume}_mask-{mask['name']}",
+                actions=[(apply_mask.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
 
 
 # Tasks to test afniproc vs fmriprep.
