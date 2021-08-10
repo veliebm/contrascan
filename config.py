@@ -200,6 +200,9 @@ fname.add("occipital_pole_mask", "{masks_dir}/occipital_pole+tlrc.HEAD")
 # task_get_calcarine_mask:
 fname.add("calcarine_mask", "{masks_dir}/calcarine+tlrc.HEAD")
 
+# task_resample_masks:
+fname.add("resampled_mask", "{processed_data_dir}/masks_resampled/mask-{mask}_resampled+tlrc.HEAD")
+
 # task_apply_masks:
 fname.add("correlations_ttest_masked", "{correlations_ttest_dir}/startvolume-{start_volume}_masked-{mask}_correlations_ttest+tlrc.HEAD")
 

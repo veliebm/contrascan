@@ -672,26 +672,56 @@ def task_get_calcarine_mask() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_resample_masks() -> Dict:
+    """
+    Resample our masks so we may apply them to our correlation results.
+    """
+    masks = [
+        dict(name="calcarine", in_path=fname.calcarine_mask, out_path=fname.resampled_mask(mask="calcarine")),
+        dict(name="occipital", in_path=fname.occipital_pole_mask, out_path=fname.resampled_mask(mask="occipital")),
+    ]
+
+    for mask in masks:
+
+        sources = [
+            mask["in_path"],
+            fname.resampled_template,
+        ]
+        targets = [mask["out_path"]]
+
+
+        kwargs = dict(
+            from_image=mask["in_path"],
+            to_image=fname.resampled_template,
+            to_prefix=get_prefix(mask["out_path"]),
+        )
+
+        yield dict(
+            name=mask["name"],
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 def task_apply_masks() -> Dict:
     """
     Apply masks to our correlation results.
     """
     masks = [
-        dict(name="calcarine", path=fname.calcarine_mask),
-        dict(name="occipital", path=fname.occipital_pole_mask),
+        dict(name="calcarine", in_path=fname.resampled_mask(mask="calcarine")),
+        dict(name="occipital", in_path=fname.resampled_mask(mask="occipital")),
     ]
 
     for start_volume in range(1, 4):
         for mask in masks:
             sources = [fname.correlations_ttest(start_volume=start_volume)]
-            sources += mask["path"]
+            sources += [mask["in_path"]]
 
             targets = [fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"])]
 
             kwargs = dict(
                 in_image=fname.correlations_ttest(start_volume=start_volume),
-                in_mask=mask["path"],
-                out_prefix=fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"]),
+                in_mask=mask["in_path"],
+                out_prefix=get_prefix(fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"])),
             )
 
             yield dict(
