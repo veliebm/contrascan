@@ -113,6 +113,12 @@ fname.add("afniproc_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{
 fname.add("afniproc_anat", "{afniproc_subject_dir}/{subject}.results/anat_final.{subject}+tlrc.HEAD")
 fname.add("afniproc_preprocessed_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
 
+# task_resample_deconvolutions:
+fname.add("afniproc_deconvolved_resampled", "{afniproc_subject_dir}/{subject}.results/stats.{subject}_resampled+tlrc.HEAD")
+
+# task_ttest_deconvolutions:
+fname.add("afniproc_ttest_result", "{processed_data_dir}/afniproc_ttests/subbrick-{subbrick}+tlrc.HEAD")
+
 # task_align_func_images:
 fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
 fname.add("alignment_dir", "{processed_data_dir}/alignment")

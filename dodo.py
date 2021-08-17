@@ -237,6 +237,49 @@ def task_trim_func_images() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_resample_deconvolutions() -> Dict:
+    """
+    Resample the deconvolution results so we can t-test them against each other.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.resampled_template,
+            fname.afniproc_deconvolved(subject=subject),
+        ]
+        targets = [
+            fname.afniproc_deconvolved_resampled(subject=subject),
+        ]
+
+        kwargs = dict(
+            from_image=fname.afniproc_deconvolved(subject=subject),
+            to_image=fname.resampled_template,
+            to_prefix=get_prefix(fname.afniproc_deconvolved_resampled(subject=subject)),
+        )
+
+        yield dict(
+            name=subject,
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+def task_ttest_deconvolutions() -> Dict:
+    """
+    Here we t-test our 3dDeconvolve results. Onward!
+    """
+    for subbrick in range(1, 9):
+        sources = [fname.afniproc_deconvolved_resampled(subject=subject) for subject in SUBJECTS]
+        targets = [fname.afniproc_ttest_result(subbrick=subbrick)]
+
+        kwargs = dict(
+            images=[fname.afniproc_deconvolved_resampled(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
+            prefix=get_prefix(fname.afniproc_ttest_result(subbrick=subbrick)),
+        )
+        yield dict(
+            name=f"subbrick-{subbrick}",
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 
 
 # EEG-only tasks.
