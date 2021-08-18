@@ -745,7 +745,7 @@ def task_resample_masks() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def task_apply_masks() -> Dict:
+def task_apply_masks_to_correlations() -> Dict:
     """
     Apply masks to our correlation results.
     """
@@ -773,7 +773,43 @@ def task_apply_masks() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_apply_masks_to_irfs() -> Dict:
+    """
+    FOR each subject, USING her IRF, USING sub-brick 3, FOR each ROI, APPLY ROI mask to IRF.
 
+    THEORY
+    ------
+    For each subject, we want to compare the most positive blob within the occipital pole with the most negative blob within the calcarine. Get these blobs from the IRFs. Presumable, sub-brick 3 or sub-brick 4.
+		
+	What does it mean to be the most positive blob? Easy. Within the ROI, find all contiguous blobs. I didn't ask whether touching edges count, but I bet they do. Within each contiguous blob, sum the signal of each voxel together. Pick the blob with the largest sum. Or in the case of the calcarine, the lowest sum. Huzzah!
+		
+    Then, use each voxel in that blob in the original correlation test. Maybe make a mask for that blob, then apply the mask to the original correlation t-tests. That's a good idea!
+    """
+    masks = [
+        dict(name="calcarine", in_path=fname.resampled_mask(mask="calcarine")),
+        dict(name="occipital", in_path=fname.resampled_mask(mask="occipital")),
+    ]
+    for subject in SUBJECTS:
+        for mask in masks:
+            sources = [
+                fname.afniproc_resampled_irf(subject=subject),
+                mask["in_path"],
+
+            ]
+            targets = [fname.masked_irf(subject=subject, mask=mask["name"])]
+
+            kwargs = dict(
+                in_image=fname.afniproc_resampled_irf(subject=subject),
+                in_mask=mask["in_path"],
+                out_prefix=get_prefix(fname.masked_irf(subject=subject, mask=mask["name"])),
+            )
+
+            yield dict(
+                name=f"sub {subject}, mask {mask['name']}",
+                actions=[(apply_mask.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
