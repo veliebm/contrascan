@@ -215,6 +215,11 @@ fname.add("correlations_ttest_masked", "{correlations_ttest_dir}/startvolume-{st
 # task_apply_masks_to_irfs:
 fname.add("masked_irf", "{processed_data_dir}/masked_irfs/sub-{subject}_masked-{mask}_irf+tlrc.HEAD")
 
+# task_clusterize_irfs:
+fname.add("clusters_dir", "{processed_data_dir}/clusters")
+fname.add("clusters", "{clusters_dir}/sub-{subject}_source-{mask}_clusters+tlrc.HEAD")
+fname.add("clusters_summary", "{clusters_dir}/sub-{subject}_source-{mask}_summary.1D")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.

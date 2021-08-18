@@ -30,6 +30,7 @@ import ttest
 import average_freqtags
 import combine_masks
 import apply_mask
+import clusterize
 
 
 # Configuration for the pydoit tool.
@@ -810,6 +811,34 @@ def task_apply_masks_to_irfs() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_clusterize_irfs() -> Dict:
+    """
+    FOR each subject, FOR each masked IRF, GET all clusters.
+    """
+    for subject in SUBJECTS:
+        masked_irfs = [
+            dict(name="calcarine", in_path=fname.masked_irf(subject=subject, mask="calcarine")),
+            dict(name="occipital", in_path=fname.masked_irf(subject=subject, mask="occipital")),
+        ]
+
+        for irf in masked_irfs:
+            sources = [fname.masked_irf(subject=subject, mask=irf["name"])]
+            targets = [fname.clusters(subject=subject, mask=irf["name"])]
+
+            kwargs = dict(
+                in_image=fname.masked_irf(subject=subject, mask=irf["name"]),
+                out_prefix=get_prefix(fname.clusters(subject=subject, mask=irf["name"])),
+                out_summary=fname.clusters_summary(subject=subject, mask=irf["name"]),
+                subbrick=3,
+            )
+
+            yield dict(
+                name=f"subject - {subject}, IRF - {irf['name']}",
+                actions=[(clusterize.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
+
 
 # Tasks to test afniproc vs fmriprep.
 def task_align_afniproc_irfs() -> Dict:
