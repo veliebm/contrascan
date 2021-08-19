@@ -31,6 +31,7 @@ import average_freqtags
 import combine_masks
 import apply_mask
 import clusterize
+import micromasks
 
 
 # Configuration for the pydoit tool.
@@ -835,6 +836,36 @@ def task_clusterize_irfs() -> Dict:
             yield dict(
                 name=f"subject - {subject}, IRF - {irf['name']}",
                 actions=[(clusterize.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
+def task_make_micromasks() -> Dict:
+    """
+    Convert our clusters into bona fide masks! Wow!
+
+    FOR each image of clusters, GET strongest cluster.
+    """
+    for subject in SUBJECTS:
+        regions = "calcarine occipital".split()
+        for region in regions:
+
+            sources = [
+                fname.clusters(subject=subject, mask=region),
+                fname.clusters_summary(subject=subject, mask=region),
+                ]
+
+            targets = [fname.micromask(subject=subject, mask=region)]
+
+            kwargs = dict(
+                clusters_image=fname.clusters(subject=subject, mask=region),
+                clusters_1d_file=fname.clusters_summary(subject=subject, mask=region),
+                get_positive_cluster=True if region == "occipital" else False,
+                out_prefix=get_prefix(fname.micromask(subject=subject, mask=region)),
+            )
+
+            yield dict(
+                name=f"subject - {subject}, region - {region}",
+                actions=[(micromasks.main, [], kwargs)],
                 file_dep=sources,
                 targets=targets,
             )

@@ -220,6 +220,9 @@ fname.add("clusters_dir", "{processed_data_dir}/clusters")
 fname.add("clusters", "{clusters_dir}/sub-{subject}_source-{mask}_clusters+tlrc.HEAD")
 fname.add("clusters_summary", "{clusters_dir}/sub-{subject}_source-{mask}_summary.1D")
 
+# task_make_micromasks:
+fname.add("micromask", "{processed_data_dir}/micromasks/sub-{subject}_source-{mask}_micromask+tlrc.HEAD")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
