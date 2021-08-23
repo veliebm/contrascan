@@ -226,6 +226,9 @@ fname.add("micromask", "{processed_data_dir}/micromasks/sub-{subject}_source-{ma
 # task_apply_micromasks_to_trimmed_trimmed_funcs:
 fname.add("micromasked_func", "{processed_data_dir}/micromasked_funcs/sub-{subject}_source-{mask}_startvolume-{start_volume}_bold_micromasked+tlrc.HEAD")
 
+# task_average_microregion_voxels:
+fname.add("microregion_average", "{processed_data_dir}/microregion_averages/sub-{subject}_source-{mask}_startvolume-{start_volume}_average.txt")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.

@@ -32,6 +32,7 @@ import combine_masks
 import apply_mask
 import clusterize
 import micromasks
+import average_voxels
 
 
 # Configuration for the pydoit tool.
@@ -896,6 +897,32 @@ def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
                 yield dict(
                     name=f"subject - {subject}, mask - {region}, start_volume - {start_volume}",
                     actions=[(apply_mask.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
+def task_average_microregion_voxels() -> Dict:
+    """
+    Within each microregion of the trimmed trimmed funcs, average together all voxels of that region into their own timeseries.
+    """
+    regions = "calcarine occipital".split()
+    for subject in SUBJECTS:
+        for region in regions:
+            for start_volume in range(1, 4):
+                micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
+                averages = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
+
+                sources = [micromasked_func]
+                targets = [averages]
+
+                kwargs = dict(
+                    in_image=micromasked_func,
+                    out_file=averages,
+                    mask="SELF"
+                )
+
+                yield dict(
+                    name=f"subject - {subject}, mask - {region}, start_volume - {start_volume}",
+                    actions=[(average_voxels.main, [], kwargs)],
                     file_dep=sources,
                     targets=targets,
                 )
