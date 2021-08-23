@@ -845,8 +845,8 @@ def task_make_micromasks() -> Dict:
 
     FOR each image of clusters, GET strongest cluster.
     """
+    regions = "calcarine occipital".split()
     for subject in SUBJECTS:
-        regions = "calcarine occipital".split()
         for region in regions:
 
             sources = [
@@ -869,6 +869,36 @@ def task_make_micromasks() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
+    """
+    Does what it says on the tin.
+    """
+    regions = "calcarine occipital".split()
+    for subject in SUBJECTS:
+        for region in regions:
+            for start_volume in range(1, 4):
+                trimmed_trimmed_func = fname.final_func(subject=subject, start_volume=start_volume)
+                micromask = fname.micromask(subject=subject, mask=region)
+                micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
+
+                sources = [
+                    trimmed_trimmed_func,
+                    micromask,
+                ]
+                targets = [micromasked_func]
+
+                kwargs = dict(
+                    in_image=trimmed_trimmed_func,
+                    in_mask=micromask,
+                    out_prefix=get_prefix(micromasked_func),
+                )
+
+                yield dict(
+                    name=f"subject - {subject}, mask - {region}, start_volume - {start_volume}",
+                    actions=[(apply_mask.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
 
 
 # Tasks to test afniproc vs fmriprep.
