@@ -71,7 +71,18 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     %% Run sliding window analysis.
     [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, 12, 600, 500, out_sliding_window_prefix);
 
+
+    %% Averaging across sliding windows.
+    meanwinmat = mean(winmat3d, 3);
+    plot_sliding_window_average(meanwinmat, 'Mean of moving windows at 12 Hz', 'Sample points', 'Voltage')
     
+
+    %% Project sliding window average into frequency domain.
+    % Note the sample rate is 600 Hz at 6 Hz
+    [meanwinmat_pow, meanwinmat_phase, meanwinmat_freqs] = freqtag_FFT(meanwinmat, 600); 
+    plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, 'Power spectrum of the mean window shifted at 12 Hz', 'Frequency (Hz)')
+
+
     %% Plot spectrum
     %plot_single_fft_all_sensors(faxisall, spec)
     %plot_single_fft_one_sensor(spec, faxisall, oz_id)
@@ -95,6 +106,23 @@ end
 
 
 %% Plot functions.
+function plot_sliding_window_average(meanwinmat, fig_title, fig_x_label, fig_y_label)
+    % Plot that fancy sliding window average you calculated.
+    figure
+    plot(meanwinmat')
+    title(fig_title)
+    xlabel(fig_x_label)
+    ylabel(fig_y_label)
+end
+function plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, fig_title, fig_x_label)
+    % Plot that fancy sliding window average you calculated - but now after it's been FFT'd!
+    figure,
+    bar(meanwinmat_freqs(2:20), meanwinmat_pow(32,2:20)');
+    title(fig_title)
+    xlabel(fig_x_label)
+end
+
+
 function plot_hilbert(powermat, sensor, fig_title)
     % Plot frequency over time
     figure(), plot(powermat(sensor, :)')
