@@ -174,6 +174,7 @@ fname.add("freqtageeg_dir", "{processed_data_dir}/freqtageeg")
 fname.add("freqtageeg_json", "{freqtageeg_dir}/parameters.json")
 fname.add("out_fft_path", "{freqtageeg_dir}/sub-{subject}_mean_FFT.tsv")
 fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_mean_hilbert.tsv")
+fname.add("out_sliding_window_path", "{freqtageeg_dir}/sub-{subject}_slidingwindow.slidwin.mat")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/mean_mean_FFT.tsv")
@@ -228,6 +229,9 @@ fname.add("micromasked_func", "{processed_data_dir}/micromasked_funcs/sub-{subje
 
 # task_average_microregion_voxels:
 fname.add("microregion_average", "{processed_data_dir}/microregion_averages/sub-{subject}_source-{mask}_startvolume-{start_volume}_average.txt")
+
+# task_correlate_microregions:
+fname.add("microregions_correlation_results", "{processed_data_dir}/microregion_correlations/source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
 
 
 ###################################################################

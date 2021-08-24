@@ -33,6 +33,7 @@ import apply_mask
 import clusterize
 import micromasks
 import average_voxels
+import correlate_regions
 
 
 # Configuration for the pydoit tool.
@@ -534,6 +535,7 @@ def task_prepare_to_freqtag_eeg() -> Dict:
             in_eeg_dir=fname.segmenteeg_dir,
             out_fft_path=fname.out_fft_path(subject=subject),
             out_hilbert_path=fname.out_hilbert_path(subject=subject),
+            out_sliding_window_prefix=get_matlab_prefix(fname.out_sliding_window_path(subject=subject)),
         ))
 
     kwargs = dict(
@@ -554,8 +556,10 @@ def task_freqtag_eeg() -> Dict:
     We must do all subjects in one glorious blaze!
     """
     sources = [fname.freqtageeg_json]
+
     targets = [fname.out_fft_path(subject=subject) for subject in SUBJECTS]
     targets += [fname.out_hilbert_path(subject=subject) for subject in SUBJECTS]
+    targets += [fname.out_sliding_window_path(subject=subject) for subject in SUBJECTS]
 
     kwargs = dict(
         path_to_script="freqtag_pipeline.m",
@@ -926,6 +930,30 @@ def task_average_microregion_voxels() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
+def WIP_task_correlate_microregions() -> Dict:
+    """
+    Run a Spearman correlation on our microregions.
+    """
+    regions = "calcarine occipital".split()
+    for region in regions:
+        for start_volume in range(1, 4):
+            averages = [fname.microregion_average(subject=subject, mask=region, start_volume=start_volume) for subject in SUBJECTS]
+            correlations = fname.microregions_correlation_results(mask=region, start_volume=start_volume)
+
+            sources = averages
+            targets = [correlations]
+
+            kwargs = dict(
+                in_averages= averages,
+                out_correlation=correlations,
+            )
+
+            yield dict(
+                name=f"mask - {region}, start_volume - {start_volume}",
+                actions=[(correlate_regions.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
 
 
 # Tasks to test afniproc vs fmriprep.
@@ -1160,6 +1188,11 @@ def get_prefix(filename: str) -> str:
     Returns the prefix of an AFNI file. (Everything before the final "+".)
     """
     return "".join(filename.split("+")[:-1])
+def get_matlab_prefix(filename: str) -> str:
+    """
+    Returns the prefix of MatLab files, which sometimes have multiple "." characters in their filenames.
+    """
+    return ".".join(filename.split(".")[:-2])
 def get_view(filename: str) -> str:
     """
     Returns the view of an AFNI file. (Everything after the final "+".)

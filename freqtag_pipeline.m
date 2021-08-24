@@ -15,10 +15,10 @@ function do_all(parameters_file)
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path)
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix)
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -57,6 +57,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path)
     
     [pow, phase, freqs] = freqtag_FFT(mean(dataset(:, stimulus_start:stimulus_end, :),3), 500); %The fft function takes a 2-D matrix, it is necessary to average over the trials (third dimension) 
     to_tsv(pow, out_fft_path)
+    to_tsv(freqs, 'processed/freqtageeg/freqs.tsv')
     
     
     %% Plot the spectrum. For visualization purposes, only plot the frequencies of interest.
@@ -64,9 +65,12 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path)
     %plot_fft_sensor(pow, freqs, num_freqs, oz_id)
     
     
-    %% Run FFT on single-trials
-    [spec] = freqtag3D_FFT(dataset, stimulus_start:stimulus_end, sampling_rate); %No need to average over the third dimension here. 
+    %% Run FFT on single-trials.
+    [spec] = freqtag3D_FFT(dataset, stimulus_start:stimulus_end, sampling_rate); %No need to average over the third dimension here.
     
+    %% Run sliding window analysis.
+    [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, 12, 600, 500, out_sliding_window_prefix);
+
     
     %% Plot spectrum
     %plot_single_fft_all_sensors(faxisall, spec)
@@ -74,7 +78,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path)
     
     
     %% Run Hilbert Transform. Check the 12Hz frequency.
-    [powermat, phasemat, complexmat] = freqtag_HILB(mean(dataset(:, stimulus_start:stimulus_end, :), 3), 12, 4, oz_id, 0, sampling_rate);
+    [powermat, phasemat, complexmat] = freqtag_HILB(mean(dataset(:, stimulus_start:stimulus_end, :), 3), 12, 8, oz_id, 0, sampling_rate);
     to_tsv(powermat, out_hilbert_path)
     
     
@@ -164,7 +168,7 @@ end
 
 %% Other functions.
 function to_tsv(mat, out_filename)
-    % Write a matric to tsv.
+    % Write a matrix to tsv.
     dlmwrite(out_filename, mat, '\t');
 end
 function [EEG] = load_dataset(file_name, directory)
