@@ -78,7 +78,7 @@ def convert_to_dataframe(func_image: nibabel.brikhead.AFNIImage, trim_volumes: i
 
 def get_all_amplitudes(eeg_amplitudes_path: PathLike) -> pandas.DataFrame:
     """
-    Returns the column of amplitudes for a channel from an eeg amplitudes tsv file.
+    Returns all amplitudes from an EEG amplitudes file as a pretty dataframe.
     """
     all_amplitudes = pandas.read_table(
         eeg_amplitudes_path,
