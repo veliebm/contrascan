@@ -323,12 +323,14 @@ def task_convert_eeg() -> Dict:
     sources = [fname.converteeg_json]
     targets = [fname.converted_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        path_to_script="convert_eegs.m",
-    )
+    path_to_script="convert_eegs.m"
+    action = f"""
+        python3 matlab.py
+        --run_script_at {path_to_script}
+    """.split()
 
     return dict(
-        actions=[(matlab.main, [], kwargs)],
+        actions=[action],
         file_dep=sources,
         targets=targets,
     )
