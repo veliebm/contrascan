@@ -33,7 +33,6 @@ import apply_mask
 import clusterize
 import micromasks
 import average_voxels
-import correlate_regions
 
 
 # Configuration for the pydoit tool.
@@ -930,30 +929,38 @@ def task_average_microregion_voxels() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
-def WIP_task_correlate_microregions() -> Dict:
+def task_correlate_microregions() -> Dict:
     """
-    Run a Spearman correlation on our microregions.
+    Correlate the time series of each microregion with its image's Oz data.
     """
     regions = "calcarine occipital".split()
-    for region in regions:
-        for start_volume in range(1, 4):
-            averages = [fname.microregion_average(subject=subject, mask=region, start_volume=start_volume) for subject in SUBJECTS]
-            correlations = fname.microregions_correlation_results(mask=region, start_volume=start_volume)
+    for subject in SUBJECTS:
+        for region in regions:
+            for start_volume in range(1, 4):
+                average = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
+                moving_moving_window_data = fname.out_tsv_name(subject=subject)
+                correlations = fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume)
+                table = fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume)
+                scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume)
 
-            sources = averages
-            targets = [correlations]
+                sources = [average, moving_moving_window_data]
+                targets = [correlations]
 
-            kwargs = dict(
-                in_averages= averages,
-                out_correlation=correlations,
-            )
+                action = f"""
+                    python3 correlate_regions.py
+                    --load_amplitudes_from {moving_moving_window_data}
+                    --load_microROI_from {average}
+                    --save_scatter_to {scatter}
+                    --save_table_to {table}
+                    --save_spearman_to {correlations}
+                """.split()
 
-            yield dict(
-                name=f"mask - {region}, start_volume - {start_volume}",
-                actions=[(correlate_regions.main, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
-            )
+                yield dict(
+                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
+                    actions=[action],
+                    file_dep=sources,
+                    targets=targets,
+                )
 
 
 # Tasks to test afniproc vs fmriprep.

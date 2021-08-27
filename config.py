@@ -22,7 +22,7 @@ host = getfqdn()  # Hostname of the machine running the scripts
 if user == "csea":
     # CSEA desktop
     raw_data_dir = "./data"
-    n_jobs = 4  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
+    n_jobs = 1  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
 else:
     # Defaults
     raw_data_dir = "./data"
@@ -231,7 +231,10 @@ fname.add("micromasked_func", "{processed_data_dir}/micromasked_funcs/sub-{subje
 fname.add("microregion_average", "{processed_data_dir}/microregion_averages/sub-{subject}_source-{mask}_startvolume-{start_volume}_average.txt")
 
 # task_correlate_microregions:
-fname.add("microregions_correlation_results", "{processed_data_dir}/microregion_correlations/source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
+fname.add("microregions_correlation_dir", "{processed_data_dir}/microregion_correlations")
+fname.add("microregions_correlation_results", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
+fname.add("microregions_and_amplitudes", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_microregion+amplitudes.csv")
+fname.add("microregions_correlation_scatter_plot", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_scatter.png")
 
 
 ###################################################################
