@@ -372,12 +372,14 @@ def task_preprocess_eeg() -> Dict:
     sources = [fname.preprocesseeg_json]
     targets = [fname.preprocessed_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        path_to_script="preprocess_eegs.m",
-    )
+    path_to_script="preprocess_eegs.m"
+    action = f"""
+        python3 matlab.py
+        --run_script_at {path_to_script}
+    """.split()
 
     return dict(
-        actions=[(matlab.main, [], kwargs)],
+        actions=[action],
         file_dep=sources,
         targets=targets,
     )
@@ -417,12 +419,14 @@ def task_segment_eeg() -> Dict:
     sources = [fname.segmenteeg_json]
     targets = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        path_to_script="segment_eegs.m",
-    )
+    path_to_script="segment_eegs.m"
+    action = f"""
+        python3 matlab.py
+        --run_script_at {path_to_script}
+    """.split()
 
     return dict(
-        actions=[(matlab.main, [], kwargs)],
+        actions=[action],
         file_dep=sources,
         targets=targets,
     )
@@ -465,12 +469,14 @@ def task_trim_eeg() -> Dict:
     sources = [fname.trimeeg_json]
     targets = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        path_to_script="trim_eegs.m",
-    )
+    path_to_script="trim_eegs.m"
+    action = f"""
+        python3 matlab.py
+        --run_script_at {path_to_script}
+    """.split()
 
     return dict(
-        actions=[(matlab.main, [], kwargs)],
+        actions=[action],
         file_dep=sources,
         targets=targets,
     )
@@ -513,12 +519,14 @@ def task_moving_moving_window_eeg() -> Dict:
     sources = [fname.movingmovingwindoweeg_json]
     targets = [fname.moving_moving_windowed_eeg(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        path_to_script="moving_moving_window_eegs.m",
-    )
+    path_to_script="moving_moving_window_eegs.m"
+    action = f"""
+        python3 matlab.py
+        --run_script_at {path_to_script}
+    """.split()
 
     return dict(
-        actions=[(matlab.main, [], kwargs)],
+        actions=[action],
         file_dep=sources,
         targets=targets,
     )
@@ -562,12 +570,14 @@ def task_freqtag_eeg() -> Dict:
     targets += [fname.out_hilbert_path(subject=subject) for subject in SUBJECTS]
     targets += [fname.out_sliding_window_path(subject=subject) for subject in SUBJECTS]
 
-    kwargs = dict(
-        path_to_script="freqtag_pipeline.m",
-    )
+    path_to_script="freqtag_pipeline.m"
+    action = f"""
+        python3 matlab.py
+        --run_script_at {path_to_script}
+    """.split()
 
     return dict(
-        actions=[(matlab.main, [], kwargs)],
+        actions=[action],
         file_dep=sources,
         targets=targets,
     )
