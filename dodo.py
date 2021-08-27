@@ -944,7 +944,7 @@ def task_correlate_microregions() -> Dict:
                 scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume)
 
                 sources = [average, moving_moving_window_data]
-                targets = [correlations]
+                targets = [correlations, scatter, table]
 
                 action = f"""
                     python3 correlate_regions.py
@@ -961,6 +961,39 @@ def task_correlate_microregions() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
+def task_correlate_across_subjects() -> Dict:
+    """
+    How big is the correlation across ALL subjects for each microROI?
+    """
+    regions = "calcarine occipital".split()
+    for region in regions:
+        for start_volume in range(1, 4):
+            
+            # Get sources.
+            tables_to_be_catenated = [fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume) for subject in SUBJECTS]
+            sources = tables_to_be_catenated
+
+            # Get targets.
+            correlations = fname.correlation_across_subjects(mask=region, start_volume=start_volume)
+            table = fname.correlation_across_subjects_table(mask=region, start_volume=start_volume)
+            scatter = fname.correlation_across_subjects_scatter(mask=region, start_volume=start_volume)
+            targets = [correlations, table, scatter]
+
+            # Get action.
+            action = f"""
+                python3 correlate_all_microregions.py
+                --load_tables_from {" ".join(tables_to_be_catenated)}
+                --save_scatter_to {scatter}
+                --save_table_to {table}
+                --save_spearman_to {correlations}
+            """.split()
+
+            yield dict(
+                name=f"mask--{region}, start_volume--{start_volume}",
+                actions=[action],
+                file_dep=sources,
+                targets=targets,
+            )
 
 
 # Tasks to test afniproc vs fmriprep.

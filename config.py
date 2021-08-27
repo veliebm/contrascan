@@ -236,6 +236,12 @@ fname.add("microregions_correlation_results", "{microregions_correlation_dir}/su
 fname.add("microregions_and_amplitudes", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_microregion+amplitudes.csv")
 fname.add("microregions_correlation_scatter_plot", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_scatter.png")
 
+# task_correlate_across_subjects:
+fname.add("correlation_across_subjects_dir", "{processed_data_dir}/correlation_across_subjects")
+fname.add("correlation_across_subjects", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_correlation.txt")
+fname.add("correlation_across_subjects_scatter", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_scatter.png")
+fname.add("correlation_across_subjects_table", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_microregions+amplitudes.csv")
+
 
 ###################################################################
 # Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
