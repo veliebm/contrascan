@@ -5,5 +5,4 @@ function delete_lock_file(script_name)
     if exist(lock_name, 'file')==2
         delete(lock_name);
     end
-    pause
 end
