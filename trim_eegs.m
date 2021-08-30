@@ -6,6 +6,7 @@
 
 parameters_file = 'processed/trimeeg/parameters.json';
 do_all(parameters_file)
+delete_lock_file(mfilename('fullpath'))
 
 function do_all(parameters_file)
     % Trim all subjects whose metadata we've stored in a JSON file.

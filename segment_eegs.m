@@ -6,6 +6,7 @@
 
 parameters_file = 'processed/segmenteeg/parameters.json';
 segment_all(parameters_file)
+delete_lock_file(mfilename('fullpath'))
 
 function segment_all(parameters_file)
     % Preprocesses all subjects whose metadata we've stored in a JSON file.

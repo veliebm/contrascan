@@ -7,6 +7,7 @@
 %% Load our parameters.
 parameters_file = 'processed/freqtageeg/parameters.json';
 do_all(parameters_file)
+delete_lock_file(mfilename('fullpath'))
 
 
 %% Driver functions.
@@ -16,6 +17,7 @@ function do_all(parameters_file)
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
         do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix)
+        pause
     end
 end
 function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix)
@@ -74,13 +76,13 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
 
     %% Averaging across sliding windows.
     meanwinmat = mean(winmat3d, 3);
-    plot_sliding_window_average(meanwinmat, 'Mean of moving windows at 12 Hz', 'Sample points', 'Voltage')
+    %plot_sliding_window_average(meanwinmat, 'Mean of moving windows at 12 Hz', 'Sample points', 'Voltage')
     
 
     %% Project sliding window average into frequency domain.
     % Note the sample rate is 600 Hz at 6 Hz
     [meanwinmat_pow, meanwinmat_phase, meanwinmat_freqs] = freqtag_FFT(meanwinmat, 600); 
-    plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, 'Power spectrum of the mean window shifted at 12 Hz', 'Frequency (Hz)')
+    %plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, 'Power spectrum of the mean window shifted at 12 Hz', 'Frequency (Hz)')
 
 
     %% Plot spectrum
