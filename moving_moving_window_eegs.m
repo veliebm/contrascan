@@ -9,6 +9,7 @@
 
 parameters_file = 'processed/movingmovingwindoweeg/parameters.json';
 do_all(parameters_file)
+delete_lock_file(mfilename('fullpath'))
 
 function do_all(parameters_file)
     % Moving moving window all subjects whose metadata we've stored in a JSON file.
