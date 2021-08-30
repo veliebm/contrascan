@@ -5,20 +5,19 @@
 % --------------------------------------------------------------------------
 
 parameters_file = 'processed/segmenteeg/parameters.json';
-segment_all(parameters_file)
+do_all(parameters_file)
 delete_lock_file(mfilename('fullpath'))
 
-function segment_all(parameters_file)
+function do_all(parameters_file)
     % Preprocesses all subjects whose metadata we've stored in a JSON file.
     all_parameters = read_json(parameters_file);
 
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i)
-        segment(parameters.in_name, parameters.in_directory, parameters.out_directory);
+        do_one(parameters.in_name, parameters.in_directory, parameters.out_directory);
     end
 end
-
-function segment(file_name, in_directory, out_directory)
+function do_one(file_name, in_directory, out_directory)
     eeglab;
     EEG = load_dataset(file_name, in_directory);
     
