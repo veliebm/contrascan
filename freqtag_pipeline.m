@@ -17,7 +17,6 @@ function do_all(parameters_file)
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
         do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix)
-        pause
     end
 end
 function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix)
