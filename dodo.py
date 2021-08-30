@@ -16,7 +16,6 @@ from config import fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE
 import create_bids_root
 import bidsify_subject
 import afniproc
-import matlab
 import trim_func_images
 import align
 import resample
