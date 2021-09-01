@@ -30,7 +30,6 @@ import average_freqtags
 import combine_masks
 import apply_mask
 import clusterize
-import micromasks
 import average_voxels
 
 
