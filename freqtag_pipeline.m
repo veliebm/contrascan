@@ -1,5 +1,5 @@
 %% This file runs a frequency tagging analysis on EEG data files defined in a JSON file.
-% The pipeline was created by Jessica Figueira, then I adapted it to this dataset.
+% The pipeline was created by Jessica Figueira and Andreas Keil, then I adapted it to this dataset.
 % Benjamin Velie, 7/29/2021
 % veliebm@ufl.edu
 
