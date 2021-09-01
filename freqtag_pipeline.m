@@ -16,10 +16,10 @@ function do_all(parameters_file)
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency))
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot)
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -75,7 +75,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
 
     %% Averaging across sliding windows.
     meanwinmat = mean(winmat3d, 3);
-    %plot_sliding_window_average(meanwinmat, 'Mean of moving windows at {FREQUENCY} Hz', 'Sample points', 'Voltage')
+    plot_sliding_window_average(meanwinmat, sprintf('Mean of moving windows at %i Hz', frequency), 'Sample points', 'Voltage', sliding_window_average_plot)
     
 
     %% Project sliding window average into frequency domain.
@@ -105,13 +105,17 @@ end
 
 
 %% Plot functions.
-function plot_sliding_window_average(meanwinmat, fig_title, fig_x_label, fig_y_label)
+function plot_sliding_window_average(meanwinmat, fig_title, fig_x_label, fig_y_label, out_path)
     % Plot that fancy sliding window average you calculated.
-    figure
+    fig = figure('visible', 'off');
+    
     plot(meanwinmat')
     title(fig_title)
     xlabel(fig_x_label)
     ylabel(fig_y_label)
+
+    exportgraphics(fig, out_path, 'Resolution', 300)
+    close(fig)
 end
 function plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, fig_title, fig_x_label)
     % Plot that fancy sliding window average you calculated - but now after it's been FFT'd!

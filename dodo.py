@@ -537,9 +537,15 @@ def task_prepare_to_freqtag_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script we wrote to run a frequency tagging analysis.
     """
-    sources = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
-    targets = [fname.freqtageeg_json]
+    # Get sources.
+    segmented_eegs = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
+    sources = segmented_eegs
 
+    # Get targets.
+    freqtag_eeg_json = fname.freqtageeg_json
+    targets = [freqtag_eeg_json]
+
+    # Get args.
     data = []
     for subject in SUBJECTS:
         for frequency in FREQUENCIES:
@@ -551,13 +557,15 @@ def task_prepare_to_freqtag_eeg() -> Dict:
                 out_hilbert_path=fname.out_hilbert_path(subject=subject, frequency=frequency),
                 out_sliding_window_prefix=get_matlab_prefix(fname.out_sliding_window_path(subject=subject, frequency=frequency)),
                 frequency=frequency,
+                sliding_window_average_plot=fname.sliding_window_average_plot(subject=subject, frequency=frequency),
             ))
 
     kwargs = dict(
-        out_path=fname.freqtageeg_json,
+        out_path=freqtag_eeg_json,
         data=data,
     )
 
+    # Go!
     return dict(
         actions=[(write_json.main, [], kwargs)],
         file_dep=sources,
@@ -572,18 +580,22 @@ def task_freqtag_eeg() -> Dict:
     """
     for frequency in FREQUENCIES:
 
+        # Get sources.
         sources = [fname.freqtageeg_json]
 
+        # Get targets.
         targets = [fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
         targets += [fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
         targets += [fname.out_sliding_window_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
 
+        # Get action.
         path_to_script="freqtag_pipeline.m"
         action = f"""
             python3 matlab.py
             --run_script_at {path_to_script}
         """.split()
 
+        # Go!
         yield dict(
             name=f"frequency--{frequency}",
             actions=[action],

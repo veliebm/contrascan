@@ -22,7 +22,7 @@ host = getfqdn()  # Hostname of the machine running the scripts
 if user == "csea":
     # CSEA desktop
     raw_data_dir = "./data"
-    n_jobs = 4  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
+    n_jobs = 1  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
 else:
     # Defaults
     raw_data_dir = "./data"
@@ -181,6 +181,7 @@ fname.add("freqtageeg_json", "{freqtageeg_dir}/parameters.json")
 fname.add("out_fft_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_mean_FFT.tsv")
 fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_mean_hilbert.tsv")
 fname.add("out_sliding_window_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow.slidwin.mat")
+fname.add("sliding_window_average_plot", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow_average.jpeg")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")
