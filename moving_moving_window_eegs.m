@@ -11,38 +11,25 @@ parameters_file = 'processed/movingmovingwindoweeg/parameters.json';
 do_all(parameters_file)
 delete_lock_file(mfilename('fullpath'))
 
+%% Structural functions.
 function do_all(parameters_file)
     % Moving moving window all subjects whose metadata we've stored in a JSON file.
     all_parameters = read_json(parameters_file);
 
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i)
-        main(parameters.in_filename, parameters.in_dir, parameters.out_stem, parameters.out_tsv_name);
+        do_one(parameters.in_filename, parameters.in_dir, parameters.out_stem, parameters.out_tsv_name, str2num(parameters.frequency));
     end
 end
-
-function main(in_filename, in_dir, out_stem, out_tsv_name)
+function do_one(in_filename, in_dir, out_stem, out_tsv_name, frequency)
     % Run stead2singtrialsCont on a subject.
     eeglab;
-    stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, 12, 600, 500, 1, out_stem);
+    stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, frequency, 600, 500, 1, out_stem);
     convert_to_tsv(strcat(out_stem, '.amp.at'), out_tsv_name)
 end
-function [data] = read_json(in_path)
-    % Read a JSON file.
-    fname = in_path; 
-    fid = fopen(fname); 
-    raw = fread(fid,inf); 
-    str = char(raw'); 
-    fclose(fid); 
-    data = jsondecode(str);
-end
-function convert_to_tsv(in_filename, out_filename)
-    % Convert an emegs file to tsv.
-    amplitude = ReadAvgFile(in_filename);
-    dlmwrite(out_filename, amplitude, '\t');
-end
 
-function [winmat, fftamp] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, plotflag, bslvec, ssvepvec, foi, sampnew, SampRate, saveflag, outname)
+%% Functions that do math.
+function [winmat, SNR] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, plotflag, bslvec, ssvepvec, foi, sampnew, SampRate, saveflag, outname)
     % samprate is the NEW NEW sample rate  - user needs to calculate such that
     % integer number of sample points fits in a cycle  foi = freq of interest
     % this is for 2-D files from eeglab
@@ -251,4 +238,20 @@ function[OutMat] = regressionMAT(InMat)
         reggerade = [1:dummy(2)].*regkoefs(2,1) + regkoefs(1,1);
         OutMat(channel, :) = InMat(channel, :) - reggerade;
     end
+end
+
+%% Input/output functions.
+function [data] = read_json(in_path)
+    % Read a JSON file.
+    fname = in_path; 
+    fid = fopen(fname); 
+    raw = fread(fid,inf); 
+    str = char(raw'); 
+    fclose(fid); 
+    data = jsondecode(str);
+end
+function convert_to_tsv(in_filename, out_filename)
+    % Convert an emegs file to tsv.
+    amplitude = ReadAvgFile(in_filename);
+    dlmwrite(out_filename, amplitude, '\t');
 end

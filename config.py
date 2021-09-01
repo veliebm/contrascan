@@ -22,7 +22,7 @@ host = getfqdn()  # Hostname of the machine running the scripts
 if user == "csea":
     # CSEA desktop
     raw_data_dir = "./data"
-    n_jobs = 1  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
+    n_jobs = 4  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
 else:
     # Defaults
     raw_data_dir = "./data"
@@ -37,6 +37,12 @@ os.environ["OMP_NUM_THREADS"] = str(n_jobs)
 
 # All subjects for whom our analysis can actually work.
 SUBJECTS = "104 106 107 108 109 110 111 112 113 115 116 117 120 121 122 123 124 125".split()
+
+# Which frequencies to use in our frequencies analyses.
+FREQUENCIES = "12 24".split()
+
+# Which volumes to start our EEG/fMRI correlation from.
+START_VOLUMES = range(1, 5)
 
 # Which ICA components to remove for each subject.
 COMPONENTS_TO_REMOVE = {
@@ -172,31 +178,31 @@ fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 # task_prepare_to_freqtag_eeg:
 fname.add("freqtageeg_dir", "{processed_data_dir}/freqtageeg")
 fname.add("freqtageeg_json", "{freqtageeg_dir}/parameters.json")
-fname.add("out_fft_path", "{freqtageeg_dir}/sub-{subject}_mean_FFT.tsv")
-fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_mean_hilbert.tsv")
-fname.add("out_sliding_window_path", "{freqtageeg_dir}/sub-{subject}_slidingwindow.slidwin.mat")
+fname.add("out_fft_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_mean_FFT.tsv")
+fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_mean_hilbert.tsv")
+fname.add("out_sliding_window_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow.slidwin.mat")
 
 # task_mean_mean_fft:
-fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/mean_mean_FFT.tsv")
+fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")
 
 # task_mean_mean_hilbert:
-fname.add("mean_mean_hilbert", "{processed_data_dir}/mean_mean_hilbert/mean_mean_hilbert.tsv")
+fname.add("mean_mean_hilbert", "{processed_data_dir}/mean_mean_hilbert/frequency-{frequency}_mean_mean_hilbert.tsv")
 
 # task_prepare_to_moving_moving_window_eeg:
 fname.add("movingmovingwindoweeg_dir", "{processed_data_dir}/movingmovingwindoweeg")
 fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.json")
 
 # task_moving_moving_window_eeg:
-fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.amp.at")
-fname.add("out_tsv_name", "{movingmovingwindoweeg_dir}/sub-{subject}_moving_moving_window_average.tsv")
+fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.amp.at")
+fname.add("out_tsv_name", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.tsv")
 
 # task_correlate_eeg_fmri:
 fname.add("correlation_dir", "{processed_data_dir}/eeg_fmri_correlation")
-fname.add("correlation_image", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_correlation.nii")
+fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_correlation.nii")
 
 # task_ttest_eeg_fmri_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlations_ttest")
-fname.add("correlations_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
+fname.add("correlations_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
 
 # task_get_occipital_mask:
 fname.add("kastner_mask_dir", "{raw_data_dir}/misc/kastner_cortex_masks/subj_vol_all")
@@ -211,7 +217,7 @@ fname.add("calcarine_mask", "{masks_dir}/calcarine+tlrc.HEAD")
 fname.add("resampled_mask", "{processed_data_dir}/masks_resampled/mask-{mask}_resampled+tlrc.HEAD")
 
 # task_apply_masks_to_correlations:
-fname.add("correlations_ttest_masked", "{correlations_ttest_dir}/startvolume-{start_volume}_masked-{mask}_correlations_ttest+tlrc.HEAD")
+fname.add("correlations_ttest_masked", "{correlations_ttest_dir}/startvolume-{start_volume}_frequency-{frequency}_masked-{mask}_correlations_ttest+tlrc.HEAD")
 
 # task_apply_masks_to_irfs:
 fname.add("masked_irf", "{processed_data_dir}/masked_irfs/sub-{subject}_masked-{mask}_irf+tlrc.HEAD")
@@ -232,15 +238,15 @@ fname.add("microregion_average", "{processed_data_dir}/microregion_averages/sub-
 
 # task_correlate_microregions:
 fname.add("microregions_correlation_dir", "{processed_data_dir}/microregion_correlations")
-fname.add("microregions_correlation_results", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
-fname.add("microregions_and_amplitudes", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_microregion+amplitudes.csv")
-fname.add("microregions_correlation_scatter_plot", "{microregions_correlation_dir}/sub-{subject}_source-{mask}_startvolume-{start_volume}_scatter.png")
+fname.add("microregions_correlation_results", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
+fname.add("microregions_and_amplitudes", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion+amplitudes.csv")
+fname.add("microregions_correlation_scatter_plot", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_scatter.png")
 
 # task_correlate_across_subjects:
 fname.add("correlation_across_subjects_dir", "{processed_data_dir}/correlation_across_subjects")
-fname.add("correlation_across_subjects", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_correlation.txt")
-fname.add("correlation_across_subjects_scatter", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_scatter.png")
-fname.add("correlation_across_subjects_table", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_microregions+amplitudes.csv")
+fname.add("correlation_across_subjects", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_correlation.txt")
+fname.add("correlation_across_subjects_scatter", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_scatter.png")
+fname.add("correlation_across_subjects_table", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregions+amplitudes.csv")
 
 
 ###################################################################

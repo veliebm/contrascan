@@ -12,14 +12,14 @@ delete_lock_file(mfilename('fullpath'))
 
 %% Driver functions.
 function do_all(parameters_file)
-    % Read a JSON file to get parameters, then use them process all subjects.
+    % Read a JSON file to get parameters, then use them to process all subjects.
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix)
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency))
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -70,18 +70,18 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     [spec] = freqtag3D_FFT(dataset, stimulus_start:stimulus_end, sampling_rate); %No need to average over the third dimension here.
     
     %% Run sliding window analysis.
-    [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, 12, 600, 500, out_sliding_window_prefix);
+    [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, 500, out_sliding_window_prefix);
 
 
     %% Averaging across sliding windows.
     meanwinmat = mean(winmat3d, 3);
-    %plot_sliding_window_average(meanwinmat, 'Mean of moving windows at 12 Hz', 'Sample points', 'Voltage')
+    %plot_sliding_window_average(meanwinmat, 'Mean of moving windows at {FREQUENCY} Hz', 'Sample points', 'Voltage')
     
 
     %% Project sliding window average into frequency domain.
     % Note the sample rate is 600 Hz at 6 Hz
     [meanwinmat_pow, meanwinmat_phase, meanwinmat_freqs] = freqtag_FFT(meanwinmat, 600); 
-    %plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, 'Power spectrum of the mean window shifted at 12 Hz', 'Frequency (Hz)')
+    %plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, 'Power spectrum of the mean window shifted at {FREQUENCY} Hz', 'Frequency (Hz)')
 
 
     %% Plot spectrum
@@ -89,20 +89,18 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     %plot_single_fft_one_sensor(spec, faxisall, oz_id)
     
     
-    %% Run Hilbert Transform. Check the 12Hz frequency.
-    [powermat, phasemat, complexmat] = freqtag_HILB(mean(dataset(:, stimulus_start:stimulus_end, :), 3), 12, 8, oz_id, 0, sampling_rate);
+    %% Run Hilbert Transform. Check the frequency of interest.
+    [powermat, phasemat, complexmat] = freqtag_HILB(mean(dataset(:, stimulus_start:stimulus_end, :), 3), frequency, 8, oz_id, 0, sampling_rate);
     to_tsv(powermat, out_hilbert_path)
     
     
     %% Plot frequency over time
-    %plot_hilbert(powermat, oz_id, 'Hilbert Transform (12Hz Stimuli)')
+    %plot_hilbert(powermat, oz_id, 'Hilbert Transform ({FREQUENCY} Stimuli)')
     
     
     %% Close all figures and clean the worskpace
     %close all
     %clear all
-    
-    
 end
 
 

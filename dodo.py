@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Dict, Iterable
 
 # Import internal modules and libraries.
-from config import fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE
+from config import FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES
 
 # Import tasks
 import create_bids_root
@@ -92,7 +92,7 @@ def task_bidsify_subject() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(bidsify_subject.main, [sources, targets])],
             file_dep=list(sources.values()),
             targets=list(targets.values()),
@@ -131,7 +131,7 @@ def task_afniproc() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(afniproc.main, [], kwargs)],
             file_dep=list(sources.values()),
             targets=list(targets.values()),
@@ -206,7 +206,7 @@ def task_resample_func_images() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -234,7 +234,7 @@ def task_trim_func_images() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(trim_func_images.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -259,7 +259,7 @@ def task_resample_deconvolutions() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -277,7 +277,7 @@ def task_ttest_deconvolutions() -> Dict:
             prefix=get_prefix(fname.afniproc_ttest_result(subbrick=subbrick)),
         )
         yield dict(
-            name=f"subbrick-{subbrick}",
+            name=f"subbrick--{subbrick}",
             actions=[(ttest.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -489,17 +489,19 @@ def task_prepare_to_moving_moving_window_eeg() -> Dict:
 
     data = []
     for subject in SUBJECTS:
-        out_path = Path(fname.moving_moving_windowed_eeg(subject=subject))
-        data.append(dict(
-            in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
-            in_dir=fname.trimeeg_dir,
-            out_stem=str(out_path.parent / out_path.name.split(".")[0]),
-            out_tsv_name=fname.out_tsv_name(subject=subject),
-        ))
+        for frequency in FREQUENCIES:
+            out_path = Path(fname.moving_moving_windowed_eeg(subject=subject, frequency=frequency))
+            data.append(dict(
+                in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
+                in_dir=fname.trimeeg_dir,
+                out_stem=str(out_path.parent / out_path.name.split(".")[0]),
+                out_tsv_name=fname.out_tsv_name(subject=subject, frequency=frequency),
+                frequency=frequency,
+            ))
 
     kwargs = dict(
-        out_path=fname.movingmovingwindoweeg_json,
-        data=data,
+            out_path=fname.movingmovingwindoweeg_json,
+            data=data,
     )
 
     return dict(
@@ -515,20 +517,23 @@ def task_moving_moving_window_eeg() -> Dict:
     We must do all subjects in one glorious blaze!
     Sigh.
     """
-    sources = [fname.movingmovingwindoweeg_json]
-    targets = [fname.moving_moving_windowed_eeg(subject=subject) for subject in SUBJECTS]
+    for frequency in FREQUENCIES:
 
-    path_to_script="moving_moving_window_eegs.m"
-    action = f"""
-        python3 matlab.py
-        --run_script_at {path_to_script}
-    """.split()
+        sources = [fname.movingmovingwindoweeg_json]
+        targets = [fname.moving_moving_windowed_eeg(subject=subject, frequency=frequency) for subject in SUBJECTS]
 
-    return dict(
-        actions=[action],
-        file_dep=sources,
-        targets=targets,
-    )
+        path_to_script="moving_moving_window_eegs.m"
+        action = f"""
+            python3 matlab.py
+            --run_script_at {path_to_script}
+        """.split()
+
+        yield dict(
+            name=f"frequency--{frequency}",
+            actions=[action],
+            file_dep=sources,
+            targets=targets,
+        )
 def task_prepare_to_freqtag_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script we wrote to run a frequency tagging analysis.
@@ -538,13 +543,16 @@ def task_prepare_to_freqtag_eeg() -> Dict:
 
     data = []
     for subject in SUBJECTS:
-        data.append(dict(
-            in_eeg_name=Path(fname.segmented_eeg(subject=subject)).name,
-            in_eeg_dir=fname.segmenteeg_dir,
-            out_fft_path=fname.out_fft_path(subject=subject),
-            out_hilbert_path=fname.out_hilbert_path(subject=subject),
-            out_sliding_window_prefix=get_matlab_prefix(fname.out_sliding_window_path(subject=subject)),
-        ))
+        for frequency in FREQUENCIES:
+
+            data.append(dict(
+                in_eeg_name=Path(fname.segmented_eeg(subject=subject)).name,
+                in_eeg_dir=fname.segmenteeg_dir,
+                out_fft_path=fname.out_fft_path(subject=subject, frequency=frequency),
+                out_hilbert_path=fname.out_hilbert_path(subject=subject, frequency=frequency),
+                out_sliding_window_prefix=get_matlab_prefix(fname.out_sliding_window_path(subject=subject, frequency=frequency)),
+                frequency=frequency,
+            ))
 
     kwargs = dict(
         out_path=fname.freqtageeg_json,
@@ -563,57 +571,66 @@ def task_freqtag_eeg() -> Dict:
     Because MatLab is ~quirky~, we can't do multithreading on this one.
     We must do all subjects in one glorious blaze!
     """
-    sources = [fname.freqtageeg_json]
+    for frequency in FREQUENCIES:
 
-    targets = [fname.out_fft_path(subject=subject) for subject in SUBJECTS]
-    targets += [fname.out_hilbert_path(subject=subject) for subject in SUBJECTS]
-    targets += [fname.out_sliding_window_path(subject=subject) for subject in SUBJECTS]
+        sources = [fname.freqtageeg_json]
 
-    path_to_script="freqtag_pipeline.m"
-    action = f"""
-        python3 matlab.py
-        --run_script_at {path_to_script}
-    """.split()
+        targets = [fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
+        targets += [fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
+        targets += [fname.out_sliding_window_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
 
-    return dict(
-        actions=[action],
-        file_dep=sources,
-        targets=targets,
-    )
+        path_to_script="freqtag_pipeline.m"
+        action = f"""
+            python3 matlab.py
+            --run_script_at {path_to_script}
+        """.split()
+
+        yield dict(
+            name=f"frequency--{frequency}",
+            actions=[action],
+            file_dep=sources,
+            targets=targets,
+        )
 def task_mean_mean_fft() -> Dict:
     """
     Average the mean FFT calculated for each subject. But this time, across ALL subjects!
     """
-    sources = [fname.out_fft_path(subject=subject) for subject in SUBJECTS]
-    targets = [fname.mean_mean_fft]
+    for frequency in FREQUENCIES:
 
-    kwargs = dict(
-        in_tsvs=[fname.out_fft_path(subject=subject) for subject in SUBJECTS],
-        out_tsv=fname.mean_mean_fft,
-    )
+        sources = [fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
+        targets = [fname.mean_mean_fft(frequency=frequency)]
 
-    return dict(
-        actions=[(average_freqtags.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
+        kwargs = dict(
+            in_tsvs=[fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
+            out_tsv=fname.mean_mean_fft(frequency=frequency),
+        )
+
+        yield dict(
+            name=f"frequency--{frequency}",
+            actions=[(average_freqtags.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 def task_mean_mean_hilbert() -> Dict:
     """
     Average the mean hilbert calculated for each subject. But this time, across ALL subjects!
     """
-    sources = [fname.out_hilbert_path(subject=subject) for subject in SUBJECTS]
-    targets = [fname.mean_mean_hilbert]
+    for frequency in FREQUENCIES:
 
-    kwargs = dict(
-        in_tsvs=[fname.out_hilbert_path(subject=subject) for subject in SUBJECTS],
-        out_tsv=fname.mean_mean_hilbert,
-    )
+        sources = [fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
+        targets = [fname.mean_mean_hilbert(frequency=frequency)]
 
-    return dict(
-        actions=[(average_freqtags.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
+        kwargs = dict(
+            in_tsvs=[fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
+            out_tsv=fname.mean_mean_hilbert(frequency=frequency),
+        )
+
+        yield dict(
+            name=f"frequency--{frequency}",
+            actions=[(average_freqtags.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 
 
 # fMRI/EEG correlation tasks.
@@ -625,7 +642,7 @@ def task_trim_func_images_again() -> Dict:
 
         sources = [fname.trimmed_func(subject=subject)]
 
-        for volumes_to_remove in range(1, 4):
+        for volumes_to_remove in START_VOLUMES:
 
             targets = [
                 fname.final_func(subject=subject, start_volume=volumes_to_remove),
@@ -638,7 +655,7 @@ def task_trim_func_images_again() -> Dict:
             )
 
             yield dict(
-                name=f"sub-{subject}_startvolume-{volumes_to_remove}",
+                name=f"sub--{subject}, startvolume--{volumes_to_remove}",
                 actions=[(trim_func_images.main2, [], kwargs)],
                 file_dep=sources,
                 targets=targets,
@@ -647,48 +664,50 @@ def task_correlate_eeg_fmri() -> Dict:
     """
     This is it! Huzzah! Correlate our EEG and fMRI data across the whole brain.
     """
-    for subject in SUBJECTS:
-        for start_volume in range(1, 4):
+    for frequency in FREQUENCIES:
+        for subject in SUBJECTS:
+            for start_volume in START_VOLUMES:
 
-            sources = [
-                fname.final_func(subject=subject, start_volume=start_volume),
-                fname.out_tsv_name(subject=subject),
-            ]
-            targets = [
-                fname.correlation_image(subject=subject, start_volume=start_volume),
-            ]
+                sources = [
+                    fname.final_func(subject=subject, start_volume=start_volume),
+                    fname.out_tsv_name(subject=subject, frequency=frequency),
+                ]
+                targets = [
+                    fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                ]
 
-            kwargs = dict(
-                in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
-                in_eeg_path=fname.out_tsv_name(subject=subject),
-                out_image_path=fname.correlation_image(subject=subject, start_volume=start_volume),
-            )
+                kwargs = dict(
+                    in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
+                    in_eeg_path=fname.out_tsv_name(subject=subject, frequency=frequency),
+                    out_image_path=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                )
 
-            yield dict(
-                name=f"sub-{subject}_startvolume-{start_volume}",
-                actions=[(correlate_eeg_fmri.main, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
-            )
+                yield dict(
+                    name=f"sub--{subject}, startvolume--{start_volume}, frequency--{frequency}",
+                    actions=[(correlate_eeg_fmri.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
 def task_ttest_eeg_fmri_correlations() -> Dict:
     """
     ttest the correlations we calculated.
     """
-    for start_volume in range(1, 4):
-        sources = [fname.correlation_image(subject=subject, start_volume=start_volume) for subject in SUBJECTS]
-        targets = [fname.correlations_ttest(start_volume=start_volume)]
+    for frequency in FREQUENCIES:
+        for start_volume in START_VOLUMES:
+            sources = [fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS]
+            targets = [fname.correlations_ttest(start_volume=start_volume, frequency=frequency)]
 
-        kwargs = dict(
-            images=[fname.correlation_image(subject=subject, start_volume=start_volume) for subject in SUBJECTS],
-            prefix=get_prefix(fname.correlations_ttest(start_volume=start_volume)),
-        )
+            kwargs = dict(
+                images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
+                prefix=get_prefix(fname.correlations_ttest(start_volume=start_volume, frequency=frequency)),
+            )
 
-        yield dict(
-            name=f"startvolume-{start_volume}",
-            actions=[(ttest.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
+            yield dict(
+                name=f"startvolume--{start_volume}, frequency--{frequency}",
+                actions=[(ttest.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
 def task_get_occipital_mask() -> Dict:
     """
     Combine 4 Kastner masks to get 1 occipital pole mask. Now that's a steal!
@@ -757,7 +776,7 @@ def task_resample_masks() -> Dict:
         )
 
         yield dict(
-            name=mask["name"],
+            name=f"mask--{mask['name']}",
             actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -770,26 +789,27 @@ def task_apply_masks_to_correlations() -> Dict:
         dict(name="calcarine", in_path=fname.resampled_mask(mask="calcarine")),
         dict(name="occipital", in_path=fname.resampled_mask(mask="occipital")),
     ]
+    
+    for frequency in FREQUENCIES:
+        for start_volume in START_VOLUMES:
+            for mask in masks:
+                sources = [fname.correlations_ttest(start_volume=start_volume, frequency=frequency)]
+                sources += [mask["in_path"]]
 
-    for start_volume in range(1, 4):
-        for mask in masks:
-            sources = [fname.correlations_ttest(start_volume=start_volume)]
-            sources += [mask["in_path"]]
+                targets = [fname.correlations_ttest_masked(start_volume=start_volume, frequency=frequency, mask=mask["name"])]
 
-            targets = [fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"])]
+                kwargs = dict(
+                    in_image=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
+                    in_mask=mask["in_path"],
+                    out_prefix=get_prefix(fname.correlations_ttest_masked(start_volume=start_volume, frequency=frequency, mask=mask["name"])),
+                )
 
-            kwargs = dict(
-                in_image=fname.correlations_ttest(start_volume=start_volume),
-                in_mask=mask["in_path"],
-                out_prefix=get_prefix(fname.correlations_ttest_masked(start_volume=start_volume, mask=mask["name"])),
-            )
-
-            yield dict(
-                name=f"startvolume-{start_volume}_mask-{mask['name']}",
-                actions=[(apply_mask.main, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
-            )
+                yield dict(
+                    name=f"startvolume--{start_volume}, mask--{mask['name']}, frequency--{frequency}",
+                    actions=[(apply_mask.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
 def task_apply_masks_to_irfs() -> Dict:
     """
     FOR each subject, USING her IRF, USING sub-brick 3, FOR each ROI, APPLY ROI mask to IRF.
@@ -822,7 +842,7 @@ def task_apply_masks_to_irfs() -> Dict:
             )
 
             yield dict(
-                name=f"sub {subject}, mask {mask['name']}",
+                name=f"sub--{subject}, mask--{mask['name']}",
                 actions=[(apply_mask.main, [], kwargs)],
                 file_dep=sources,
                 targets=targets,
@@ -831,25 +851,29 @@ def task_clusterize_irfs() -> Dict:
     """
     FOR each subject, FOR each masked IRF, GET all clusters.
     """
+    regions = "calcarine occipital".split()
     for subject in SUBJECTS:
-        masked_irfs = [
-            dict(name="calcarine", in_path=fname.masked_irf(subject=subject, mask="calcarine")),
-            dict(name="occipital", in_path=fname.masked_irf(subject=subject, mask="occipital")),
-        ]
+        for region in regions:
 
-        for irf in masked_irfs:
-            sources = [fname.masked_irf(subject=subject, mask=irf["name"])]
-            targets = [fname.clusters(subject=subject, mask=irf["name"])]
+            # Get sources.
+            masked_irf = fname.masked_irf(subject=subject, mask=region)
+            sources = [masked_irf]
 
+            # Get targets.
+            clusters = fname.clusters(subject=subject, mask=region)
+            clusters_summary = fname.clusters_summary(subject=subject, mask=region)
+            targets = [clusters, clusters_summary]
+
+            # Get args to run.
             kwargs = dict(
-                in_image=fname.masked_irf(subject=subject, mask=irf["name"]),
-                out_prefix=get_prefix(fname.clusters(subject=subject, mask=irf["name"])),
-                out_summary=fname.clusters_summary(subject=subject, mask=irf["name"]),
+                in_image=masked_irf,
+                out_prefix=get_prefix(clusters),
+                out_summary=clusters_summary,
                 subbrick=3,
             )
 
             yield dict(
-                name=f"subject - {subject}, IRF - {irf['name']}",
+                name=f"subject--{subject}, region--{region}",
                 actions=[(clusterize.main, [], kwargs)],
                 file_dep=sources,
                 targets=targets,
@@ -864,23 +888,27 @@ def task_make_micromasks() -> Dict:
     for subject in SUBJECTS:
         for region in regions:
 
-            sources = [
-                fname.clusters(subject=subject, mask=region),
-                fname.clusters_summary(subject=subject, mask=region),
-                ]
+            # Get sources.
+            clusters_image = fname.clusters(subject=subject, mask=region)
+            clusters_summary = fname.clusters_summary(subject=subject, mask=region)
+            sources = [clusters_image, clusters_summary]
 
-            targets = [fname.micromask(subject=subject, mask=region)]
+            # Get targets.
+            micromask = fname.micromask(subject=subject, mask=region)
+            targets = [micromask]
 
-            kwargs = dict(
-                clusters_image=fname.clusters(subject=subject, mask=region),
-                clusters_1d_file=fname.clusters_summary(subject=subject, mask=region),
-                get_positive_cluster=True if region == "occipital" else False,
-                out_prefix=get_prefix(fname.micromask(subject=subject, mask=region)),
-            )
+            # Get action.
+            action = f"""
+                python3 micromasks.py
+                --clusters_image {clusters_image}
+                --clusters_1d_file {clusters_summary}
+                --out_prefix {get_prefix(micromask)}
+                --get_negative_cluster {True if region == "calcarine" else False,}
+            """.split()
 
             yield dict(
-                name=f"subject - {subject}, region - {region}",
-                actions=[(micromasks.main, [], kwargs)],
+                name=f"subject--{subject}, region--{region}",
+                actions=[action],
                 file_dep=sources,
                 targets=targets,
             )
@@ -891,7 +919,7 @@ def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
     regions = "calcarine occipital".split()
     for subject in SUBJECTS:
         for region in regions:
-            for start_volume in range(1, 4):
+            for start_volume in START_VOLUMES:
                 trimmed_trimmed_func = fname.final_func(subject=subject, start_volume=start_volume)
                 micromask = fname.micromask(subject=subject, mask=region)
                 micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
@@ -909,7 +937,7 @@ def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
                 )
 
                 yield dict(
-                    name=f"subject - {subject}, mask - {region}, start_volume - {start_volume}",
+                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
                     actions=[(apply_mask.main, [], kwargs)],
                     file_dep=sources,
                     targets=targets,
@@ -921,7 +949,7 @@ def task_average_microregion_voxels() -> Dict:
     regions = "calcarine occipital".split()
     for subject in SUBJECTS:
         for region in regions:
-            for start_volume in range(1, 4):
+            for start_volume in START_VOLUMES:
                 micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
                 averages = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
 
@@ -935,7 +963,7 @@ def task_average_microregion_voxels() -> Dict:
                 )
 
                 yield dict(
-                    name=f"subject - {subject}, mask - {region}, start_volume - {start_volume}",
+                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
                     actions=[(average_voxels.main, [], kwargs)],
                     file_dep=sources,
                     targets=targets,
@@ -945,66 +973,69 @@ def task_correlate_microregions() -> Dict:
     Correlate the time series of each microregion with its image's Oz data.
     """
     regions = "calcarine occipital".split()
-    for subject in SUBJECTS:
+    for frequency in FREQUENCIES:
+        for subject in SUBJECTS:
+            for region in regions:
+                for start_volume in START_VOLUMES:
+                    average = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
+                    moving_moving_window_data = fname.out_tsv_name(subject=subject, frequency=frequency)
+                    correlations = fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
+                    table = fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
+                    scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
+
+                    sources = [average, moving_moving_window_data]
+                    targets = [correlations, scatter, table]
+
+                    action = f"""
+                        python3 correlate_regions.py
+                        --load_amplitudes_from {moving_moving_window_data}
+                        --load_microROI_from {average}
+                        --save_scatter_to {scatter}
+                        --save_table_to {table}
+                        --save_spearman_to {correlations}
+                    """.split()
+
+                    yield dict(
+                        name=f"subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
+                        actions=[action],
+                        file_dep=sources,
+                        targets=targets,
+                    )
+def task_correlate_across_subjects() -> Dict:
+    """
+    How big is the correlation across ALL subjects for each microROI?
+    """
+    regions = "calcarine occipital".split()
+
+    for frequency in FREQUENCIES:
         for region in regions:
-            for start_volume in range(1, 4):
-                average = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
-                moving_moving_window_data = fname.out_tsv_name(subject=subject)
-                correlations = fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume)
-                table = fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume)
-                scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume)
+            for start_volume in START_VOLUMES:
 
-                sources = [average, moving_moving_window_data]
-                targets = [correlations, scatter, table]
+                # Get sources.
+                tables_to_be_catenated = [fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS]
+                sources = tables_to_be_catenated
 
+                # Get targets.
+                correlations = fname.correlation_across_subjects(mask=region, frequency=frequency, start_volume=start_volume)
+                table = fname.correlation_across_subjects_table(mask=region, frequency=frequency, start_volume=start_volume)
+                scatter = fname.correlation_across_subjects_scatter(mask=region, frequency=frequency, start_volume=start_volume)
+                targets = [correlations, table, scatter]
+
+                # Get action.
                 action = f"""
-                    python3 correlate_regions.py
-                    --load_amplitudes_from {moving_moving_window_data}
-                    --load_microROI_from {average}
+                    python3 correlate_all_microregions.py
+                    --load_tables_from {" ".join(tables_to_be_catenated)}
                     --save_scatter_to {scatter}
                     --save_table_to {table}
                     --save_spearman_to {correlations}
                 """.split()
 
                 yield dict(
-                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
+                    name=f"mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
                     actions=[action],
                     file_dep=sources,
                     targets=targets,
                 )
-def task_correlate_across_subjects() -> Dict:
-    """
-    How big is the correlation across ALL subjects for each microROI?
-    """
-    regions = "calcarine occipital".split()
-    for region in regions:
-        for start_volume in range(1, 4):
-            
-            # Get sources.
-            tables_to_be_catenated = [fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume) for subject in SUBJECTS]
-            sources = tables_to_be_catenated
-
-            # Get targets.
-            correlations = fname.correlation_across_subjects(mask=region, start_volume=start_volume)
-            table = fname.correlation_across_subjects_table(mask=region, start_volume=start_volume)
-            scatter = fname.correlation_across_subjects_scatter(mask=region, start_volume=start_volume)
-            targets = [correlations, table, scatter]
-
-            # Get action.
-            action = f"""
-                python3 correlate_all_microregions.py
-                --load_tables_from {" ".join(tables_to_be_catenated)}
-                --save_scatter_to {scatter}
-                --save_table_to {table}
-                --save_spearman_to {correlations}
-            """.split()
-
-            yield dict(
-                name=f"mask--{region}, start_volume--{start_volume}",
-                actions=[action],
-                file_dep=sources,
-                targets=targets,
-            )
 
 
 # Tasks to test afniproc vs fmriprep.
@@ -1058,7 +1089,7 @@ def task_resample_afniproc_irfs() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -1083,7 +1114,7 @@ def task_smooth_fmriprep() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(smooth.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -1106,7 +1137,7 @@ def task_scale_fmriprep() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(scale.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -1135,7 +1166,7 @@ def task_deconvolve_fmriprep() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(deconvolve.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -1190,7 +1221,7 @@ def task_resample_fmriprep_irfs() -> Dict:
         )
 
         yield dict(
-            name=subject,
+            name=f"subject--{subject}",
             actions=[(resample.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
@@ -1212,7 +1243,7 @@ def task_ttest_fmriprep_vs_afniproc() -> Dict:
         )
 
         yield dict(
-            name=f"subbrick {subbrick}",
+            name=f"subbrick--{subbrick}",
             actions=[(ttest_2_groups.main, [], kwargs)],
             file_dep=sources,
             targets=targets,
