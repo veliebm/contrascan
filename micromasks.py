@@ -53,4 +53,4 @@ def read_1D(in_path: PathLike) -> pandas.DataFrame:
     """
     Read an AFNI 1D file.
     """
-    return pandas.read_table(in_path, sep=" +", header=None, index_col=False, comment="#")
+    return pandas.read_table(in_path, sep=" +", header=None, index_col=False, comment="#", engine="python")
