@@ -13,13 +13,14 @@ delete_lock_file(mfilename('fullpath'))
 %% Driver functions.
 function do_all(parameters_file)
     % Read a JSON file to get parameters, then use them to process all subjects.
+    eeglab;
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot, parameters.out_faxisall_path, parameters.out_spec_path)
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot, parameters.out_faxisall_path, parameters.out_spec_path, parameters.out_meanwinmat_pow_path)
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot, out_faxisall_path, out_spec_path)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot, out_faxisall_path, out_spec_path, out_meanwinmat_pow_path)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -82,7 +83,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     % Note the sample rate is 600 Hz at 6 Hz
     [meanwinmat_pow, meanwinmat_phase, meanwinmat_freqs] = freqtag_FFT(meanwinmat, 600); 
     plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, sprintf('Power spectrum of the mean window shifted at %i Hz', frequency), 'Frequency (Hz)', sliding_window_average_fft_plot)
-
+    to_csv(meanwinmat_pow, out_meanwinmat_pow_path)
 
     %% Plot spectrum
     %plot_single_fft_all_sensors(faxisall, spec)
@@ -213,7 +214,6 @@ function to_csv(mat, out_filename)
 end
 function [EEG] = load_dataset(file_name, directory)
     % Load a dataset.
-    eeglab;
     EEG = pop_loadset('filename', file_name, 'filepath', directory);
     EEG = eeg_checkset(EEG);
 end
