@@ -12,7 +12,7 @@ import pandas
 from pathlib import Path
 
 
-def main(in_csvs: List[PathLike], out_csv: PathLike) -> None:
+def main(in_csvs: List[PathLike], out_tsv: PathLike) -> None:
     """
     Average our freqtag stuff across subjects.
     """
@@ -24,7 +24,7 @@ def main(in_csvs: List[PathLike], out_csv: PathLike) -> None:
 
     averaged_table = summed_table / len(tables)
 
-    save_tsv(averaged_table, out_csv)
+    save_tsv(averaged_table, out_tsv)
 
 
 def save_tsv(table: pandas.DataFrame, out_path: PathLike) -> None:
