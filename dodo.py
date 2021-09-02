@@ -559,6 +559,7 @@ def task_prepare_to_freqtag_eeg() -> Dict:
                 frequency=frequency,
                 sliding_window_average_plot=fname.sliding_window_average_plot(subject=subject, frequency=frequency),
                 sliding_window_average_fft_plot=fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
+                out_freq_axis_path=fname.out_freq_axis_path(subject=subject, frequency=frequency)
             ))
 
     kwargs = dict(
@@ -585,9 +586,17 @@ def task_freqtag_eeg() -> Dict:
         sources = [fname.freqtageeg_json]
 
         # Get targets.
-        targets = [fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
-        targets += [fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
-        targets += [fname.out_sliding_window_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
+        targets = []
+        for subject in SUBJECTS:
+            subject_targets = [
+                fname.out_fft_path(subject=subject, frequency=frequency),
+                fname.out_hilbert_path(subject=subject, frequency=frequency),
+                fname.out_sliding_window_path(subject=subject, frequency=frequency),
+                fname.sliding_window_average_plot(subject=subject, frequency=frequency),
+                fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
+                fname.out_freq_axis_path(subject=subject, frequency=frequency),
+            ]
+            targets += subject_targets
 
         # Get action.
         path_to_script="freqtag_pipeline.m"
@@ -613,7 +622,7 @@ def task_mean_mean_fft() -> Dict:
         targets = [fname.mean_mean_fft(frequency=frequency)]
 
         kwargs = dict(
-            in_tsvs=[fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
+            in_csvs=[fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
             out_tsv=fname.mean_mean_fft(frequency=frequency),
         )
 
@@ -633,7 +642,7 @@ def task_mean_mean_hilbert() -> Dict:
         targets = [fname.mean_mean_hilbert(frequency=frequency)]
 
         kwargs = dict(
-            in_tsvs=[fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
+            in_csvs=[fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
             out_tsv=fname.mean_mean_hilbert(frequency=frequency),
         )
 

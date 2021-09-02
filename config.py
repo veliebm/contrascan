@@ -183,6 +183,7 @@ fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequen
 fname.add("out_sliding_window_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow.slidwin.mat")
 fname.add("sliding_window_average_plot", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow_average.jpeg")
 fname.add("sliding_window_average_fft_plot", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow_average_FFT.jpeg")
+fname.add("out_freq_axis_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_frequencyaxis.csv")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")

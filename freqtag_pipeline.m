@@ -16,10 +16,10 @@ function do_all(parameters_file)
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot)
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot, parameters.out_freq_axis_path)
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot, out_freq_axis_path)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -64,6 +64,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     %% Plot the spectrum. For visualization purposes, only plot the frequencies of interest.
     %plot_fft_all_sensors(pow, freqs, num_freqs)
     %plot_fft_sensor(pow, freqs, num_freqs, oz_id)
+    to_csv(faxisall, out_freq_axis_path)
     
     
     %% Run FFT on single-trials.
@@ -153,7 +154,7 @@ end
 function plot_single_fft_all_sensors(faxisall, spec)
     % Plot our single FFT for every sensor.
     figure(), plot(faxisall(:, 1:100), spec(:, 1:100))
-    ax = gca;%%editing the plot
+    ax = gca;
     ax.FontSize = 18;
     ax.Box = 'off'
     xlabel('Frequency (Hz)'), ylabel('Power (?V�)')
