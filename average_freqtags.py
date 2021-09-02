@@ -12,11 +12,11 @@ import pandas
 from pathlib import Path
 
 
-def main(in_tsvs: List[PathLike], out_tsv: PathLike) -> None:
+def main(in_csvs: List[PathLike], out_csv: PathLike) -> None:
     """
     Average our freqtag stuff across subjects.
     """
-    tables = [read_tsv(tsv) for tsv in in_tsvs]
+    tables = [read_csv(csv) for csv in in_csvs]
 
     summed_table = tables[0]
     for table in tables[1:]:
@@ -24,7 +24,7 @@ def main(in_tsvs: List[PathLike], out_tsv: PathLike) -> None:
 
     averaged_table = summed_table / len(tables)
 
-    save_tsv(averaged_table, out_tsv)
+    save_tsv(averaged_table, out_csv)
 
 
 def save_tsv(table: pandas.DataFrame, out_path: PathLike) -> None:
@@ -35,17 +35,17 @@ def save_tsv(table: pandas.DataFrame, out_path: PathLike) -> None:
     table.to_csv(out_path, sep='\t', index=None)
 
 
-def read_tsv(tsv_path: PathLike) -> pandas.DataFrame:
+def read_csv(csv_path: PathLike) -> pandas.DataFrame:
     """
-    Read a TSV file. Returns a DataFrame.
+    Read a csv file. Returns a DataFrame.
     """
-    tsv_info = pandas.read_table(
-        tsv_path,
-        sep="\t",
+    csv_info = pandas.read_table(
+        csv_path,
+        sep=",",
         index_col=False,
         header=None,
     ).T
 
-    tsv_info.columns += 1     # Make the channel numbers correspond to the MatLab channel numbers
+    csv_info.columns += 1     # Make the channel numbers correspond to the MatLab channel numbers
 
-    return tsv_info
+    return csv_info
