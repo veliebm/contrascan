@@ -558,6 +558,7 @@ def task_prepare_to_freqtag_eeg() -> Dict:
                 out_sliding_window_prefix=get_matlab_prefix(fname.out_sliding_window_path(subject=subject, frequency=frequency)),
                 frequency=frequency,
                 sliding_window_average_plot=fname.sliding_window_average_plot(subject=subject, frequency=frequency),
+                sliding_window_average_fft_plot=fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
             ))
 
     kwargs = dict(

@@ -16,10 +16,10 @@ function do_all(parameters_file)
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot)
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot)
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -57,8 +57,8 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     stimulus_end = 2483;
     
     [pow, phase, freqs] = freqtag_FFT(mean(dataset(:, stimulus_start:stimulus_end, :),3), 500); %The fft function takes a 2-D matrix, it is necessary to average over the trials (third dimension) 
-    to_tsv(pow, out_fft_path)
-    to_tsv(freqs, 'processed/freqtageeg/freqs.tsv')
+    to_csv(pow, out_fft_path)
+    to_csv(freqs, 'processed/freqtageeg/freqs.csv')
     
     
     %% Plot the spectrum. For visualization purposes, only plot the frequencies of interest.
@@ -81,7 +81,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     %% Project sliding window average into frequency domain.
     % Note the sample rate is 600 Hz at 6 Hz
     [meanwinmat_pow, meanwinmat_phase, meanwinmat_freqs] = freqtag_FFT(meanwinmat, 600); 
-    %plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, 'Power spectrum of the mean window shifted at {FREQUENCY} Hz', 'Frequency (Hz)')
+    plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, sprintf('Power spectrum of the mean window shifted at %i Hz', frequency), 'Frequency (Hz)', sliding_window_average_fft_plot)
 
 
     %% Plot spectrum
@@ -91,7 +91,7 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     
     %% Run Hilbert Transform. Check the frequency of interest.
     [powermat, phasemat, complexmat] = freqtag_HILB(mean(dataset(:, stimulus_start:stimulus_end, :), 3), frequency, 8, oz_id, 0, sampling_rate);
-    to_tsv(powermat, out_hilbert_path)
+    to_csv(powermat, out_hilbert_path)
     
     
     %% Plot frequency over time
@@ -117,12 +117,16 @@ function plot_sliding_window_average(meanwinmat, fig_title, fig_x_label, fig_y_l
     exportgraphics(fig, out_path, 'Resolution', 300)
     close(fig)
 end
-function plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, fig_title, fig_x_label)
+function plot_sliding_window_average_FFT(meanwinmat_freqs, meanwinmat_pow, fig_title, fig_x_label, out_path)
     % Plot that fancy sliding window average you calculated - but now after it's been FFT'd!
-    figure,
+    fig = figure('visible', 'off');
+
     bar(meanwinmat_freqs(2:20), meanwinmat_pow(32,2:20)');
     title(fig_title)
     xlabel(fig_x_label)
+
+    exportgraphics(fig, out_path, 'Resolution', 300)
+    close(fig)
 end
 
 
@@ -198,9 +202,9 @@ end
 
 
 %% Other functions.
-function to_tsv(mat, out_filename)
-    % Write a matrix to tsv.
-    dlmwrite(out_filename, mat, '\t');
+function to_csv(mat, out_filename)
+    % Write a matrix to a csv file.
+    writematrix(mat, out_filename);
 end
 function [EEG] = load_dataset(file_name, directory)
     % Load a dataset.
