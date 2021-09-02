@@ -186,6 +186,7 @@ fname.add("sliding_window_average_fft_plot", "{freqtageeg_dir}/sub-{subject}_fre
 fname.add("out_faxisall_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_faxisall.csv")
 fname.add("out_spec_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_spec.csv")
 fname.add("out_meanwinmat_pow_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_meanwinmat_pow.csv")
+fname.add("out_meanwinmat_freqs_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_meanwinmat_freqs.csv")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")
