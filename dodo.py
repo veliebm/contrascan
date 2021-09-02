@@ -559,7 +559,8 @@ def task_prepare_to_freqtag_eeg() -> Dict:
                 frequency=frequency,
                 sliding_window_average_plot=fname.sliding_window_average_plot(subject=subject, frequency=frequency),
                 sliding_window_average_fft_plot=fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
-                out_freq_axis_path=fname.out_freq_axis_path(subject=subject, frequency=frequency)
+                out_faxisall_path=fname.out_faxisall_path(subject=subject, frequency=frequency),
+                out_spec_path=fname.out_spec_path(subject=subject, frequency=frequency),
             ))
 
     kwargs = dict(
@@ -594,7 +595,8 @@ def task_freqtag_eeg() -> Dict:
                 fname.out_sliding_window_path(subject=subject, frequency=frequency),
                 fname.sliding_window_average_plot(subject=subject, frequency=frequency),
                 fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
-                fname.out_freq_axis_path(subject=subject, frequency=frequency),
+                fname.out_faxisall_path(subject=subject, frequency=frequency),
+                fname.out_spec_path(subject=subject, frequency=frequency),
             ]
             targets += subject_targets
 

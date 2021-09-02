@@ -16,10 +16,10 @@ function do_all(parameters_file)
     all_parameters = read_json(parameters_file);
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i);
-        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot, parameters.out_freq_axis_path)
+        do_one(parameters.in_eeg_name, parameters.in_eeg_dir, parameters.out_fft_path, parameters.out_hilbert_path, parameters.out_sliding_window_prefix, str2num(parameters.frequency), parameters.sliding_window_average_plot, parameters.sliding_window_average_fft_plot, parameters.out_faxisall_path, parameters.out_spec_path)
     end
 end
-function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot, out_freq_axis_path)
+function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sliding_window_prefix, frequency, sliding_window_average_plot, sliding_window_average_fft_plot, out_faxisall_path, out_spec_path)
     % Process a subject.
     %% Load our data.
     EEG = load_dataset(in_eeg_name, in_eeg_dir);
@@ -64,7 +64,6 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     %% Plot the spectrum. For visualization purposes, only plot the frequencies of interest.
     %plot_fft_all_sensors(pow, freqs, num_freqs)
     %plot_fft_sensor(pow, freqs, num_freqs, oz_id)
-    to_csv(faxisall, out_freq_axis_path)
     
     
     %% Run FFT on single-trials.
@@ -88,6 +87,8 @@ function do_one(in_eeg_name, in_eeg_dir, out_fft_path, out_hilbert_path, out_sli
     %% Plot spectrum
     %plot_single_fft_all_sensors(faxisall, spec)
     %plot_single_fft_one_sensor(spec, faxisall, oz_id)
+    to_csv(faxisall, out_faxisall_path)
+    to_csv(spec, out_spec_path)
     
     
     %% Run Hilbert Transform. Check the frequency of interest.
@@ -206,6 +207,9 @@ end
 function to_csv(mat, out_filename)
     % Write a matrix to a csv file.
     writematrix(mat, out_filename);
+
+    % Pause to hopefully allow MatLab to actually write more than one file :(
+    pause(2)
 end
 function [EEG] = load_dataset(file_name, directory)
     % Load a dataset.
