@@ -59,6 +59,7 @@ function do_one()
     save('{kwargs["write_stimulus_start_to"]}', 'stimulus_start');
     save('{kwargs["write_stimulus_end_to"]}', 'stimulus_end');
     save('{kwargs["write_epoch_duration_to"]}', 'epoch_duration');
+    save('{kwargs["write_sampling_rate_to"]}', 'sampling_rate');
 end
 """)
 
@@ -102,6 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("--write_stimulus_start_to", required=True, help="Where to write the stimulus start time.")
     parser.add_argument("--write_stimulus_end_to", required=True, help="Where to write the stimulus end time.")
     parser.add_argument("--write_epoch_duration_to", required=True, help="Where to write epoch duration.")
+    parser.add_argument("--write_sampling_rate_to", required=True, help="Where to write sampling rate.")
 
     parsed_args = parser.parse_args()
     parsed_args_dict = vars(parsed_args)
