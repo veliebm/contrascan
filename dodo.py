@@ -533,7 +533,7 @@ def task_moving_moving_window_eeg() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def task_prepare_to_freqtag_eeg() -> Dict:
+def UNUSED_task_prepare_to_freqtag_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script we wrote to run a frequency tagging analysis.
     """
@@ -576,49 +576,49 @@ def task_prepare_to_freqtag_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
-def task_freqtag_eeg() -> Dict:
+def task_freqtag_calculate_parameters() -> Dict:
     """
-    Run a frequency tagging analysis!
-
-    Because MatLab is ~quirky~, we can't do multithreading on this one.
-    We must do all subjects in one glorious blaze!
+    Calculate the parameters of the freqtag pipeline.
     """
-    for frequency in FREQUENCIES:
+    Path(fname.freqtag_parameters_dir).mkdir(exist_ok=True, parents=True)
 
-        # Get sources.
-        sources = [fname.freqtageeg_json]
+    # Get sources.
+    sources = []
 
-        # Get targets.
-        targets = []
-        for subject in SUBJECTS:
-            subject_targets = [
-                fname.out_fft_path(subject=subject, frequency=frequency),
-                fname.out_hilbert_path(subject=subject, frequency=frequency),
-                fname.out_sliding_window_path(subject=subject, frequency=frequency),
-                fname.sliding_window_average_plot(subject=subject, frequency=frequency),
-                fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
-                fname.out_faxisall_path(subject=subject, frequency=frequency),
-                fname.out_spec_path(subject=subject, frequency=frequency),
-                fname.out_meanwinmat_pow_path(subject=subject, frequency=frequency),
-                fname.out_meanwinmat_freqs_path(subject=subject, frequency=frequency),
-            ]
-            targets += subject_targets
+    # Get targets.
+    script = fname.write_parameters_script_to
+    faxis = fname.write_faxis_to
+    faxisall = fname.write_faxisall_to
+    stimulus_start = fname.write_stimulus_start_to
+    stimulus_end = fname.write_stimulus_end_to
+    epoch_duration = fname.write_epoch_duration_to
+    targets = [
+        script,
+        faxis,
+        faxisall,
+        stimulus_start,
+        stimulus_end,
+        epoch_duration
+    ]
 
-        # Get action.
-        path_to_script="freqtag_pipeline.m"
-        action = f"""
-            python3 matlab.py
-            --run_script_at {path_to_script}
-        """.split()
+    # Get args.
+    action = f"""\
+        python3 freqtag_calculate_parameters.py
+        --write_script_to {script}
+        --write_faxis_to {faxis}
+        --write_faxisall_to {faxisall}
+        --write_stimulus_start_to {stimulus_start}
+        --write_stimulus_end_to {stimulus_end}
+        --write_epoch_duration_to {epoch_duration}
+    """.split()
 
-        # Go!
-        yield dict(
-            name=f"frequency--{frequency}",
-            actions=[action],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_mean_mean_fft() -> Dict:
+    # Go!
+    return dict(
+        actions=[action],
+        file_dep=sources,
+        targets=targets,
+    )
+def TEMPORARILY_DISABLED_task_mean_mean_fft() -> Dict:
     """
     Average the mean FFT calculated for each subject. But this time, across ALL subjects!
     """
@@ -638,7 +638,7 @@ def task_mean_mean_fft() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def task_mean_mean_hilbert() -> Dict:
+def TEMPORARILY_DISABLED_task_mean_mean_hilbert() -> Dict:
     """
     Average the mean hilbert calculated for each subject. But this time, across ALL subjects!
     """

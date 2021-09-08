@@ -85,6 +85,9 @@ fname.add("brainvision_dir", "{raw_data_dir}/brainvision/EXPORT")
 # Processed data directory.
 fname.add("processed_data_dir", "./processed")
 
+# Script directory.
+fname.add("scripts_dir", ".")
+
 # task_check:
 fname.add("system_check", "./system_check.txt")
 
@@ -175,18 +178,14 @@ fname.add("trimeeg_json", "{trimeeg_dir}/parameters.json")
 # task_segment_eeg:
 fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 
-# task_prepare_to_freqtag_eeg:
-fname.add("freqtageeg_dir", "{processed_data_dir}/freqtageeg")
-fname.add("freqtageeg_json", "{freqtageeg_dir}/parameters.json")
-fname.add("out_fft_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_mean_FFT.csv")
-fname.add("out_hilbert_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_mean_hilbert.csv")
-fname.add("out_sliding_window_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow.slidwin.mat")
-fname.add("sliding_window_average_plot", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow_average.jpeg")
-fname.add("sliding_window_average_fft_plot", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_slidingwindow_average_FFT.jpeg")
-fname.add("out_faxisall_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_faxisall.csv")
-fname.add("out_spec_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_spec.csv")
-fname.add("out_meanwinmat_pow_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_meanwinmat_pow.csv")
-fname.add("out_meanwinmat_freqs_path", "{freqtageeg_dir}/sub-{subject}_frequency-{frequency}_meanwinmat_freqs.csv")
+# task_freqtag_calculate_parameters:
+fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")
+fname.add("write_parameters_script_to", "{scripts_dir}/TEMP_get_params.m")
+fname.add("write_faxis_to", "{freqtag_parameters_dir}/faxis.mat")
+fname.add("write_faxisall_to", "{freqtag_parameters_dir}/faxisall.mat")
+fname.add("write_stimulus_start_to", "{freqtag_parameters_dir}/stimulus_start.mat")
+fname.add("write_stimulus_end_to", "{freqtag_parameters_dir}/stimulus_end.mat")
+fname.add("write_epoch_duration_to", "{freqtag_parameters_dir}/epoch_duration.mat")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")
