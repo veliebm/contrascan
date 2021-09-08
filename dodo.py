@@ -533,49 +533,6 @@ def task_moving_moving_window_eeg() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def UNUSED_task_prepare_to_freqtag_eeg() -> Dict:
-    """
-    Write a JSON file that will be read later by a MatLab script we wrote to run a frequency tagging analysis.
-    """
-    # Get sources.
-    segmented_eegs = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
-    sources = segmented_eegs
-
-    # Get targets.
-    freqtag_eeg_json = fname.freqtageeg_json
-    targets = [freqtag_eeg_json]
-
-    # Get args.
-    data = []
-    for subject in SUBJECTS:
-        for frequency in FREQUENCIES:
-
-            data.append(dict(
-                in_eeg_name=Path(fname.segmented_eeg(subject=subject)).name,
-                in_eeg_dir=fname.segmenteeg_dir,
-                out_fft_path=fname.out_fft_path(subject=subject, frequency=frequency),
-                out_hilbert_path=fname.out_hilbert_path(subject=subject, frequency=frequency),
-                out_sliding_window_prefix=get_matlab_prefix(fname.out_sliding_window_path(subject=subject, frequency=frequency)),
-                frequency=frequency,
-                sliding_window_average_plot=fname.sliding_window_average_plot(subject=subject, frequency=frequency),
-                sliding_window_average_fft_plot=fname.sliding_window_average_fft_plot(subject=subject, frequency=frequency),
-                out_faxisall_path=fname.out_faxisall_path(subject=subject, frequency=frequency),
-                out_spec_path=fname.out_spec_path(subject=subject, frequency=frequency),
-                out_meanwinmat_pow_path=fname.out_meanwinmat_pow_path(subject=subject, frequency=frequency),
-                out_meanwinmat_freqs_path=fname.out_meanwinmat_freqs_path(subject=subject, frequency=frequency),
-            ))
-
-    kwargs = dict(
-        out_path=freqtag_eeg_json,
-        data=data,
-    )
-
-    # Go!
-    return dict(
-        actions=[(write_json.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
 def task_freqtag_calculate_parameters() -> Dict:
     """
     Calculate the parameters of the freqtag pipeline.
