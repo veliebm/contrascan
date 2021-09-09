@@ -629,6 +629,51 @@ def task_freqtag_fft() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_freqtag_3d_fft() -> Dict:
+    """
+    Do an FFT of each and every trial whooooooooooooooooah man
+    """
+    Path(fname.freqtag_3d_fft_dir).mkdir(exist_ok=True, parents=True)
+
+    for subject in SUBJECTS:
+        # Get sources.
+        segmented_eeg = fname.segmented_eeg(subject=subject)
+        sampling_rate = fname.freqtag_sampling_rate
+        stimulus_start = fname.freqtag_stimulus_start
+        stimulus_end = fname.freqtag_stimulus_end
+        sources = [
+            segmented_eeg,
+            sampling_rate,
+            stimulus_start,
+            stimulus_end
+        ]
+
+        # Get targets.
+        script = fname.freqtag_3d_fft_script(subject=subject)
+        spec = fname.freqtag_3d_fft_spec(subject=subject)
+        targets = [
+            script,
+            spec,
+        ]
+
+        # Get args.
+        action = f"""\
+            python3 freqtag_3d_fft.py
+            --write_script_to {script}
+            --write_spec_to {spec}
+            --read_segmented_eeg_from {segmented_eeg}
+            --read_sampling_rate_from {sampling_rate}
+            --read_stimulus_start_from {stimulus_start}
+            --read_stimulus_end_from {stimulus_end}
+        """.split()
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources,
+            targets=targets,
+        )
 def TEMPORARILY_DISABLED_task_mean_mean_fft() -> Dict:
     """
     Average the mean FFT calculated for each subject. But this time, across ALL subjects!

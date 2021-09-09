@@ -195,6 +195,11 @@ fname.add("freqtag_fft_phase", "{freqtag_fft_dir}/sub-{subject}_phase.mat")
 fname.add("freqtag_fft_pow", "{freqtag_fft_dir}/sub-{subject}_pow.mat")
 fname.add("freqtag_fft_freqs", "{freqtag_fft_dir}/sub-{subject}_freqs.mat")
 
+# task_freqtag_3d_fft:
+fname.add("freqtag_3d_fft_script", "{scripts_dir}/TEMP_sub{subject}_freqtag_3d_fft.m")
+fname.add("freqtag_3d_fft_dir", "{processed_data_dir}/freqtag_3d_fft")
+fname.add("freqtag_3d_fft_spec", "{freqtag_3d_fft_dir}/sub-{subject}_spec.mat")
+
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")
 
