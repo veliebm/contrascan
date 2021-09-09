@@ -180,12 +180,20 @@ fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 
 # task_freqtag_calculate_parameters:
 fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")
-fname.add("write_parameters_script_to", "{scripts_dir}/TEMP_get_params.m")
-fname.add("write_faxis_to", "{freqtag_parameters_dir}/faxis.mat")
-fname.add("write_faxisall_to", "{freqtag_parameters_dir}/faxisall.mat")
-fname.add("write_stimulus_start_to", "{freqtag_parameters_dir}/stimulus_start.mat")
-fname.add("write_stimulus_end_to", "{freqtag_parameters_dir}/stimulus_end.mat")
-fname.add("write_epoch_duration_to", "{freqtag_parameters_dir}/epoch_duration.mat")
+fname.add("freqtag_parameters_script", "{scripts_dir}/TEMP_get_params.m")
+fname.add("freqtag_faxis", "{freqtag_parameters_dir}/faxis.mat")
+fname.add("freqtag_faxisall", "{freqtag_parameters_dir}/faxisall.mat")
+fname.add("freqtag_stimulus_start", "{freqtag_parameters_dir}/stimulus_start.mat")
+fname.add("freqtag_stimulus_end", "{freqtag_parameters_dir}/stimulus_end.mat")
+fname.add("freqtag_epoch_duration", "{freqtag_parameters_dir}/epoch_duration.mat")
+fname.add("freqtag_sampling_rate", "{freqtag_parameters_dir}/sampling_rate.mat")
+
+# task_freqtag_fft:
+fname.add("freqtag_fft_script", "{scripts_dir}/TEMP_sub{subject}_freqtag_fft.m")
+fname.add("freqtag_fft_dir", "{processed_data_dir}/freqtag_fft")
+fname.add("freqtag_fft_phase", "{freqtag_fft_dir}/sub-{subject}_phase.mat")
+fname.add("freqtag_fft_pow", "{freqtag_fft_dir}/sub-{subject}_pow.mat")
+fname.add("freqtag_fft_freqs", "{freqtag_fft_dir}/sub-{subject}_freqs.mat")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")

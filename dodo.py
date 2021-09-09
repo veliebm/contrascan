@@ -543,19 +543,21 @@ def task_freqtag_calculate_parameters() -> Dict:
     sources = []
 
     # Get targets.
-    script = fname.write_parameters_script_to
-    faxis = fname.write_faxis_to
-    faxisall = fname.write_faxisall_to
-    stimulus_start = fname.write_stimulus_start_to
-    stimulus_end = fname.write_stimulus_end_to
-    epoch_duration = fname.write_epoch_duration_to
+    script = fname.freqtag_parameters_script
+    faxis = fname.freqtag_faxis
+    faxisall = fname.freqtag_faxisall
+    stimulus_start = fname.freqtag_stimulus_start
+    stimulus_end = fname.freqtag_stimulus_end
+    epoch_duration = fname.freqtag_epoch_duration
+    sampling_rate = fname.freqtag_sampling_rate
     targets = [
         script,
         faxis,
         faxisall,
         stimulus_start,
         stimulus_end,
-        epoch_duration
+        epoch_duration,
+        sampling_rate
     ]
 
     # Get args.
@@ -567,6 +569,7 @@ def task_freqtag_calculate_parameters() -> Dict:
         --write_stimulus_start_to {stimulus_start}
         --write_stimulus_end_to {stimulus_end}
         --write_epoch_duration_to {epoch_duration}
+        --write_sampling_rate_to {sampling_rate}
     """.split()
 
     # Go!
@@ -575,6 +578,57 @@ def task_freqtag_calculate_parameters() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_freqtag_fft() -> Dict:
+    """
+    Make an average of our trials then do a Fast Fourier Transform on it.
+    """
+    Path(fname.freqtag_fft_dir).mkdir(exist_ok=True, parents=True)
+
+    for subject in SUBJECTS:
+        # Get sources.
+        segmented_eeg = fname.segmented_eeg(subject=subject)
+        sampling_rate = fname.freqtag_sampling_rate
+        stimulus_start = fname.freqtag_stimulus_start
+        stimulus_end = fname.freqtag_stimulus_end
+        sources = [
+            segmented_eeg,
+            sampling_rate,
+            stimulus_start,
+            stimulus_end
+        ]
+
+        # Get targets.
+        script = fname.freqtag_fft_script(subject=subject)
+        pow = fname.freqtag_fft_pow(subject=subject)
+        phase = fname.freqtag_fft_phase(subject=subject)
+        freqs = fname.freqtag_fft_freqs(subject=subject)
+        targets = [
+            script,
+            pow,
+            phase,
+            freqs,
+        ]
+
+        # Get args.
+        action = f"""\
+            python3 freqtag_fft.py
+            --write_script_to {script}
+            --write_pow_to {pow}
+            --write_phase_to {phase}
+            --write_freqs_to {freqs}
+            --read_segmented_eeg_from {segmented_eeg}
+            --read_sampling_rate_from {sampling_rate}
+            --read_stimulus_start_from {stimulus_start}
+            --read_stimulus_end_from {stimulus_end}
+        """.split()
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources,
+            targets=targets,
+        )
 def TEMPORARILY_DISABLED_task_mean_mean_fft() -> Dict:
     """
     Average the mean FFT calculated for each subject. But this time, across ALL subjects!
