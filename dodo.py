@@ -540,7 +540,7 @@ def task_freqtag_calculate_parameters() -> Dict:
     Path(fname.freqtag_parameters_dir).mkdir(exist_ok=True, parents=True)
 
     # Get sources.
-    sources = []
+    sources = ["freqtag_calculate_parameters.py"]
 
     # Get targets.
     script = fname.freqtag_parameters_script
