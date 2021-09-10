@@ -676,57 +676,7 @@ def task_freqtag_3d_fft() -> Dict:
         )
 def task_freqtag_sliding_window() -> Dict:
     """
-    Do an FFT of each and every trial whooooooooooooooooah man
-
-    [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, 500, parameters.out_sliding_window_prefix);
-    """
-    Path(fname.freqtag_sliding_window_dir).mkdir(exist_ok=True, parents=True)
-
-    for subject in SUBJECTS:
-        for frequency in FREQUENCIES:
-            # Get sources.
-            sources_dict = dict(
-                segmented_eeg=fname.segmented_eeg(subject=subject),
-                sampling_rate=fname.freqtag_sampling_rate,
-                stimulus_start=fname.freqtag_stimulus_start,
-                stimulus_end=fname.freqtag_stimulus_end,
-            )
-            sources = list(sources_dict.values())
-
-            # Get targets.
-            targets_dict = dict(
-                write_script_to=fname.freqtag_sliding_window_script(subject=subject, frequency=frequency),
-                winmat3d=fname.freqtag_sliding_window_winmat3d(subject=subject, frequency=frequency),
-                phasestabmat=fname.freqtag_sliding_window_phasestabmat(subject=subject, frequency=frequency),
-                trialSNR=fname.freqtag_sliding_window_trialSNR(subject=subject, frequency=frequency),
-                trialpow=fname.freqtag_sliding_window_trialpow(subject=subject, frequency=frequency),
-                outfile=fname.freqtag_sliding_window_outfile(subject=subject, frequency=frequency),
-            )
-            targets = list(targets_dict.values())
-
-            # Get args.
-            action = f"""\
-                python3 freqtag_sliding_window.py
-
-                frequency={frequency}
-
-                {encode_dict_in_bash(targets_dict)}
-                {encode_dict_in_bash(sources_dict)}
-
-            """.split()
-
-            # Go!
-            yield dict(
-                name=f"subject--{subject}, frequency--{frequency}",
-                actions=[action],
-                file_dep=sources,
-                targets=targets,
-            )
-def task_freqtag_sliding_window() -> Dict:
-    """
-    Do an FFT of each and every trial whooooooooooooooooah man
-
-    [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, 500, parameters.out_sliding_window_prefix);
+    Do a sliding window average of our dataset.
     """
     Path(fname.freqtag_sliding_window_dir).mkdir(exist_ok=True, parents=True)
 
@@ -756,6 +706,49 @@ def task_freqtag_sliding_window() -> Dict:
             # Get args.
             action = f"""\
                 python3 freqtag_sliding_window.py
+
+                frequency={frequency}
+
+                {encode_dict_in_bash(targets_dict)}
+                {encode_dict_in_bash(sources_dict)}
+
+            """.split()
+
+            # Go!
+            yield dict(
+                name=f"subject--{subject}, frequency--{frequency}",
+                actions=[action],
+                file_dep=sources,
+                targets=targets,
+            )
+def task_freqtag_fft_sliding_window() -> Dict:
+    """
+    Run an FFT on our sliding window results.
+
+    [pow, phase, freqs] = freqtag_FFT(meanwinmat, 600); 
+    """
+    Path(fname.freqtag_fft_sliding_window_dir).mkdir(exist_ok=True, parents=True)
+
+    for subject in SUBJECTS:
+        for frequency in FREQUENCIES:
+            # Get sources.
+            sources_dict = dict(
+                meanwinmat=fname.freqtag_sliding_window_meanwinmat(subject=subject, frequency=frequency),
+            )
+            sources = list(sources_dict.values())
+
+            # Get targets.
+            targets_dict = dict(
+                write_script_to=fname.freqtag_fft_sliding_window_script(subject=subject, frequency=frequency),
+                pow=fname.freqtag_fft_sliding_window_pow(subject=subject, frequency=frequency),
+                phase=fname.freqtag_fft_sliding_window_phase(subject=subject, frequency=frequency),
+                freqs=fname.freqtag_fft_sliding_window_freqs(subject=subject, frequency=frequency),
+            )
+            targets = list(targets_dict.values())
+
+            # Get args.
+            action = f"""\
+                python3 freqtag_fft_sliding_window.py
 
                 frequency={frequency}
 
