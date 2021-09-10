@@ -208,6 +208,7 @@ fname.add("freqtag_sliding_window_winmat3d", "{freqtag_sliding_window_dir}/sub-{
 fname.add("freqtag_sliding_window_phasestabmat", "{freqtag_sliding_window_dir}/sub-{subject}_frequency-{frequency}_phasestabmat.mat")
 fname.add("freqtag_sliding_window_trialSNR", "{freqtag_sliding_window_dir}/sub-{subject}_frequency-{frequency}_trialSNR.mat")
 fname.add("freqtag_sliding_window_outfile", "{freqtag_sliding_window_dir}/sub-{subject}_frequency-{frequency}_outfile.slidwin.mat")
+fname.add("freqtag_sliding_window_meanwinmat", "{freqtag_sliding_window_dir}/sub-{subject}_frequency-{frequency}_meanwinmat.mat")
 
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")

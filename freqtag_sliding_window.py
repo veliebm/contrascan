@@ -43,14 +43,16 @@ function do_one()
     load('{kwargs["stimulus_end"]}')
     load('{kwargs["sampling_rate"]}')
 
-    %% Run function.
+    %% Run functions.
     [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, {kwargs["frequency"]}, 600, sampling_rate, '{get_matlab_prefix(kwargs["outfile"])}');
+    meanwinmat = mean(winmat3d, 3);
 
     %% Save output variables.
     save('{kwargs["trialpow"]}', 'trialpow');
     save('{kwargs["winmat3d"]}', 'winmat3d');
     save('{kwargs["phasestabmat"]}', 'phasestabmat');
     save('{kwargs["trialSNR"]}', 'trialSNR');
+    save('{kwargs["meanwinmat"]}', 'meanwinmat');
 end
 
 function [dataset] = load_dataset(file_name, directory)
