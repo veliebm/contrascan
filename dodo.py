@@ -724,8 +724,6 @@ def task_freqtag_sliding_window() -> Dict:
 def task_freqtag_fft_sliding_window() -> Dict:
     """
     Run an FFT on our sliding window results.
-
-    [pow, phase, freqs] = freqtag_FFT(meanwinmat, 600); 
     """
     Path(fname.freqtag_fft_sliding_window_dir).mkdir(exist_ok=True, parents=True)
 
@@ -751,6 +749,51 @@ def task_freqtag_fft_sliding_window() -> Dict:
                 python3 freqtag_fft_sliding_window.py
 
                 frequency={frequency}
+
+                {encode_dict_in_bash(targets_dict)}
+                {encode_dict_in_bash(sources_dict)}
+
+            """.split()
+
+            # Go!
+            yield dict(
+                name=f"subject--{subject}, frequency--{frequency}",
+                actions=[action],
+                file_dep=sources,
+                targets=targets,
+            )
+def task_freqtag_hilbert() -> Dict:
+    """
+    Run hilbert transform!
+    """
+    Path(fname.freqtag_hilbert_dir).mkdir(exist_ok=True, parents=True)
+
+    for subject in SUBJECTS:
+        for frequency in FREQUENCIES:
+            # Get sources.
+            sources_dict = dict(
+                segmented_eeg=fname.segmented_eeg(subject=subject),
+                sampling_rate=fname.freqtag_sampling_rate,
+                stimulus_start=fname.freqtag_stimulus_start,
+                stimulus_end=fname.freqtag_stimulus_end,
+            )
+            sources = list(sources_dict.values())
+
+            # Get targets.
+            targets_dict = dict(
+                write_script_to=fname.freqtag_hilbert_script(subject=subject, frequency=frequency),
+                powermat=fname.freqtag_hilbert_powermat(subject=subject, frequency=frequency),
+                phasemat=fname.freqtag_hilbert_phasemat(subject=subject, frequency=frequency),
+                complexmat=fname.freqtag_hilbert_complexmat(subject=subject, frequency=frequency),
+            )
+            targets = list(targets_dict.values())
+
+            # Get args.
+            action = f"""\
+                python3 freqtag_hilbert.py
+
+                frequency={frequency}
+                electrode=20
 
                 {encode_dict_in_bash(targets_dict)}
                 {encode_dict_in_bash(sources_dict)}

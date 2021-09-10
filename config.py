@@ -217,6 +217,13 @@ fname.add("freqtag_fft_sliding_window_pow", "{freqtag_fft_sliding_window_dir}/su
 fname.add("freqtag_fft_sliding_window_phase", "{freqtag_fft_sliding_window_dir}/sub-{subject}_frequency-{frequency}_phase.mat")
 fname.add("freqtag_fft_sliding_window_freqs", "{freqtag_fft_sliding_window_dir}/sub-{subject}_frequency-{frequency}_freqs.mat")
 
+# task_freqtag_hilbert:
+fname.add("freqtag_hilbert_script", "{scripts_dir}/TEMP_sub{subject}_{frequency}Hz_hilbert.m")
+fname.add("freqtag_hilbert_dir", "{processed_data_dir}/freqtag_hilbert")
+fname.add("freqtag_hilbert_powermat", "{freqtag_hilbert_dir}/sub-{subject}_frequency-{frequency}_powermat.mat")
+fname.add("freqtag_hilbert_phasemat", "{freqtag_hilbert_dir}/sub-{subject}_frequency-{frequency}_phasemat.mat")
+fname.add("freqtag_hilbert_complexmat", "{freqtag_hilbert_dir}/sub-{subject}_frequency-{frequency}_complexmat.mat")
+
 # task_mean_mean_fft:
 fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{frequency}_mean_mean_FFT.tsv")
 
