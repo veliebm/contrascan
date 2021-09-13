@@ -30,7 +30,7 @@ def write_matlab_script(write_script_to, lock_file, **kwargs):
 
     with open(write_script_to, "w") as io:
         io.write(f"""\
-%% This script runs a fast fourier transform on our data.
+%% This script runs sliding window analysis.
 do_one()
 delete('{lock_file}');
 
