@@ -7,26 +7,13 @@ Config file
 Configuration parameters for the study.
 """
 import os
-import getpass
-from socket import getfqdn
 from fnames import FileNames
 
-###############################################################################
-# Determine which user is running the scripts on which machine and set the path
-# where the data is stored and how many CPU cores to use.
+###############################
+# Set number of cores to use and stuff.
 
-user = getpass.getuser()  # Username of the user running the scripts
-host = getfqdn()  # Hostname of the machine running the scripts
-
-# You want to add your machine to this list
-if user == "csea":
-    # CSEA desktop
-    raw_data_dir = "./data"
-    n_jobs = 1  # The CSEA desktop has 12 logical processors, but I don't want to use all of them at once. Gotta save some for other jobs.
-else:
-    # Defaults
-    raw_data_dir = "./data"
-    n_jobs = 1
+raw_data_dir = "./data"
+n_jobs = 4
 
 # For BLAS to use the right amount of cores
 os.environ["OMP_NUM_THREADS"] = str(n_jobs)
