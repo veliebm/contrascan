@@ -725,7 +725,7 @@ def task_freqtag_3d_fft() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def TEMPDISABLED_task_freqtag_sliding_window() -> Dict:
+def task_freqtag_sliding_window() -> Dict:
     """
     Do a sliding window average of our dataset.
     """
@@ -772,7 +772,7 @@ def TEMPDISABLED_task_freqtag_sliding_window() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
-def TEMPDISABLED_task_freqtag_fft_sliding_window() -> Dict:
+def task_freqtag_fft_sliding_window() -> Dict:
     """
     Run an FFT on our sliding window results.
     """
@@ -825,6 +825,7 @@ def task_freqtag_better_sliding_window() -> Dict:
             sampling_rate=fname.freqtag_sampling_rate,
             stimulus_start=fname.freqtag_stimulus_start,
             stimulus_end=fname.freqtag_stimulus_end,
+            dat=fname.bids_dat(subject=subject)
         )
         sources_list = list(sources.values())
 
@@ -839,12 +840,11 @@ def task_freqtag_better_sliding_window() -> Dict:
             meanwinmat=fname.freqtag_better_sliding_window_meanwinmat(subject=subject),
         )
         targets_list = list(targets.values())
-        frequency = 12
         Path(targets["outfile"]).parent.mkdir(exist_ok=True, parents=True)
 
         # Make the script to run.
         script = textwrap.dedent(f"""\
-            %% This script runs a sliding window analysis.
+            %% This script runs a sliding window analysis. It's special in that it uses a different frequency for each trial in the analysis.
             do_one()
 
             function do_one()
@@ -857,7 +857,20 @@ def task_freqtag_better_sliding_window() -> Dict:
                 load('{sources["sampling_rate"]}')
 
                 %% Run functions.
-                [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, {frequency}, 600, sampling_rate, '{get_matlab_prefix(targets["outfile"])}');
+                durations = get_durations('{sources["dat"]}')
+                trialpow = [];
+                winmat3d = [];
+                phasestabmat = [];
+                trialSNR = [];
+                for i = 1:numel(durations)
+                    duration = durations(i)
+                    frequency = 1./(duration/50)
+                    [minitrialpow,miniwinmat3d,miniphasestabmat,minitrialSNR] = freqtag_slidewin(dataset(:,:,i), 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, sampling_rate, 'TEMP');
+                    trialpow = [trialpow, minitrialpow];
+                    winmat3d = [winmat3d, miniwinmat3d];
+                    phasestabmat = [phasestabmat, miniphasestabmat];
+                    trialSNR = [trialSNR, minitrialSNR];
+                end
                 meanwinmat = mean(winmat3d, 3);
 
                 %% Save output variables.
@@ -866,6 +879,11 @@ def task_freqtag_better_sliding_window() -> Dict:
                 save('{targets["phasestabmat"]}', 'phasestabmat');
                 save('{targets["trialSNR"]}', 'trialSNR');
                 save('{targets["meanwinmat"]}', 'meanwinmat');
+            end
+
+            function [durations] = get_durations(dat_path)
+                datmat = importdata(dat_path)
+                durations = datmat(1:end, 5);
             end
 
             function [dataset] = load_dataset(path)
@@ -890,7 +908,6 @@ def task_freqtag_better_sliding_window() -> Dict:
             file_dep=sources_list,
             targets=targets_list,
         )
-
 def task_freqtag_hilbert() -> Dict:
     """
     Run hilbert transform!
