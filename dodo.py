@@ -281,6 +281,61 @@ def task_ttest_deconvolutions() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_align_afniproc_irfs() -> Dict:
+    """
+    Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
+
+    Note that the aligned IRFs appear in the afniproc dir, not the alignment template dir.
+    I'm aware that this is quirky, but it's convenient.
+
+    Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
+    for one subject, then apply the transformation to all the others.
+    """
+    sources = [fname.afniproc_irf(subject=subject) for subject in SUBJECTS]
+    sources += [
+        fname.atlas_template,
+        fname.afniproc_template,
+    ]
+
+    targets = [fname.afniproc_aligned_irf(subject=subject) for subject in SUBJECTS]
+
+    kwargs = dict(
+        from_images=[fname.afniproc_irf(subject=subject) for subject in SUBJECTS],
+        from_template=fname.afniproc_template,
+        to_template=fname.atlas_template,
+        to_dir=fname.afniproc_alignment_dir,
+    )
+
+    return dict(
+        actions=[(align.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_resample_afniproc_irfs() -> Dict:
+    """
+    Resample our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.resampled_template,
+            fname.afniproc_aligned_irf(subject=subject)
+        ]
+        targets = [
+            fname.afniproc_resampled_irf(subject=subject)
+        ]
+
+        kwargs = dict(
+            from_image=fname.afniproc_aligned_irf(subject=subject),
+            to_image=fname.resampled_template,
+            to_prefix=get_prefix(fname.afniproc_resampled_irf(subject=subject)),
+        )
+
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 
 
 # EEG-only tasks.
@@ -807,46 +862,6 @@ def task_freqtag_hilbert() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
-def TEMPORARILY_DISABLED_task_mean_mean_fft() -> Dict:
-    """
-    Average the mean FFT calculated for each subject. But this time, across ALL subjects!
-    """
-    for frequency in FREQUENCIES:
-
-        sources = [fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
-        targets = [fname.mean_mean_fft(frequency=frequency)]
-
-        kwargs = dict(
-            in_csvs=[fname.out_fft_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
-            out_tsv=fname.mean_mean_fft(frequency=frequency),
-        )
-
-        yield dict(
-            name=f"frequency--{frequency}",
-            actions=[(average_freqtags.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def TEMPORARILY_DISABLED_task_mean_mean_hilbert() -> Dict:
-    """
-    Average the mean hilbert calculated for each subject. But this time, across ALL subjects!
-    """
-    for frequency in FREQUENCIES:
-
-        sources = [fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS]
-        targets = [fname.mean_mean_hilbert(frequency=frequency)]
-
-        kwargs = dict(
-            in_csvs=[fname.out_hilbert_path(subject=subject, frequency=frequency) for subject in SUBJECTS],
-            out_tsv=fname.mean_mean_hilbert(frequency=frequency),
-        )
-
-        yield dict(
-            name=f"frequency--{frequency}",
-            actions=[(average_freqtags.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
 
 
 # fMRI/EEG correlation tasks.
@@ -1252,218 +1267,6 @@ def task_correlate_across_subjects() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
-
-
-# Tasks to test afniproc vs fmriprep.
-def task_align_afniproc_irfs() -> Dict:
-    """
-    Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
-
-    Note that the aligned IRFs appear in the afniproc dir, not the alignment template dir.
-    I'm aware that this is quirky, but it's convenient.
-
-    Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
-    for one subject, then apply the transformation to all the others.
-    """
-    sources = [fname.afniproc_irf(subject=subject) for subject in SUBJECTS]
-    sources += [
-        fname.atlas_template,
-        fname.afniproc_template,
-    ]
-
-    targets = [fname.afniproc_aligned_irf(subject=subject) for subject in SUBJECTS]
-
-    kwargs = dict(
-        from_images=[fname.afniproc_irf(subject=subject) for subject in SUBJECTS],
-        from_template=fname.afniproc_template,
-        to_template=fname.atlas_template,
-        to_dir=fname.afniproc_alignment_dir,
-    )
-
-    return dict(
-        actions=[(align.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
-def task_resample_afniproc_irfs() -> Dict:
-    """
-    Resample our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
-    """
-    for subject in SUBJECTS:
-        sources = [
-            fname.resampled_template,
-            fname.afniproc_aligned_irf(subject=subject)
-        ]
-        targets = [
-            fname.afniproc_resampled_irf(subject=subject)
-        ]
-
-        kwargs = dict(
-            from_image=fname.afniproc_aligned_irf(subject=subject),
-            to_image=fname.resampled_template,
-            to_prefix=get_prefix(fname.afniproc_resampled_irf(subject=subject)),
-        )
-
-        yield dict(
-            name=f"subject--{subject}",
-            actions=[(resample.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_smooth_fmriprep() -> Dict:
-    """
-    Smooth our fMRIPrep images.
-    """
-    for subject in SUBJECTS:
-        sources = [
-            fname.fmriprep_func(subject=subject)
-        ]
-
-        targets = [
-            fname.fmriprep_smoothed(subject=subject)
-        ]
-
-        kwargs = dict(
-            image=fname.fmriprep_func(subject=subject),
-            fwhm="4.0",
-            prefix=get_prefix(fname.fmriprep_smoothed(subject=subject)),
-        )
-
-        yield dict(
-            name=f"subject--{subject}",
-            actions=[(smooth.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_scale_fmriprep() -> Dict:
-    """
-    Scale our smoothed fMRIPrep images.
-    """
-    for subject in SUBJECTS:
-        sources = [
-            fname.fmriprep_smoothed(subject=subject)
-        ]
-        targets = [
-            fname.fmriprep_scaled(subject=subject)
-        ]
-
-        kwargs = dict(
-            image=fname.fmriprep_smoothed(subject=subject),
-            prefix=get_prefix(fname.fmriprep_scaled(subject=subject)),
-        )
-
-        yield dict(
-            name=f"subject--{subject}",
-            actions=[(scale.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_deconvolve_fmriprep() -> Dict:
-    """
-    Deconvolve our scaled fMRIPrep images.
-    """
-    for subject in SUBJECTS:
-        sources = [
-            fname.fmriprep_scaled(subject=subject),
-        ]
-        targets = [
-            fname.fmriprep_deconvolved(subject=subject),
-            fname.fmriprep_irf(subject=subject),
-        ]
-
-        kwargs = dict(
-            regressors_tsv=fname.regressors_tsv(subject=subject),
-            regressors_dir=fname.fmriprep_regressors_dir(subject=subject),
-            deconvolved_prefix=get_prefix(fname.fmriprep_deconvolved(subject=subject)),
-            IRF_prefix=get_prefix(fname.fmriprep_irf(subject=subject)),
-            func_path=fname.fmriprep_scaled(subject=subject),
-            events_tsv=fname.bids_events(subject=subject),
-            events_dir=fname.fmriprep_deconvolve_dir(subject=subject)
-        )
-
-        yield dict(
-            name=f"subject--{subject}",
-            actions=[(deconvolve.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_align_fmriprep_irfs() -> Dict:
-    """
-    Align our fMRIPrep IRFs to the space of the Kastner cortex masks so we may compare them with afni_proc's IRFs.
-
-    Note that the aligned IRFs appear in the fMRIPrep IRF dir, not the alignment template dir.
-    I'm aware that this is quirky, but it's convenient.
-
-    Also, we don't separate each subject into a sub-task for a very good reason. It's more efficient to calculate the alignment
-    for one subject, then apply the transformation to all the others.
-    """
-    sources = [fname.fmriprep_irf(subject=subject) for subject in SUBJECTS]
-    sources += [
-        fname.atlas_template,
-        fname.fmriprep_template,
-    ]
-
-    targets = [fname.fmriprep_aligned_irf(subject=subject) for subject in SUBJECTS]
-
-    kwargs = dict(
-        from_images=[fname.fmriprep_irf(subject=subject) for subject in SUBJECTS],
-        from_template=fname.fmriprep_template,
-        to_template=fname.atlas_template,
-        to_dir=fname.fmriprep_alignment_dir,
-    )
-
-    return dict(
-        actions=[(align.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
-def task_resample_fmriprep_irfs() -> Dict:
-    """
-    Resample our IRFs to the space of the Kastner cortex masks so we may compare them with our afniproc IRFs.
-    """
-    for subject in SUBJECTS:
-        sources = [
-            fname.resampled_template,
-            fname.fmriprep_aligned_irf(subject=subject)
-        ]
-        targets = [
-            fname.fmriprep_resampled_irf(subject=subject)
-        ]
-
-        kwargs = dict(
-            from_image=fname.fmriprep_aligned_irf(subject=subject),
-            to_image=fname.resampled_template,
-            to_prefix=get_prefix(fname.fmriprep_resampled_irf(subject=subject)),
-        )
-
-        yield dict(
-            name=f"subject--{subject}",
-            actions=[(resample.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_ttest_fmriprep_vs_afniproc() -> Dict:
-    """
-    ttest IRFs of fMRIPrep vs afniproc so we may find the TRUE pipeline of kings.
-    """
-    sources = [fname.fmriprep_resampled_irf(subject=subject) for subject in SUBJECTS]
-    sources += [fname.afniproc_resampled_irf(subject=subject) for subject in SUBJECTS]
-
-    for subbrick in range(1, 9):
-        targets = [fname.ttest_result(subbrick=subbrick)]
-
-        kwargs = dict(
-            list_a=[fname.fmriprep_resampled_irf(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
-            list_b=[fname.afniproc_resampled_irf(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
-            prefix=get_prefix(fname.ttest_result(subbrick=subbrick)),
-        )
-
-        yield dict(
-            name=f"subbrick--{subbrick}",
-            actions=[(ttest_2_groups.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
 
 
 # Helper functions.

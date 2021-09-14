@@ -136,6 +136,14 @@ fname.add("aligned_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{su
 # task_resample_template
 fname.add("resampled_template", "{processed_data_dir}/resampled_kastner/MNI152_T1_1mm_resampled+tlrc.HEAD")
 
+# task_align_afniproc_irfs:
+fname.add("atlas_template", "{raw_data_dir}/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz")
+fname.add("afniproc_alignment_dir", "{processed_data_dir}/afniproc_alignment")
+fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}_aligned+tlrc.HEAD")
+
+# task_resample_afniproc_irfs:
+fname.add("afniproc_resampled_irf", "{processed_data_dir}/afniproc_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
+
 # task_resample_func_images:
 fname.add("resampled_func", "{processed_data_dir}/resample/sub-{subject}_func_resampled+tlrc.HEAD")
 
@@ -289,42 +297,3 @@ fname.add("correlation_across_subjects_dir", "{processed_data_dir}/correlation_a
 fname.add("correlation_across_subjects", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_correlation.txt")
 fname.add("correlation_across_subjects_scatter", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_scatter.png")
 fname.add("correlation_across_subjects_table", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregions+amplitudes.csv")
-
-
-###################################################################
-# Templates for filenames we're using to compare fMRIPrep and afni_proc.py.
-# 
-# Researchers outside our lab don't need to play with any of these.
-
-# task_align_afniproc_irfs:
-fname.add("atlas_template", "{raw_data_dir}/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz")
-fname.add("afniproc_alignment_dir", "{processed_data_dir}/afniproc_alignment")
-fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}_aligned+tlrc.HEAD")
-
-# task_resample_afniproc_irfs:
-fname.add("afniproc_resampled_irf", "{processed_data_dir}/afniproc_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
-
-# task_smooth_fmriprep:
-fname.add("fmriprep_func", "{fmriprep_subject_dir}/sub-{subject}/func/sub-{subject}_task-gabor_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz")
-fname.add("fmriprep_smoothed", "{processed_data_dir}/fmriprep_smoothed/sub-{subject}_func_smoothed+tlrc.HEAD")
-
-# task_scale_fmriprep:
-fname.add("fmriprep_scaled", "{processed_data_dir}/fmriprep_scaled/sub-{subject}_func_scaled+tlrc.HEAD")
-
-# task_deconvolve_fmriprep:
-fname.add("fmriprep_deconvolve_dir", "{processed_data_dir}/fmriprep_deconvolved/sub-{subject}")
-fname.add("fmriprep_deconvolved", "{fmriprep_deconvolve_dir}/sub-{subject}_deconvolved+tlrc.HEAD")
-fname.add("fmriprep_irf", "{fmriprep_deconvolve_dir}/sub-{subject}_IRF+tlrc.HEAD")
-fname.add("fmriprep_regressors_dir", "{fmriprep_deconvolve_dir}/regressors")
-fname.add("regressors_tsv", "{fmriprep_subject_dir}/sub-{subject}/func/sub-{subject}_task-gabor_desc-confounds_timeseries.tsv")
-
-# task_align_fmriprep_irfs:
-fname.add("fmriprep_template", "{raw_data_dir}/misc/tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz")
-fname.add("fmriprep_alignment_dir", "{processed_data_dir}/fmriprep_alignment")
-fname.add("fmriprep_aligned_irf", "{fmriprep_deconvolve_dir}/sub-{subject}_IRF_aligned+tlrc.HEAD")
-
-# task_resample_fmriprep_irfs:
-fname.add("fmriprep_resampled_irf", "{processed_data_dir}/fmriprep_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
-
-# task_ttest_fmriprep_vs_afniproc:
-fname.add("ttest_result", "{processed_data_dir}/fmriprep_vs_afniproc_ttests/subbrick-{subbrick}_seta-fmriprep_setb-afniproc_ttest+tlrc.HEAD")
