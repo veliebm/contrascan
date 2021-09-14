@@ -8,6 +8,7 @@ All the filenames are defined in config.py
 # Import external modules and libraries.
 from pathlib import Path
 from typing import Dict, Iterable
+import textwrap
 
 # Import internal modules and libraries.
 from config import FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES
@@ -724,7 +725,7 @@ def task_freqtag_3d_fft() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def task_freqtag_sliding_window() -> Dict:
+def TEMPDISABLED_task_freqtag_sliding_window() -> Dict:
     """
     Do a sliding window average of our dataset.
     """
@@ -771,7 +772,7 @@ def task_freqtag_sliding_window() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
-def task_freqtag_fft_sliding_window() -> Dict:
+def TEMPDISABLED_task_freqtag_fft_sliding_window() -> Dict:
     """
     Run an FFT on our sliding window results.
     """
@@ -812,6 +813,84 @@ def task_freqtag_fft_sliding_window() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_freqtag_better_sliding_window() -> Dict:
+    """
+    Run a sliding window using exactly correct frequencies rather than approximating them to 12Hz or 24Hz.
+    """
+    for subject in SUBJECTS:
+
+        # Get sources.
+        sources = dict(
+            segmented_eeg=fname.segmented_eeg(subject=subject),
+            sampling_rate=fname.freqtag_sampling_rate,
+            stimulus_start=fname.freqtag_stimulus_start,
+            stimulus_end=fname.freqtag_stimulus_end,
+        )
+        sources_list = list(sources.values())
+
+        # Get targets.
+        targets = dict(
+            write_script_to=fname.freqtag_better_sliding_window_script(subject=subject),
+            winmat3d=fname.freqtag_better_sliding_window_winmat3d(subject=subject),
+            phasestabmat=fname.freqtag_better_sliding_window_phasestabmat(subject=subject),
+            trialSNR=fname.freqtag_better_sliding_window_trialSNR(subject=subject),
+            trialpow=fname.freqtag_better_sliding_window_trialpow(subject=subject),
+            outfile=fname.freqtag_better_sliding_window_outfile(subject=subject),
+            meanwinmat=fname.freqtag_better_sliding_window_meanwinmat(subject=subject),
+        )
+        targets_list = list(targets.values())
+        frequency = 12
+        Path(targets["outfile"]).parent.mkdir(exist_ok=True, parents=True)
+
+        # Make the script to run.
+        script = textwrap.dedent(f"""\
+            %% This script runs a sliding window analysis.
+            do_one()
+
+            function do_one()
+                %% Load dataset.
+                dataset = load_dataset('{sources["segmented_eeg"]}');
+
+                %% Read input variables.
+                load('{sources["stimulus_start"]}')
+                load('{sources["stimulus_end"]}')
+                load('{sources["sampling_rate"]}')
+
+                %% Run functions.
+                [trialpow,winmat3d,phasestabmat,trialSNR] = freqtag_slidewin(dataset, 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, {frequency}, 600, sampling_rate, '{get_matlab_prefix(targets["outfile"])}');
+                meanwinmat = mean(winmat3d, 3);
+
+                %% Save output variables.
+                save('{targets["trialpow"]}', 'trialpow');
+                save('{targets["winmat3d"]}', 'winmat3d');
+                save('{targets["phasestabmat"]}', 'phasestabmat');
+                save('{targets["trialSNR"]}', 'trialSNR');
+                save('{targets["meanwinmat"]}', 'meanwinmat');
+            end
+
+            function [dataset] = load_dataset(path)
+                % Load a dataset.
+                [parent_dir, stem, suffix] = fileparts(path);
+                eeglab;
+                EEG = pop_loadset('filename', strcat(stem, suffix), 'filepath', parent_dir);
+                EEG = eeg_checkset(EEG);
+                dataset = double(EEG.data);
+            end
+            """)
+
+        # Make action to run script.
+        action = f"python3 matlab2.py".split()
+        action += ["--script_contents", script]
+        action += ["--write_script_to", targets["write_script_to"]]
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources_list,
+            targets=targets_list,
+        )
+
 def task_freqtag_hilbert() -> Dict:
     """
     Run hilbert transform!

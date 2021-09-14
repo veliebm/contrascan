@@ -13,7 +13,7 @@ from fnames import FileNames
 # Set number of cores to use and stuff.
 
 raw_data_dir = "./data"
-n_jobs = 4
+n_jobs = 1
 
 # For BLAS to use the right amount of cores
 os.environ["OMP_NUM_THREADS"] = str(n_jobs)
@@ -211,6 +211,16 @@ fname.add("freqtag_fft_sliding_window_dir", "{processed_data_dir}/freqtag_FFT_sl
 fname.add("freqtag_fft_sliding_window_pow", "{freqtag_fft_sliding_window_dir}/sub-{subject}_frequency-{frequency}_pow.mat")
 fname.add("freqtag_fft_sliding_window_phase", "{freqtag_fft_sliding_window_dir}/sub-{subject}_frequency-{frequency}_phase.mat")
 fname.add("freqtag_fft_sliding_window_freqs", "{freqtag_fft_sliding_window_dir}/sub-{subject}_frequency-{frequency}_freqs.mat")
+
+# task_freqtag_better_sliding_window
+fname.add("freqtag_better_sliding_window_script", "{scripts_dir}/TEMP_sub{subject}_better_sliding_window.m")
+fname.add("freqtag_better_sliding_window_dir", "{processed_data_dir}/freqtag_better_sliding_window")
+fname.add("freqtag_better_sliding_window_trialpow", "{freqtag_better_sliding_window_dir}/sub-{subject}_trialpow.mat")
+fname.add("freqtag_better_sliding_window_winmat3d", "{freqtag_better_sliding_window_dir}/sub-{subject}_winmat3d.mat")
+fname.add("freqtag_better_sliding_window_phasestabmat", "{freqtag_better_sliding_window_dir}/sub-{subject}_phasestabmat.mat")
+fname.add("freqtag_better_sliding_window_trialSNR", "{freqtag_better_sliding_window_dir}/sub-{subject}_trialSNR.mat")
+fname.add("freqtag_better_sliding_window_outfile", "{freqtag_better_sliding_window_dir}/sub-{subject}_outfile.slidwin.mat")
+fname.add("freqtag_better_sliding_window_meanwinmat", "{freqtag_better_sliding_window_dir}/sub-{subject}_meanwinmat.mat")
 
 # task_freqtag_hilbert:
 fname.add("freqtag_hilbert_script", "{scripts_dir}/TEMP_sub{subject}_{frequency}Hz_hilbert.m")
