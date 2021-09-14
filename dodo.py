@@ -19,14 +19,9 @@ import afniproc
 import trim_func_images
 import align
 import resample
-import smooth
-import scale
-import deconvolve
-import ttest_2_groups
 import write_json
 import correlate_eeg_fmri
 import ttest
-import average_freqtags
 import combine_masks
 import apply_mask
 import clusterize
