@@ -461,9 +461,8 @@ def task_segment_eeg() -> Dict:
     """
     Segment our preprocessed EEG files.
 
-    Because MatLab is ~quirky~, we can't do multithreading on this one.
+    Because we are using MatLab, we can't do multithreading on this one.
     We must do all subjects in one glorious blaze!
-    Sigh.
     """
     sources = [fname.segmenteeg_json]
     targets = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
@@ -862,7 +861,7 @@ def task_freqtag_better_sliding_window() -> Dict:
                 winmat3d = [];
                 phasestabmat = [];
                 trialSNR = [];
-                for i = 1:numel(durations)
+                for i = 1:numel(dataset(1,1,:))
                     duration = durations(i)
                     frequency = 1./(duration/50)
                     [minitrialpow,miniwinmat3d,miniphasestabmat,minitrialSNR] = freqtag_slidewin(dataset(:,:,i), 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, sampling_rate, 'TEMP');
@@ -964,7 +963,6 @@ def task_freqtag_better_fft_sliding_window() -> Dict:
             file_dep=sources_list,
             targets=targets_list,
         )
-
 def task_freqtag_hilbert() -> Dict:
     """
     Run hilbert transform!
