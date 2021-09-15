@@ -39,10 +39,10 @@ def run_matlab_script(path_to_script: PathLike) -> None:
 
 def run_matlab_function(matlab_function: str) -> None:
     """
-    Run a matlab function. It'll be really slow, but that's MatLab for ya :(
+    Run a matlab function.
     """
     args = "matlab.exe -nosplash -nodesktop -minimize -r".split()
-    args += [f"try, {matlab_function}, catch e, disp(getReport(e)), exit(1), end, exit(0);"]
+    args += [f"try, {matlab_function}, catch e, disp(getReport(e)), pause, exit(1), end, exit(0);"]
 
     subprocess.run(args)
 
