@@ -42,7 +42,7 @@ def run_matlab_function(matlab_function: str) -> None:
     Run a matlab function.
     """
     args = "matlab.exe -nosplash -nodesktop -minimize -r".split()
-    args += [f"try, {matlab_function}, catch e, disp(getReport(e)), pause, exit(1), end, exit(0);"]
+    args += [f"try, {matlab_function}, catch e, disp(getReport(e)), keyboard, exit(1), end, exit(0);"]
 
     subprocess.run(args)
 
