@@ -117,22 +117,22 @@ fname.add("afniproc_ttest_result", "{processed_data_dir}/afniproc_ttests/subbric
 
 # task_align_func_images:
 fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
-fname.add("alignment_dir", "{processed_data_dir}/alignment")
+fname.add("alignment_dir", "{processed_data_dir}/func_alignment")
 fname.add("aligned_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}_aligned+tlrc.HEAD")
 
 # task_resample_template
-fname.add("resampled_template", "{processed_data_dir}/resampled_kastner/MNI152_T1_1mm_resampled+tlrc.HEAD")
+fname.add("resampled_template", "{processed_data_dir}/kastner_resample/MNI152_T1_1mm_resampled+tlrc.HEAD")
 
 # task_align_afniproc_irfs:
 fname.add("atlas_template", "{raw_data_dir}/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz")
-fname.add("afniproc_alignment_dir", "{processed_data_dir}/afniproc_alignment")
+fname.add("afniproc_alignment_dir", "{processed_data_dir}/IRF_alignment")
 fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/iresp_stim.{subject}_aligned+tlrc.HEAD")
 
 # task_resample_afniproc_irfs:
-fname.add("afniproc_resampled_irf", "{processed_data_dir}/afniproc_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
+fname.add("afniproc_resampled_irf", "{processed_data_dir}/IRF_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
 
 # task_resample_func_images:
-fname.add("resampled_func", "{processed_data_dir}/resample/sub-{subject}_func_resampled+tlrc.HEAD")
+fname.add("resampled_func", "{processed_data_dir}/func_resample/sub-{subject}_func_resampled+tlrc.HEAD")
 
 # task_trim_func_images:
 fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
