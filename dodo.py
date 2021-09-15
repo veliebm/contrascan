@@ -835,11 +835,10 @@ def task_freqtag_better_sliding_window() -> Dict:
             phasestabmat=fname.freqtag_better_sliding_window_phasestabmat(subject=subject),
             trialSNR=fname.freqtag_better_sliding_window_trialSNR(subject=subject),
             trialpow=fname.freqtag_better_sliding_window_trialpow(subject=subject),
-            outfile=fname.freqtag_better_sliding_window_outfile(subject=subject),
             meanwinmat=fname.freqtag_better_sliding_window_meanwinmat(subject=subject),
         )
         targets_list = list(targets.values())
-        Path(targets["outfile"]).parent.mkdir(exist_ok=True, parents=True)
+        Path(targets["meanwinmat"]).parent.mkdir(exist_ok=True, parents=True)
 
         # Make the script to run.
         script = textwrap.dedent(f"""\
