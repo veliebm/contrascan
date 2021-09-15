@@ -142,7 +142,7 @@ fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{s
 
 # task_trim_func_images_again:
 fname.add("final_funcs_dir", "{processed_data_dir}/func_final_trim")
-fname.add("final_func", "{final_funcs_dir}/sub-{subject}_startvolume-{start_volume}_func_final+tlrc.HEAD")
+fname.add("final_func", "{final_funcs_dir}/sub-{subject}_startvolume-{start_volume}_func+tlrc.HEAD")
 
 # task_prepare_to_convert_eeg:
 fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
