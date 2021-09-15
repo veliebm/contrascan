@@ -135,7 +135,7 @@ fname.add("afniproc_resampled_irf", "{processed_data_dir}/IRF_resample/sub-{subj
 fname.add("resampled_func", "{processed_data_dir}/func_resample/sub-{subject}_func_resampled+tlrc.HEAD")
 
 # task_trim_func_images:
-fname.add("trimmed_dir", "{processed_data_dir}/trimmedfuncs")
+fname.add("trimmed_dir", "{processed_data_dir}/funcs_trimmed_to_first_stim")
 fname.add("trimmed_func", "{trimmed_dir}/sub-{subject}_func_trimmed+tlrc.HEAD")
 fname.add("afniproc_onsets", "{afniproc_subject_dir}/onsets.tsv")
 fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{subject}+tlrc.HEAD")
@@ -167,7 +167,7 @@ fname.add("segmenteeg_json", "{segmenteeg_dir}/parameters.json")
 fname.add("segmented_eeg", "{segmenteeg_dir}/sub-{subject}_eeg.set")
 
 # task_prepare_to_trim_eeg:
-fname.add("trimeeg_dir", "{processed_data_dir}/trimeeg")
+fname.add("trimeeg_dir", "{processed_data_dir}/eeg_trimmed_to_trimmed_func_start")
 fname.add("trimeeg_json", "{trimeeg_dir}/parameters.json")
 
 # task_segment_eeg:
