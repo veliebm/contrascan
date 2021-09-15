@@ -46,7 +46,7 @@ def run_matlab_function(matlab_function: str, lock_file: PathLike) -> None:
 
     # Run script.
     args = "matlab.exe -nosplash -nodesktop -minimize -r".split()
-    args += [f"try, {matlab_function}, delete('{lock_file}'), catch e, disp(getReport(e)), pause, exit(1), end, exit(0);"]
+    args += [f"try, {matlab_function}, delete('{lock_file}'), catch e, disp(getReport(e)), keyboard, exit(1), end, exit(0);"]
     subprocess.run(args)
 
     # Wait for lock file to be deleted.
