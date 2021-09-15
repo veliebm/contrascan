@@ -908,6 +908,63 @@ def task_freqtag_better_sliding_window() -> Dict:
             file_dep=sources_list,
             targets=targets_list,
         )
+def task_freqtag_better_fft_sliding_window() -> Dict:
+    """
+    Run an FFT on our better sliding window analysis.
+    """
+    Path(fname.freqtag_better_fft_sliding_window_dir).mkdir(exist_ok=True, parents=True)
+
+    for subject in SUBJECTS:
+
+        # Get sources.
+        sources = dict(
+            meanwinmat=fname.freqtag_better_sliding_window_meanwinmat(subject=subject),
+        )
+        sources_list = list(sources.values())
+
+        # Get targets.
+        targets = dict(
+            write_script_to=fname.freqtag_better_fft_sliding_window_script(subject=subject),
+            pow=fname.freqtag_better_fft_sliding_window_pow(subject=subject),
+            phase=fname.freqtag_better_fft_sliding_window_phase(subject=subject),
+            freqs=fname.freqtag_better_fft_sliding_window_freqs(subject=subject),
+        )
+        targets_list = list(targets.values())
+        
+        Path(targets["pow"]).parent.mkdir(exist_ok=True, parents=True)
+
+        # Make MatLab script.
+        script = textwrap.dedent(f"""\
+        %% This script runs a fast fourier transform on our sliding window average.
+        do_one()
+
+        function do_one();
+            %% Read input variables.
+            load('{sources["meanwinmat"]}');
+
+            %% Run functions.
+            [pow, phase, freqs] = freqtag_FFT(meanwinmat, 600); 
+
+            %% Save output variables.
+            save('{targets["pow"]}', 'pow');
+            save('{targets["phase"]}', 'phase');
+            save('{targets["freqs"]}', 'freqs');
+        end
+        """)
+
+        # Make action to run script.
+        action = f"python3 matlab2.py".split()
+        action += ["--script_contents", script]
+        action += ["--write_script_to", targets["write_script_to"]]
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources_list,
+            targets=targets_list,
+        )
+
 def task_freqtag_hilbert() -> Dict:
     """
     Run hilbert transform!
