@@ -334,7 +334,7 @@ def task_resample_afniproc_irfs() -> Dict:
         )
 
 
-# EEG-only tasks.
+# EEG preprocessing.
 def task_prepare_to_convert_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script I wrote to convert EEG files.
@@ -579,6 +579,9 @@ def task_moving_moving_window_eeg() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+
+
+# Freqtag pipeline.
 def task_freqtag_calculate_parameters() -> Dict:
     """
     Calculate the parameters of the freqtag pipeline.
