@@ -7,7 +7,7 @@
 % akeil@ufl.edu
 % --------------------------------------------------------------------------
 
-parameters_file = 'processed/movingmovingwindoweeg/parameters.json';
+parameters_file = 'processed/eeg_moving_moving_window/parameters.json';
 do_all(parameters_file)
 delete_lock_file(mfilename('fullpath'))
 
