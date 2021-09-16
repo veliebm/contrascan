@@ -145,7 +145,7 @@ fname.add("final_funcs_dir", "{processed_data_dir}/func_final_trim")
 fname.add("final_func", "{final_funcs_dir}/sub-{subject}_startvolume-{start_volume}_func+tlrc.HEAD")
 
 # task_prepare_to_convert_eeg:
-fname.add("converteeg_dir", "{processed_data_dir}/converteeg")
+fname.add("converteeg_dir", "{processed_data_dir}/eeg_convert_from_brainvision")
 fname.add("converteeg_json", "{converteeg_dir}/parameters.json")
 fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artifact Correction.vhdr")
 
@@ -153,14 +153,14 @@ fname.add("brainvision_eeg", "{brainvision_dir}/contrascan_{subject}_Pulse Artif
 fname.add("converted_eeg", "{converteeg_dir}/sub-{subject}_eeg.set")
 
 # task_prepare_to_preprocess_eeg:
-fname.add("preprocesseeg_dir", "{processed_data_dir}/preprocesseeg")
+fname.add("preprocesseeg_dir", "{processed_data_dir}/eeg_preprocess")
 fname.add("preprocesseeg_json", "{preprocesseeg_dir}/parameters.json")
 
 # task_preprocess_eeg:
 fname.add("preprocessed_eeg", "{preprocesseeg_dir}/sub-{subject}_eeg.set")
 
 # task_prepare_to_segment_eeg:
-fname.add("segmenteeg_dir", "{processed_data_dir}/segmenteeg")
+fname.add("segmenteeg_dir", "{processed_data_dir}/eeg_segment")
 fname.add("segmenteeg_json", "{segmenteeg_dir}/parameters.json")
 
 # task_segment_eeg:
@@ -244,19 +244,19 @@ fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{freque
 fname.add("mean_mean_hilbert", "{processed_data_dir}/mean_mean_hilbert/frequency-{frequency}_mean_mean_hilbert.tsv")
 
 # task_prepare_to_moving_moving_window_eeg:
-fname.add("movingmovingwindoweeg_dir", "{processed_data_dir}/movingmovingwindoweeg")
+fname.add("movingmovingwindoweeg_dir", "{processed_data_dir}/eeg_moving_moving_window")
 fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.json")
 
 # task_moving_moving_window_eeg:
 fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.amp.at")
-fname.add("out_tsv_name", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.tsv")
+fname.add("amplitudes", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.tsv")
 
 # task_correlate_eeg_fmri:
-fname.add("correlation_dir", "{processed_data_dir}/eeg_fmri_correlation")
+fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
 fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_correlation.nii")
 
 # task_ttest_eeg_fmri_correlations:
-fname.add("correlations_ttest_dir", "{processed_data_dir}/correlations_ttest")
+fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
 fname.add("correlations_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
 
 # task_get_occipital_mask:

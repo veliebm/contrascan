@@ -540,7 +540,7 @@ def task_prepare_to_moving_moving_window_eeg() -> Dict:
                 in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
                 in_dir=fname.trimeeg_dir,
                 out_stem=str(out_path.parent / out_path.name.split(".")[0]),
-                out_tsv_name=fname.out_tsv_name(subject=subject, frequency=frequency),
+                out_tsv_name=fname.amplitudes(subject=subject, frequency=frequency),
                 frequency=frequency,
             ))
 
@@ -1045,7 +1045,7 @@ def task_correlate_eeg_fmri() -> Dict:
 
                 sources = [
                     fname.final_func(subject=subject, start_volume=start_volume),
-                    fname.out_tsv_name(subject=subject, frequency=frequency),
+                    fname.amplitudes(subject=subject, frequency=frequency),
                 ]
                 targets = [
                     fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
@@ -1053,7 +1053,7 @@ def task_correlate_eeg_fmri() -> Dict:
 
                 kwargs = dict(
                     in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
-                    in_eeg_path=fname.out_tsv_name(subject=subject, frequency=frequency),
+                    in_eeg_path=fname.amplitudes(subject=subject, frequency=frequency),
                     out_image_path=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
                 )
 
@@ -1353,7 +1353,7 @@ def task_correlate_microregions() -> Dict:
             for region in regions:
                 for start_volume in START_VOLUMES:
                     average = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
-                    moving_moving_window_data = fname.out_tsv_name(subject=subject, frequency=frequency)
+                    moving_moving_window_data = fname.amplitudes(subject=subject, frequency=frequency)
                     correlations = fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
                     table = fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
                     scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
