@@ -335,54 +335,43 @@ def task_resample_afniproc_irfs() -> Dict:
 
 
 # EEG preprocessing.
-def task_prepare_to_convert_eeg() -> Dict:
-    """
-    Write a JSON file that will be read later by a MatLab script I wrote to convert EEG files.
-    """
-    sources = [fname.brainvision_eeg(subject=subject) for subject in SUBJECTS]
-    targets = [fname.converteeg_json]
-
-    data = []
-    for subject in SUBJECTS:
-        data.append(dict(
-            brainvision_dir=fname.brainvision_dir,
-            brainvision_name=Path(fname.brainvision_eeg(subject=subject)).name,
-            converted_path=fname.converted_eeg(subject=subject),
-            setname=f"sub-{subject}",
-        ))
-
-    kwargs = dict(
-        out_path=fname.converteeg_json,
-        data=data,
-    )
-
-    return dict(
-        actions=[(write_json.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
 def task_convert_eeg() -> Dict:
     """
-    Convert BrainVision EEG files into EEGLAB EEG files, which are easier to edit.
-
-    Because MatLab is ~quirky~, we can't do multithreading on this one.
-    We must convert all subjects in one glorious blaze!
-    Sigh.
+    Convert brainvision files to EEGLAB files.
     """
-    sources = [fname.converteeg_json]
-    targets = [fname.converted_eeg(subject=subject) for subject in SUBJECTS]
+    Path(fname.converteeg_dir).mkdir(exist_ok=True, parents=True)
+    
+    for subject in SUBJECTS:
 
-    path_to_script="convert_eegs.m"
-    action = f"""
-        python3 matlab.py
-        --run_script_at {path_to_script}
-    """.split()
+        # Get sources.
+        sources = dict(brainvision=fname.brainvision_eeg(subject=subject))
+        sources_list = list(sources.values())
 
-    return dict(
-        actions=[action],
-        file_dep=sources,
-        targets=targets,
-    )
+        # Get targets.
+        targets = dict(converted_eeg=fname.converted_eeg(subject=subject), script=fname.converteeg_script(subject=subject))
+        targets_list = list(targets.values())
+
+        # Make MatLab script.
+        script = textwrap.dedent(f"""\
+        % Convert a subject from BrainVision format to EEGLAB format.
+        [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
+        EEG = eeg_checkset( EEG );
+        EEG = pop_loadbv('{Path(sources["brainvision"]).parent}', '{Path(sources["brainvision"]).name}');
+        [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'setname','sub-{subject}','savenew','{targets["converted_eeg"]}','gui','off');
+        """)
+
+        # Make action to run script.
+        action = f"python3 matlab2.py".split()
+        action += ["--script_contents", script]
+        action += ["--write_script_to", targets["script"]]
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources_list,
+            targets=targets_list,
+        )
 def task_prepare_to_preprocess_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script I wrote to preprocess EEG files.
@@ -557,10 +546,6 @@ def task_prepare_to_moving_moving_window_eeg() -> Dict:
 def task_moving_moving_window_eeg() -> Dict:
     """
     Run a moving moving window analysis on our trimmed, preprocessed EEG files.
-
-    Because MatLab is ~quirky~, we can't do multithreading on this one.
-    We must do all subjects in one glorious blaze!
-    Sigh.
     """
     for frequency in FREQUENCIES:
 
