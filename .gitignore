@@ -10,3 +10,4 @@ __pycache__
 .doit*
 system_check.txt
 TEMP*
+*LOCKFILE
