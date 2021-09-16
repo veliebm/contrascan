@@ -4,7 +4,7 @@
 % veliebm@ufl.edu
 % --------------------------------------------------------------------------
 
-parameters_file = 'processed/preprocesseeg/parameters.json';
+parameters_file = 'processed/eeg_preprocess/parameters.json';
 preprocess_all(parameters_file)
 delete_lock_file(mfilename('fullpath'))
 
