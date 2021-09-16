@@ -4,7 +4,7 @@
 % veliebm@ufl.edu
 % --------------------------------------------------------------------------
 
-parameters_file = 'processed/trimeeg/parameters.json';
+parameters_file = 'processed/eeg_trimmed_to_trimmed_func_start/parameters.json';
 do_all(parameters_file)
 delete_lock_file(mfilename('fullpath'))
 
