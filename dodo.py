@@ -1258,12 +1258,13 @@ def task_make_micromasks() -> Dict:
             targets = [micromask]
 
             # Get action.
+
             action = f"""
                 python3 micromasks.py
                 --clusters_image {clusters_image}
                 --clusters_1d_file {clusters_summary}
                 --out_prefix {get_prefix(micromask)}
-                --get_negative_cluster {True if region == "calcarine" else False,}
+                {"--get_negative_cluster" if region == "calcarine" else ""}
             """.split()
 
             yield dict(
