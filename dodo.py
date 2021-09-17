@@ -1258,7 +1258,6 @@ def task_make_micromasks() -> Dict:
             targets = [micromask]
 
             # Get action.
-
             action = f"""
                 python3 micromasks.py
                 --clusters_image {clusters_image}
