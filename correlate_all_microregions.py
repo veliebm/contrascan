@@ -73,6 +73,7 @@ def get_spearman(list1: List[float], list2: List[float], out_path: PathLike) -> 
     table = pandas.DataFrame([list1, list2]).T
     correlation_results = table.corr(method="spearman")
     correlation = correlation_results[0][1]
+    print(table)
     print(f" \nCorrelation: \n{correlation} \n")
 
     with open(out_path, "w") as io:
