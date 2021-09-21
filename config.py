@@ -172,6 +172,11 @@ fname.add("trimeeg_json", "{trimeeg_dir}/parameters.json")
 # task_segment_eeg:
 fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 
+# task_eeg_get_flicker_frequencies
+fname.add("eeg_flicker_frequencies_dir", "{processed_data_dir}/eeg_flicker_frequencies")
+fname.add("eeg_flicker_frequencies_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_flicker_frequencies.m")
+fname.add("eeg_flicker_frequencies_trials", "{eeg_flicker_frequencies_dir}/sub-{subject}_trials.mat")
+
 # task_freqtag_calculate_parameters:
 fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")
 fname.add("freqtag_parameters_script", "{scripts_dir}/TEMP_get_params.m")

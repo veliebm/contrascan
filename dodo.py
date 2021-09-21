@@ -682,6 +682,65 @@ def task_trim_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+def task_eeg_get_flicker_frequencies() -> Dict:
+    """
+    Get the flicker frequency of each trial. Save as .mat files.
+    """
+    Path(fname.eeg_flicker_frequencies_dir).mkdir(exist_ok=True, parents=True)
+    for subject in SUBJECTS:
+
+        # Get sources.
+        sources = dict(
+            dat=fname.bids_dat(subject=subject)
+        )
+        sources_list = list(sources.values())
+
+        # Get targets.
+        targets = dict(
+            trials=fname.eeg_flicker_frequencies_trials(subject=subject),
+            write_script_to=fname.eeg_flicker_frequencies_script(subject=subject),
+        )
+        targets_list = list(targets.values())
+
+        # Make the script to run.
+        script = textwrap.dedent(f"""\
+            %% Get the flicker frequency of each trial. Save as a .mat file.
+            do_one()
+
+            function do_one()
+                %% Read input variables.
+                durations = get_durations('{sources["dat"]}')
+
+                %% Run functions.
+                trials = [];
+                for i = 1:numel(durations)
+                    duration = durations(i)
+                    trial = 1./(duration/50)
+                    trials = [trials, trial]
+                end
+
+                %% Save output variables.
+                save('{targets["trials"]}', 'trials');
+            end
+
+            function [durations] = get_durations(dat_path)
+                datmat = importdata(dat_path)
+                durations = datmat(1:end, 5);
+            end
+            """)
+
+        # Make action to run script.
+        action = f"python3 matlab2.py".split()
+        action += ["--script_contents", script]
+        action += ["--write_script_to", targets["write_script_to"]]
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources_list,
+            targets=targets_list,
+        )
 
 
 # Moving moving window analysis.
@@ -980,7 +1039,7 @@ def task_freqtag_better_sliding_window() -> Dict:
             sampling_rate=fname.freqtag_sampling_rate,
             stimulus_start=fname.freqtag_stimulus_start,
             stimulus_end=fname.freqtag_stimulus_end,
-            dat=fname.bids_dat(subject=subject)
+            trials=fname.eeg_flicker_frequencies_trials(subject=subject)
         )
         sources_list = list(sources.values())
 
@@ -1009,16 +1068,15 @@ def task_freqtag_better_sliding_window() -> Dict:
                 load('{sources["stimulus_start"]}')
                 load('{sources["stimulus_end"]}')
                 load('{sources["sampling_rate"]}')
+                load('{sources["trials"]}')
 
                 %% Run functions.
-                durations = get_durations('{sources["dat"]}')
                 trialpow = [];
                 winmat3d = [];
                 phasestabmat = [];
                 trialSNR = [];
                 for i = 1:numel(dataset(1,1,:))
-                    duration = durations(i)
-                    frequency = 1./(duration/50)
+                    frequency = trials(i)
                     [minitrialpow,miniwinmat3d,miniphasestabmat,minitrialSNR] = freqtag_slidewin(dataset(:,:,i), 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, sampling_rate, 'TEMP');
                     trialpow = [trialpow, minitrialpow];
                     winmat3d = [winmat3d, miniwinmat3d];
@@ -1033,11 +1091,6 @@ def task_freqtag_better_sliding_window() -> Dict:
                 save('{targets["phasestabmat"]}', 'phasestabmat');
                 save('{targets["trialSNR"]}', 'trialSNR');
                 save('{targets["meanwinmat"]}', 'meanwinmat');
-            end
-
-            function [durations] = get_durations(dat_path)
-                datmat = importdata(dat_path)
-                durations = datmat(1:end, 5);
             end
 
             function [dataset] = load_dataset(path)
