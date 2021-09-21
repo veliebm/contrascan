@@ -94,7 +94,7 @@ def task_bidsify_subject() -> Dict:
         )
 
 
-# fMRI-only tasks.
+# fMRI preprocessing.
 def task_afniproc() -> Dict:
     """
     Run afni_proc.py to preprocess and deconvolve our subjects.
@@ -234,49 +234,6 @@ def task_trim_func_images() -> Dict:
             file_dep=sources,
             targets=targets,
         )
-def task_resample_deconvolutions() -> Dict:
-    """
-    Resample the deconvolution results so we can t-test them against each other.
-    """
-    for subject in SUBJECTS:
-        sources = [
-            fname.resampled_template,
-            fname.afniproc_deconvolved(subject=subject),
-        ]
-        targets = [
-            fname.afniproc_deconvolved_resampled(subject=subject),
-        ]
-
-        kwargs = dict(
-            from_image=fname.afniproc_deconvolved(subject=subject),
-            to_image=fname.resampled_template,
-            to_prefix=get_prefix(fname.afniproc_deconvolved_resampled(subject=subject)),
-        )
-
-        yield dict(
-            name=f"subject--{subject}",
-            actions=[(resample.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
-def task_ttest_deconvolutions() -> Dict:
-    """
-    Here we t-test our 3dDeconvolve results. Onward!
-    """
-    for subbrick in range(1, 9):
-        sources = [fname.afniproc_deconvolved_resampled(subject=subject) for subject in SUBJECTS]
-        targets = [fname.afniproc_ttest_result(subbrick=subbrick)]
-
-        kwargs = dict(
-            images=[fname.afniproc_deconvolved_resampled(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
-            prefix=get_prefix(fname.afniproc_ttest_result(subbrick=subbrick)),
-        )
-        yield dict(
-            name=f"subbrick--{subbrick}",
-            actions=[(ttest.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
 def task_align_afniproc_irfs() -> Dict:
     """
     Align our afniproc IRFs to the space of the Kastner cortex masks so we may compare them with fMRIPrep's IRFs.
@@ -332,6 +289,218 @@ def task_resample_afniproc_irfs() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_trim_func_images_again() -> Dict:
+    """
+    Trim func images one last time so we can correlate the BOLD response with EEG signal.
+    """
+    for subject in SUBJECTS:
+
+        sources = [fname.trimmed_func(subject=subject)]
+
+        for volumes_to_remove in START_VOLUMES:
+
+            targets = [
+                fname.final_func(subject=subject, start_volume=volumes_to_remove),
+            ]
+
+            kwargs = dict(
+                new_start_volume=volumes_to_remove,
+                func_path=fname.trimmed_func(subject=subject),
+                out_prefix=get_prefix(fname.final_func(subject=subject, start_volume=volumes_to_remove)),
+            )
+
+            yield dict(
+                name=f"sub--{subject}, startvolume--{volumes_to_remove}",
+                actions=[(trim_func_images.main2, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
+
+
+# fMRI-only analysis.
+def task_resample_deconvolutions() -> Dict:
+    """
+    Resample the deconvolution results so we can t-test them against each other.
+    """
+    for subject in SUBJECTS:
+        sources = [
+            fname.resampled_template,
+            fname.afniproc_deconvolved(subject=subject),
+        ]
+        targets = [
+            fname.afniproc_deconvolved_resampled(subject=subject),
+        ]
+
+        kwargs = dict(
+            from_image=fname.afniproc_deconvolved(subject=subject),
+            to_image=fname.resampled_template,
+            to_prefix=get_prefix(fname.afniproc_deconvolved_resampled(subject=subject)),
+        )
+
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+def task_ttest_deconvolutions() -> Dict:
+    """
+    Here we t-test our 3dDeconvolve results. Onward!
+    """
+    for subbrick in range(1, 9):
+        sources = [fname.afniproc_deconvolved_resampled(subject=subject) for subject in SUBJECTS]
+        targets = [fname.afniproc_ttest_result(subbrick=subbrick)]
+
+        kwargs = dict(
+            images=[fname.afniproc_deconvolved_resampled(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
+            prefix=get_prefix(fname.afniproc_ttest_result(subbrick=subbrick)),
+        )
+        yield dict(
+            name=f"subbrick--{subbrick}",
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+
+
+# Getting masks.
+def task_get_occipital_mask() -> Dict:
+    """
+    Combine 4 Kastner masks to get 1 occipital pole mask. Now that's a steal!
+
+    Specifically, combines Kastner V2d and V3d L/R.
+    """
+    sources = []
+    for hemisphere in "lr":
+        for roi_number in [4, 6]:
+            sources.append(fname.kastner_mask(roi_number=roi_number, hemisphere=hemisphere))
+    
+    targets = [fname.occipital_pole_mask]
+    
+    kwargs = dict(
+        in_masks=sources,
+        out_prefix=get_prefix(fname.occipital_pole_mask),
+    )
+    return dict(
+        actions=[(combine_masks.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_get_calcarine_mask() -> Dict:
+    """
+    Combine 2 Kastner masks to get 1 calcarine mask. Now that's a steal!
+
+    Specifically, combines Kastner V1v L/R.
+    """
+    sources = []
+    for hemisphere in "lr":
+        sources.append(fname.kastner_mask(roi_number=1, hemisphere=hemisphere))
+    
+    targets = [fname.calcarine_mask]
+    
+    kwargs = dict(
+        in_masks=sources,
+        out_prefix=get_prefix(fname.calcarine_mask),
+    )
+    return dict(
+        actions=[(combine_masks.main, [], kwargs)],
+        file_dep=sources,
+        targets=targets,
+    )
+def task_resample_masks() -> Dict:
+    """
+    Resample our masks so we may apply them to our correlation results.
+    """
+    masks = [
+        dict(name="calcarine", in_path=fname.calcarine_mask, out_path=fname.resampled_mask(mask="calcarine")),
+        dict(name="occipital", in_path=fname.occipital_pole_mask, out_path=fname.resampled_mask(mask="occipital")),
+    ]
+
+    for mask in masks:
+
+        sources = [
+            mask["in_path"],
+            fname.resampled_template,
+        ]
+        targets = [mask["out_path"]]
+
+
+        kwargs = dict(
+            from_image=mask["in_path"],
+            to_image=fname.resampled_template,
+            to_prefix=get_prefix(mask["out_path"]),
+        )
+
+        yield dict(
+            name=f"mask--{mask['name']}",
+            actions=[(resample.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
+def task_make_micromasks() -> Dict:
+    """
+    Convert our clusters into bona fide masks! Wow!
+
+    FOR each image of clusters, GET strongest cluster.
+    """
+    regions = "calcarine occipital".split()
+    for subject in SUBJECTS:
+        for region in regions:
+
+            # Get sources.
+            clusters_image = fname.clusters(subject=subject, mask=region)
+            clusters_summary = fname.clusters_summary(subject=subject, mask=region)
+            sources = [clusters_image, clusters_summary]
+
+            # Get targets.
+            micromask = fname.micromask(subject=subject, mask=region)
+            targets = [micromask]
+
+            # Get action.
+            action = f"""
+                python3 micromasks.py
+                --clusters_image {clusters_image}
+                --clusters_1d_file {clusters_summary}
+                --out_prefix {get_prefix(micromask)}
+                {"--get_negative_cluster" if region == "calcarine" else ""}
+            """.split()
+
+            yield dict(
+                name=f"subject--{subject}, region--{region}",
+                actions=[action],
+                file_dep=sources,
+                targets=targets,
+            )
+def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
+    """
+    Does what it says on the tin.
+    """
+    regions = "calcarine occipital".split()
+    for subject in SUBJECTS:
+        for region in regions:
+            for start_volume in START_VOLUMES:
+                trimmed_trimmed_func = fname.final_func(subject=subject, start_volume=start_volume)
+                micromask = fname.micromask(subject=subject, mask=region)
+                micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
+
+                sources = [
+                    trimmed_trimmed_func,
+                    micromask,
+                ]
+                targets = [micromasked_func]
+
+                kwargs = dict(
+                    in_image=trimmed_trimmed_func,
+                    in_mask=micromask,
+                    out_prefix=get_prefix(micromasked_func),
+                )
+
+                yield dict(
+                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
+                    actions=[(apply_mask.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
 
 
 # EEG preprocessing.
@@ -513,6 +682,9 @@ def task_trim_eeg() -> Dict:
         file_dep=sources,
         targets=targets,
     )
+
+
+# Moving moving window analysis.
 def task_prepare_to_moving_moving_window_eeg() -> Dict:
     """
     Write a JSON file that will be read later by a MatLab script we wrote to run
@@ -994,32 +1166,6 @@ def task_freqtag_hilbert() -> Dict:
 
 
 # fMRI/EEG correlation tasks.
-def task_trim_func_images_again() -> Dict:
-    """
-    Trim func images one last time so we can correlate the BOLD response with EEG signal.
-    """
-    for subject in SUBJECTS:
-
-        sources = [fname.trimmed_func(subject=subject)]
-
-        for volumes_to_remove in START_VOLUMES:
-
-            targets = [
-                fname.final_func(subject=subject, start_volume=volumes_to_remove),
-            ]
-
-            kwargs = dict(
-                new_start_volume=volumes_to_remove,
-                func_path=fname.trimmed_func(subject=subject),
-                out_prefix=get_prefix(fname.final_func(subject=subject, start_volume=volumes_to_remove)),
-            )
-
-            yield dict(
-                name=f"sub--{subject}, startvolume--{volumes_to_remove}",
-                actions=[(trim_func_images.main2, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
-            )
 def task_correlate_eeg_fmri() -> Dict:
     """
     This is it! Huzzah! Correlate our EEG and fMRI data across the whole brain.
@@ -1068,79 +1214,6 @@ def task_ttest_eeg_fmri_correlations() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
-def task_get_occipital_mask() -> Dict:
-    """
-    Combine 4 Kastner masks to get 1 occipital pole mask. Now that's a steal!
-
-    Specifically, combines Kastner V2d and V3d L/R.
-    """
-    sources = []
-    for hemisphere in "lr":
-        for roi_number in [4, 6]:
-            sources.append(fname.kastner_mask(roi_number=roi_number, hemisphere=hemisphere))
-    
-    targets = [fname.occipital_pole_mask]
-    
-    kwargs = dict(
-        in_masks=sources,
-        out_prefix=get_prefix(fname.occipital_pole_mask),
-    )
-    return dict(
-        actions=[(combine_masks.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
-def task_get_calcarine_mask() -> Dict:
-    """
-    Combine 2 Kastner masks to get 1 calcarine mask. Now that's a steal!
-
-    Specifically, combines Kastner V1v L/R.
-    """
-    sources = []
-    for hemisphere in "lr":
-        sources.append(fname.kastner_mask(roi_number=1, hemisphere=hemisphere))
-    
-    targets = [fname.calcarine_mask]
-    
-    kwargs = dict(
-        in_masks=sources,
-        out_prefix=get_prefix(fname.calcarine_mask),
-    )
-    return dict(
-        actions=[(combine_masks.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
-def task_resample_masks() -> Dict:
-    """
-    Resample our masks so we may apply them to our correlation results.
-    """
-    masks = [
-        dict(name="calcarine", in_path=fname.calcarine_mask, out_path=fname.resampled_mask(mask="calcarine")),
-        dict(name="occipital", in_path=fname.occipital_pole_mask, out_path=fname.resampled_mask(mask="occipital")),
-    ]
-
-    for mask in masks:
-
-        sources = [
-            mask["in_path"],
-            fname.resampled_template,
-        ]
-        targets = [mask["out_path"]]
-
-
-        kwargs = dict(
-            from_image=mask["in_path"],
-            to_image=fname.resampled_template,
-            to_prefix=get_prefix(mask["out_path"]),
-        )
-
-        yield dict(
-            name=f"mask--{mask['name']}",
-            actions=[(resample.main, [], kwargs)],
-            file_dep=sources,
-            targets=targets,
-        )
 def task_apply_masks_to_correlations() -> Dict:
     """
     Apply masks to our correlation results.
@@ -1238,70 +1311,6 @@ def task_clusterize_irfs() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
-def task_make_micromasks() -> Dict:
-    """
-    Convert our clusters into bona fide masks! Wow!
-
-    FOR each image of clusters, GET strongest cluster.
-    """
-    regions = "calcarine occipital".split()
-    for subject in SUBJECTS:
-        for region in regions:
-
-            # Get sources.
-            clusters_image = fname.clusters(subject=subject, mask=region)
-            clusters_summary = fname.clusters_summary(subject=subject, mask=region)
-            sources = [clusters_image, clusters_summary]
-
-            # Get targets.
-            micromask = fname.micromask(subject=subject, mask=region)
-            targets = [micromask]
-
-            # Get action.
-            action = f"""
-                python3 micromasks.py
-                --clusters_image {clusters_image}
-                --clusters_1d_file {clusters_summary}
-                --out_prefix {get_prefix(micromask)}
-                {"--get_negative_cluster" if region == "calcarine" else ""}
-            """.split()
-
-            yield dict(
-                name=f"subject--{subject}, region--{region}",
-                actions=[action],
-                file_dep=sources,
-                targets=targets,
-            )
-def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
-    """
-    Does what it says on the tin.
-    """
-    regions = "calcarine occipital".split()
-    for subject in SUBJECTS:
-        for region in regions:
-            for start_volume in START_VOLUMES:
-                trimmed_trimmed_func = fname.final_func(subject=subject, start_volume=start_volume)
-                micromask = fname.micromask(subject=subject, mask=region)
-                micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
-
-                sources = [
-                    trimmed_trimmed_func,
-                    micromask,
-                ]
-                targets = [micromasked_func]
-
-                kwargs = dict(
-                    in_image=trimmed_trimmed_func,
-                    in_mask=micromask,
-                    out_prefix=get_prefix(micromasked_func),
-                )
-
-                yield dict(
-                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
-                    actions=[(apply_mask.main, [], kwargs)],
-                    file_dep=sources,
-                    targets=targets,
-                )
 def task_average_microregion_voxels() -> Dict:
     """
     Within each microregion of the trimmed trimmed funcs, average together all voxels of that region into their own timeseries.
