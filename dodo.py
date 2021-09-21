@@ -743,6 +743,70 @@ def task_eeg_get_flicker_frequencies() -> Dict:
         )
 
 
+# Alpha analysis.
+def task_eeg_get_alphas() -> Dict:
+    """
+    Get the amount of alpha present in each TR.
+    """
+    Path(fname.eeg_alpha_dir).mkdir(exist_ok=True, parents=True)
+    for subject in SUBJECTS:
+
+        # Get sources.
+        sources = dict(
+            eeg=fname.trimmed_eeg(subject=subject)
+        )
+        sources_list = list(sources.values())
+
+        # Get targets.
+        targets = dict(
+            values=fname.eeg_alpha_values(subject=subject),
+            write_script_to=fname.eeg_alpha_script(subject=subject),
+        )
+        targets_list = list(targets.values())
+
+        # Make the script to run.
+        script = textwrap.dedent(f"""\
+            %% This script calculates the alpha value for each TR.
+
+            %% Load dataset.
+            dataset = load_dataset('{sources["eeg"]}');
+
+            %% Run functions.
+            values = [];
+            for i = 1000:1000:numel(dataset(1,:))
+                sub_dataset = dataset(:,i-999:i);
+                [pow, phase, freqs] = FFT_spectrum(sub_dataset, 500);
+                alpha = mean(mean(pow([20 31 19 7 8 9 10 ], 18:26)));
+                values = [values, alpha];
+            end
+
+            %% Save output variables.
+            save('{targets["values"]}', 'values');
+            
+            function [dataset] = load_dataset(path)
+                % Load a dataset.
+                [parent_dir, stem, suffix] = fileparts(path);
+                eeglab;
+                EEG = pop_loadset('filename', strcat(stem, suffix), 'filepath', parent_dir);
+                EEG = eeg_checkset(EEG);
+                dataset = double(EEG.data);
+            end
+            """)
+
+        # Make action to run script.
+        action = f"python3 matlab2.py".split()
+        action += ["--script_contents", script]
+        action += ["--write_script_to", targets["write_script_to"]]
+
+        # Go!
+        yield dict(
+            name=f"subject--{subject}",
+            actions=[action],
+            file_dep=sources_list,
+            targets=targets_list,
+        )
+
+
 # Moving moving window analysis.
 def task_prepare_to_moving_moving_window_eeg() -> Dict:
     """

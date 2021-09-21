@@ -169,13 +169,18 @@ fname.add("segmented_eeg", "{segmenteeg_dir}/sub-{subject}_eeg.set")
 fname.add("trimeeg_dir", "{processed_data_dir}/eeg_trimmed_to_trimmed_func_start")
 fname.add("trimeeg_json", "{trimeeg_dir}/parameters.json")
 
-# task_segment_eeg:
+# task_trim_eeg:
 fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 
-# task_eeg_get_flicker_frequencies
+# task_eeg_get_flicker_frequencies:
 fname.add("eeg_flicker_frequencies_dir", "{processed_data_dir}/eeg_flicker_frequencies")
 fname.add("eeg_flicker_frequencies_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_flicker_frequencies.m")
 fname.add("eeg_flicker_frequencies_trials", "{eeg_flicker_frequencies_dir}/sub-{subject}_trials.mat")
+
+# task_eeg_get_alphas:
+fname.add("eeg_alpha_dir", "{processed_data_dir}/eeg_alphas")
+fname.add("eeg_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_alphas.m")
+fname.add("eeg_alpha_values", "{eeg_alpha_dir}/sub-{subject}_alpha_values.mat")
 
 # task_freqtag_calculate_parameters:
 fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")
