@@ -807,59 +807,52 @@ def task_eeg_get_alphas() -> Dict:
         )
 
 
-# Moving moving window analysis.
-def task_prepare_to_moving_moving_window_eeg() -> Dict:
+# Sliding window analysis.
+def task_eeg_sliding_sliding_window() -> Dict:
     """
-    Write a JSON file that will be read later by a MatLab script we wrote to run
-    a moving moving window analysis. Welcome to the cutting edge!
+    Run a sliding sliding window analysis on our trimmed, preprocessed EEG files.
     """
-    sources = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
-    targets = [fname.movingmovingwindoweeg_json]
-
-    data = []
+    Path(fname.eeg_sliding_sliding_window_dir).mkdir(exist_ok=True, parents=True)
     for subject in SUBJECTS:
         for frequency in FREQUENCIES:
-            out_path = Path(fname.moving_moving_windowed_eeg(subject=subject, frequency=frequency))
-            data.append(dict(
-                in_filename=Path(fname.trimmed_eeg(subject=subject)).name,
-                in_dir=fname.trimeeg_dir,
-                out_stem=str(out_path.parent / out_path.name.split(".")[0]),
-                out_tsv_name=fname.amplitudes(subject=subject, frequency=frequency),
-                frequency=frequency,
-            ))
 
-    kwargs = dict(
-            out_path=fname.movingmovingwindoweeg_json,
-            data=data,
-    )
+            # Get sources.
+            sources = dict(
+                eeg=fname.trimmed_eeg(subject=subject),
+            )
+            sources_list = list(sources.values())
 
-    return dict(
-        actions=[(write_json.main, [], kwargs)],
-        file_dep=sources,
-        targets=targets,
-    )
-def task_moving_moving_window_eeg() -> Dict:
-    """
-    Run a moving moving window analysis on our trimmed, preprocessed EEG files.
-    """
-    for frequency in FREQUENCIES:
+            # Get targets.
+            targets = dict(
+                amplitudes=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=frequency),
+                write_script_to=fname.eeg_sliding_sliding_window_script(subject=subject, frequency=frequency),
+            )
+            targets_list = list(targets.values())
+            amplitudes_path = Path(targets["amplitudes"])
+            amplitudes_stem = str(amplitudes_path.parent / amplitudes_path.name.split(".")[0])
 
-        sources = [fname.movingmovingwindoweeg_json]
-        targets = [fname.moving_moving_windowed_eeg(subject=subject, frequency=frequency) for subject in SUBJECTS]
+            # Make the script to run.
+            script = textwrap.dedent(f"""\
+                % Gets a SLIDING sliding window average for a subject.
+                
+                %% Main script.
+                eeglab;
+                [in_filename, in_dir] = split_path('{sources["eeg"]}')
+                stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, {frequency}, 600, 500, 1, '{amplitudes_stem}');
+                """)
 
-        path_to_script="moving_moving_window_eegs.m"
-        action = f"""
-            python3 matlab.py
-            --run_script_at {path_to_script}
-        """.split()
+            # Make action to run script.
+            action = f"python3 matlab2.py".split()
+            action += ["--script_contents", script]
+            action += ["--write_script_to", targets["write_script_to"]]
 
-        yield dict(
-            name=f"frequency--{frequency}",
-            actions=[action],
-            file_dep=sources,
-            targets=targets,
-        )
-
+            # Go!
+            yield dict(
+                name=f"subject--{subject}, frequency--{frequency}",
+                actions=[action],
+                file_dep=sources_list,
+                targets=targets_list,
+            )
 
 # Freqtag pipeline.
 def task_freqtag_calculate_parameters() -> Dict:

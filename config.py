@@ -252,13 +252,13 @@ fname.add("mean_mean_fft", "{processed_data_dir}/mean_mean_fft/frequency-{freque
 # task_mean_mean_hilbert:
 fname.add("mean_mean_hilbert", "{processed_data_dir}/mean_mean_hilbert/frequency-{frequency}_mean_mean_hilbert.tsv")
 
-# task_prepare_to_moving_moving_window_eeg:
-fname.add("movingmovingwindoweeg_dir", "{processed_data_dir}/eeg_moving_moving_window")
-fname.add("movingmovingwindoweeg_json", "{movingmovingwindoweeg_dir}/parameters.json")
+# task_eeg_sliding_sliding_window:
+fname.add("eeg_sliding_sliding_window_script", "{scripts_dir}/TEMP_sub{subject}_{frequency}Hz_eeg_sliding_sliding_window.m")
+fname.add("eeg_sliding_sliding_window_dir", "{processed_data_dir}/eeg_sliding_sliding_window")
+fname.add("eeg_sliding_sliding_window_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_amplitudes.fftamp.mat")
 
-# task_moving_moving_window_eeg:
-fname.add("moving_moving_windowed_eeg", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.amp.at")
-fname.add("amplitudes", "{movingmovingwindoweeg_dir}/sub-{subject}_frequency-{frequency}_moving_moving_window_average.tsv")
+# PLACEHOLDER
+fname.add("amplitudes", "DELETEME{subject}{frequency}")
 
 # task_correlate_eeg_fmri:
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
