@@ -824,11 +824,12 @@ def task_eeg_sliding_sliding_window() -> Dict:
 
             # Get targets.
             targets = dict(
-                amplitudes=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=frequency),
+                fftamp=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=frequency),
+                oz_fftamp=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
                 write_script_to=fname.eeg_sliding_sliding_window_script(subject=subject, frequency=frequency),
             )
             targets_list = list(targets.values())
-            amplitudes_path = Path(targets["amplitudes"])
+            amplitudes_path = Path(targets["fftamp"])
             amplitudes_stem = str(amplitudes_path.parent / amplitudes_path.name.split(".")[0])
 
             # Make the script to run.
@@ -839,6 +840,9 @@ def task_eeg_sliding_sliding_window() -> Dict:
                 eeglab;
                 [in_filename, in_dir] = split_path('{sources["eeg"]}')
                 stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, {frequency}, 600, 500, 1, '{amplitudes_stem}');
+                load('{targets["fftamp"]}')
+                oz_fftamp = fftamp(20,:)'
+                save('{targets["oz_fftamp"]}', 'oz_fftamp');
                 """)
 
             # Make action to run script.
@@ -853,6 +857,7 @@ def task_eeg_sliding_sliding_window() -> Dict:
                 file_dep=sources_list,
                 targets=targets_list,
             )
+
 
 # Freqtag pipeline.
 def task_freqtag_calculate_parameters() -> Dict:
@@ -1286,7 +1291,7 @@ def task_correlate_eeg_fmri() -> Dict:
 
                 sources = [
                     fname.final_func(subject=subject, start_volume=start_volume),
-                    fname.amplitudes(subject=subject, frequency=frequency),
+                    fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
                 ]
                 targets = [
                     fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
@@ -1294,7 +1299,7 @@ def task_correlate_eeg_fmri() -> Dict:
 
                 kwargs = dict(
                     in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
-                    in_eeg_path=fname.amplitudes(subject=subject, frequency=frequency),
+                    in_eeg_path=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
                     out_image_path=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
                 )
 
@@ -1457,7 +1462,7 @@ def task_correlate_microregions() -> Dict:
             for region in regions:
                 for start_volume in START_VOLUMES:
                     average = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
-                    moving_moving_window_data = fname.amplitudes(subject=subject, frequency=frequency)
+                    moving_moving_window_data = fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency)
                     correlations = fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
                     table = fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
                     scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
