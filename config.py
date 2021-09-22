@@ -256,9 +256,7 @@ fname.add("mean_mean_hilbert", "{processed_data_dir}/mean_mean_hilbert/frequency
 fname.add("eeg_sliding_sliding_window_script", "{scripts_dir}/TEMP_sub{subject}_{frequency}Hz_eeg_sliding_sliding_window.m")
 fname.add("eeg_sliding_sliding_window_dir", "{processed_data_dir}/eeg_sliding_sliding_window")
 fname.add("eeg_sliding_sliding_window_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_amplitudes.fftamp.mat")
-
-# PLACEHOLDER
-fname.add("amplitudes", "DELETEME{subject}{frequency}")
+fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_amplitudes.mat")
 
 # task_correlate_eeg_fmri:
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
