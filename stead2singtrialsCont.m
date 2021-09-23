@@ -6,22 +6,28 @@ function [winmat, SNR] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, 
     EEG = pop_loadset(EEGsetfile, EEGsetfile_directory);
      
     % determine settings for each moving window 
-    % translate ssvepvec into new sample rate. the sample vector is indicated in old sample rate above 
-    ssvepvec = floor(ssvepvec .* (sampnew./SampRate)); 
-    % this to be done outside the loop to save time, needed for winshift proc
+    % translate bslvec into new sample rate. the sample vector is indicated in old sample rate above
+    % note: the resampling is doing for each segment, so the segment length
+    % (ssvepvec) does not need to be resampled at all
+    bslvec = bslvec(1):bslvec(end) .* (sampnew ./ SampRate);
+    
+    % following is done outside the loop to save time, needed for winshift
+    % proc, which is applied on each segment defined by ssvepvec
+    % so this has nothing to do with the shifting across the cont data, but
+    % only determines the sliding window within each segment (e.g. of 2
+    % seconds)
     sampcycle=1000/sampnew; %added code for the new samplerate
-    tempvec = round((1000/foi)/sampcycle); % this makes sure that average win duration is exactly @@, which is the duration in sp of one cyle at @@ Hz = @@ ms, sampled at 250 Hz
-    longvec = repmat(tempvec,1,100); % repeat this many times, at least for duration of entire epoch, subsegments are created later 
+    tempvec = round((1000/foi)/sampcycle); % this makes sure that average win duration is exactly the duration in sp of one cyle
+    longvec = repmat(tempvec,1,200); % repeat this many times, at least for duration of entire epoch, subsegments are created later 
     winshiftvec_long = [ssvepvec(1) cumsum(longvec)+ ssvepvec(1)]; % use cumsum function to create growing vector of indices for start of the winshift
     tempindexvec = find(winshiftvec_long > ssvepvec(end)); 
     
-    endindex = tempindexvec(1);  % this is the first index for which the winshiftvector exceeds the data segment 
+    endindex = tempindexvec(1);  % this is the first index for which the winshiftvector exceeds the data segment (ssvepvec)
     winshiftvec = winshiftvec_long(1:endindex-5);
    
     % need this stuff for the spectrum
-    shiftcycle=round(tempvec*4);
-    samp=1000/sampnew;
-           freqres = 1000/(shiftcycle*samp); %added code to find the appropriate bin for the frequency of interest for each segment
+    shiftcycle=round(tempvec*4); % 4 cycles hard coded
+           freqres = 1000/(shiftcycle*sampcycle); %added code to find the appropriate bin for the frequency of interest for each segment
            freqbins = 0:freqres:(sampnew/2); 
            min_diff_vec = freqbins-foi;  %revised part
            min_diff_vec = abs(min_diff_vec); %revised
@@ -54,10 +60,8 @@ function [winmat, SNR] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, 
    
    % finally determine the onsets and duration of the overlapping 2-D segments that will stand in as
    % "trials"
-   
-   duration = 2000;
-   
-   segmentonsets = 1:1000:size(mat,2)-(duration+1); 
+      
+   segmentonsets = 1:length(ssvepvec):size(mat,2)-(length(ssvepvec)+1); 
    
    % the above is still with the OLD sample rate, upsampling is done below,
    % whithin segments
@@ -73,7 +77,7 @@ function [winmat, SNR] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, 
    
      for trial = 1:length(segmentonsets)
            
-       Data = mat(:,segmentonsets(trial):segmentonsets(trial)+(duration-1));
+       Data = mat(:,segmentonsets(trial):segmentonsets(trial)+(length(ssvepvec)-1));
           
           fouriersum = []; 
       
