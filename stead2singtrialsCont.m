@@ -95,7 +95,6 @@ function [winmat, SNR] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, 
        % 2. Baseline correction
        %===========================================================
        
-       disp ('subtracting baseline')
        
        datamat = bslcorr(Data, bslvec);
    
@@ -103,7 +102,6 @@ function [winmat, SNR] = stead2singtrialsCont(EEGsetfile, EEGsetfile_directory, 
        % 3. moving window procedure with 4 cycles  !!!
        % 
        %===========================================================
-       disp('moving window procedure')
        
        winmatsum = zeros(size(datamat,1),shiftcycle); %4 cycles
        
