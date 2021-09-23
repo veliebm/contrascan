@@ -63,7 +63,10 @@ def convert_to_dataframe(func_image: nibabel.brikhead.AFNIImage, trim_volumes: i
     """
     Convert a func image to a dataframe. Trim time axis to specified point.
     """
+    print(f"Func shape: {func_image.dataobj.shape}")
+    print(f"Length of data to correlate with func: {trim_volumes}")
     trimmed_func = func_image.dataobj[:,:,:,:trim_volumes]
+    print(f"New func shape: {trimmed_func.shape}")
 
     future_dataframe = {}
     x_length, y_length, z_length, __ = trimmed_func.shape
