@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Correlate our EEG data with our fMRI data.
+Correlate a list of numbers with each voxel in a functional image.
 
 The moment we've all been waiting for!
 
