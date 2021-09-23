@@ -830,6 +830,7 @@ def task_eeg_sliding_sliding_window() -> Dict:
             # Get targets.
             targets = dict(
                 fftamp=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=frequency),
+                SNR=fname.eeg_sliding_sliding_window_SNR(subject=subject, frequency=frequency),
                 oz_fftamp=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
                 write_script_to=fname.eeg_sliding_sliding_window_script(subject=subject, frequency=frequency),
             )
@@ -842,12 +843,16 @@ def task_eeg_sliding_sliding_window() -> Dict:
                 % Gets a SLIDING sliding window average for a subject.
                 
                 %% Main script.
+
                 eeglab;
                 [in_filename, in_dir] = split_path('{sources["eeg"]}')
-                stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, {frequency}, 600, 500, 1, '{amplitudes_stem}');
+                [winmat, SNR] = stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, {frequency}, 600, 500, 1, '{amplitudes_stem}');
                 load('{targets["fftamp"]}')
                 oz_fftamp = fftamp(20,:)'
+
+                % Save variables.
                 save('{targets["oz_fftamp"]}', 'oz_fftamp');
+                save('{targets["SNR"]}', 'SNR');
                 """)
 
             # Make action to run script.
