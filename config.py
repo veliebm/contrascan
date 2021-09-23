@@ -181,6 +181,7 @@ fname.add("eeg_flicker_frequencies_trials", "{eeg_flicker_frequencies_dir}/sub-{
 fname.add("eeg_alpha_dir", "{processed_data_dir}/eeg_alphas")
 fname.add("eeg_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_alphas.m")
 fname.add("eeg_alpha_values", "{eeg_alpha_dir}/sub-{subject}_alpha_values.mat")
+fname.add("average_power", "{eeg_alpha_dir}/sub-{subject}_average_power.mat")
 
 # task_freqtag_calculate_parameters:
 fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")

@@ -760,6 +760,7 @@ def task_eeg_get_alphas() -> Dict:
         # Get targets.
         targets = dict(
             values=fname.eeg_alpha_values(subject=subject),
+            average_power=fname.average_power(subject=subject),
             write_script_to=fname.eeg_alpha_script(subject=subject),
         )
         targets_list = list(targets.values())
@@ -773,15 +774,19 @@ def task_eeg_get_alphas() -> Dict:
 
             %% Run functions.
             values = [];
+            pows = [];
             for i = 1000:1000:numel(dataset(1,:))
                 sub_dataset = dataset(:,i-999:i);
                 [pow, phase, freqs] = FFT_spectrum(sub_dataset, 500);
                 alpha = mean(mean(pow([20 31 19 7 8 9 10 ], 18:26)));
                 values = [values; alpha];
+                pows = cat(3, pows, pow);
             end
+            average_power =  mean(pows, 3);
 
             %% Save output variables.
             save('{targets["values"]}', 'values');
+            save('{targets["average_power"]}', 'average_power');
             
             function [dataset] = load_dataset(path)
                 % Load a dataset.
