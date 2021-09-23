@@ -831,6 +831,7 @@ def task_eeg_sliding_sliding_window() -> Dict:
             targets = dict(
                 fftamp=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=frequency),
                 SNR=fname.eeg_sliding_sliding_window_SNR(subject=subject, frequency=frequency),
+                oz_SNR=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
                 oz_fftamp=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
                 write_script_to=fname.eeg_sliding_sliding_window_script(subject=subject, frequency=frequency),
             )
@@ -849,10 +850,12 @@ def task_eeg_sliding_sliding_window() -> Dict:
                 [winmat, SNR] = stead2singtrialsCont(in_filename, in_dir, 0, 1:1000, 1:1000, {frequency}, 600, 500, 1, '{amplitudes_stem}');
                 load('{targets["fftamp"]}')
                 oz_fftamp = fftamp(20,:)'
+                oz_SNR = SNR(20,:)'
 
                 % Save variables.
                 save('{targets["oz_fftamp"]}', 'oz_fftamp');
                 save('{targets["SNR"]}', 'SNR');
+                save('{targets["oz_SNR"]}', 'oz_SNR');
                 """)
 
             # Make action to run script.

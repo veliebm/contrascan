@@ -258,6 +258,7 @@ fname.add("eeg_sliding_sliding_window_script", "{scripts_dir}/TEMP_sub{subject}_
 fname.add("eeg_sliding_sliding_window_dir", "{processed_data_dir}/eeg_sliding_sliding_window")
 fname.add("eeg_sliding_sliding_window_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_amplitudes.fftamp.mat")
 fname.add("eeg_sliding_sliding_window_SNR", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_SNR.mat")
+fname.add("eeg_sliding_sliding_window_oz_SNR", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_SNR.mat")
 fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_amplitudes.mat")
 
 # task_correlate_eeg_fmri:
