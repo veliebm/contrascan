@@ -305,7 +305,7 @@ fname.add("micromasked_func", "{processed_data_dir}/micromasked_funcs/sub-{subje
 # task_average_microregion_voxels:
 fname.add("microregion_average", "{processed_data_dir}/microregion_averages/sub-{subject}_source-{mask}_startvolume-{start_volume}_average.txt")
 
-# task_correlate_microregions:
+# task_correlate_eeg_with_average_microregion_timeseries:
 fname.add("microregions_correlation_dir", "{processed_data_dir}/microregion_correlations")
 fname.add("microregions_correlation_results", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
 fname.add("microregions_and_amplitudes", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion+amplitudes.csv")

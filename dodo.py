@@ -28,6 +28,7 @@ import combine_masks
 import apply_mask
 import clusterize
 import average_voxels
+import correlate_regions
 
 
 # Configuration for the pydoit tool.
@@ -567,6 +568,32 @@ def task_apply_micromasks_to_trimmed_trimmed_funcs() -> Dict:
                 yield dict(
                     name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
                     actions=[(apply_mask.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
+def task_average_microregion_voxels() -> Dict:
+    """
+    Within each microregion of the trimmed trimmed funcs, average together all voxels of that region into their own timeseries.
+    """
+    regions = "calcarine occipital".split()
+    for subject in SUBJECTS:
+        for region in regions:
+            for start_volume in START_VOLUMES:
+                micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
+                averages = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
+
+                sources = [micromasked_func]
+                targets = [averages]
+
+                kwargs = dict(
+                    in_image=micromasked_func,
+                    out_file=averages,
+                    mask="SELF"
+                )
+
+                yield dict(
+                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
+                    actions=[(average_voxels.main, [], kwargs)],
                     file_dep=sources,
                     targets=targets,
                 )
@@ -1468,64 +1495,54 @@ def task_apply_masks_to_correlations() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
-def task_average_microregion_voxels() -> Dict:
-    """
-    Within each microregion of the trimmed trimmed funcs, average together all voxels of that region into their own timeseries.
-    """
-    regions = "calcarine occipital".split()
-    for subject in SUBJECTS:
-        for region in regions:
-            for start_volume in START_VOLUMES:
-                micromasked_func = fname.micromasked_func(subject=subject, mask=region, start_volume=start_volume)
-                averages = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
-
-                sources = [micromasked_func]
-                targets = [averages]
-
-                kwargs = dict(
-                    in_image=micromasked_func,
-                    out_file=averages,
-                    mask="SELF"
-                )
-
-                yield dict(
-                    name=f"subject--{subject}, mask--{region}, start_volume--{start_volume}",
-                    actions=[(average_voxels.main, [], kwargs)],
-                    file_dep=sources,
-                    targets=targets,
-                )
-def task_correlate_microregions() -> Dict:
+def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     """
     Correlate the time series of each microregion with its image's Oz data.
     """
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        sources : Dict
+            load_microROI_from : PathLike
+                Path to a text file containing the average fMRI time series of a region.
+            load_amplitudes_from : PathLike
+                Path to a 1xN or Nx1 MatLab .mat file containing a list of numbers.
+        targets : Dict
+            save_spearman_to : PathLike
+                Where to output our correlation results to.
+            save_scatter_to : PathLike
+                Where to output our scatter plot to.
+            save_table_to : PathLike
+                Where to output a table containing the EEG data and average fMRI time series.
+        """
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(correlate_regions.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+    
     regions = "calcarine occipital".split()
     for frequency in FREQUENCIES:
         for subject in SUBJECTS:
             for region in regions:
                 for start_volume in START_VOLUMES:
-                    average = fname.microregion_average(subject=subject, mask=region, start_volume=start_volume)
-                    moving_moving_window_data = fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency)
-                    correlations = fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
-                    table = fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
-                    scatter = fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency)
-
-                    sources = [average, moving_moving_window_data]
-                    targets = [correlations, scatter, table]
-
-                    action = f"""
-                        python3 correlate_regions.py
-                        --load_amplitudes_from {moving_moving_window_data}
-                        --load_microROI_from {average}
-                        --save_scatter_to {scatter}
-                        --save_table_to {table}
-                        --save_spearman_to {correlations}
-                    """.split()
-
-                    yield dict(
-                        name=f"subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
-                        actions=[action],
-                        file_dep=sources,
-                        targets=targets,
+                    yield create_task(
+                        sources=dict(
+                            load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),
+                            load_amplitudes_from=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
+                        ),
+                        targets=dict(
+                            save_spearman_to=fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
+                            save_table_to=fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
+                            save_scatter_to=fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
+                        ),
+                        name=f"sliding sliding window, subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}"
                     )
 def task_correlate_across_subjects() -> Dict:
     """
