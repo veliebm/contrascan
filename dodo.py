@@ -1443,6 +1443,14 @@ def task_correlate_whole_brain() -> Dict:
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"sliding sliding window SNR, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
                 )
+    for subject in SUBJECTS:
+        for start_volume in START_VOLUMES:
+            yield create_task(
+                eeg_data=fname.eeg_alpha_values(subject=subject),
+                out_image=fname.correlation_whole_brain_alphas(subject=subject, start_volume=start_volume),
+                in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                name=f"alphas, sub--{subject}, startvolume--{start_volume}"
+            )
 def task_ttest_whole_brain_correlations() -> Dict:
     """
     ttest the correlations we calculated.
