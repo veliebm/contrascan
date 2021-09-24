@@ -1391,7 +1391,7 @@ def task_freqtag_hilbert() -> Dict:
 
 
 # fMRI/EEG correlation tasks.
-def task_correlate_eeg_fmri() -> Dict:
+def task_correlate_whole_brain() -> Dict:
     """
     This is it! Huzzah! Correlate EEG and fMRI data across the whole brain. EEG data must be a 1xN or Nx1 .mat file.
     """
@@ -1443,25 +1443,46 @@ def task_correlate_eeg_fmri() -> Dict:
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"sliding sliding window SNR, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
                 )
-def task_ttest_eeg_fmri_correlations() -> Dict:
+def task_ttest_whole_brain_correlations() -> Dict:
     """
     ttest the correlations we calculated.
     """
+    def create_task(images: PathLike, out_path: PathLike, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        images : PathLike
+            List of paths to images to ttest against each other.
+        out_path : PathLike
+            Where to write our ttest results to.
+        name : str
+            Name of the task.
+        """
+        sources = dict(
+            images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
+        )
+        
+        targets = dict(
+            ttest=fname.correlations_ttest(start_volume=start_volume, frequency=frequency)
+        )
+
+        kwargs = dict(**sources, prefix=get_prefix(targets["ttest"]))
+
+        return dict(
+            name=name,
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
     for frequency in FREQUENCIES:
         for start_volume in START_VOLUMES:
-            sources = [fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS]
-            targets = [fname.correlations_ttest(start_volume=start_volume, frequency=frequency)]
-
-            kwargs = dict(
+            yield create_task(
                 images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
-                prefix=get_prefix(fname.correlations_ttest(start_volume=start_volume, frequency=frequency)),
-            )
-
-            yield dict(
-                name=f"startvolume--{start_volume}, frequency--{frequency}",
-                actions=[(ttest.main, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
+                out_path=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
+                name=f"sliding sliding window, startvolume--{start_volume}, frequency--{frequency}",
             )
 def task_apply_masks_to_correlations() -> Dict:
     """
