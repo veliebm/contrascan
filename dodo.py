@@ -1369,7 +1369,7 @@ def task_correlate_eeg_fmri() -> Dict:
     """
     def create_task(eeg_data: PathLike, in_image: PathLike, out_image: PathLike, name: str) -> dict:
         """
-        Lets us generalize this task. Just pick some eeg data and name your out image.
+        Allows this task to easily be generalizable.
 
         Parameters
         ----------
@@ -1407,37 +1407,17 @@ def task_correlate_eeg_fmri() -> Dict:
                     eeg_data=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
                     out_image=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
-                    name=f"sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
+                    name=f"sliding sliding window, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
                 )
-
-                
-def task_correlate_whole_brain_SNRs_and_fmri() -> Dict:
-    """
-    Correlate our oz SNRs with the BOLD signal in each voxel of the functional scan.
-    """
+    
     for frequency in FREQUENCIES:
         for subject in SUBJECTS:
             for start_volume in START_VOLUMES:
-
-                sources = [
-                    fname.final_func(subject=subject, start_volume=start_volume),
-                    fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
-                ]
-                targets = [
-                    fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
-                ]
-
-                kwargs = dict(
-                    in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
-                    in_eeg_path=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
-                    out_image_path=fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
-                )
-
-                yield dict(
-                    name=f"sub--{subject}, startvolume--{start_volume}, frequency--{frequency}",
-                    actions=[(correlate_eeg_fmri.main, [], kwargs)],
-                    file_dep=sources,
-                    targets=targets,
+                yield create_task(
+                    eeg_data=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
+                    out_image=fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"sliding sliding window SNR, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
                 )
 def task_ttest_eeg_fmri_correlations() -> Dict:
     """
