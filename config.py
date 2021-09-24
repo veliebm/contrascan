@@ -284,9 +284,6 @@ fname.add("calcarine_mask", "{masks_dir}/calcarine+tlrc.HEAD")
 # task_resample_masks:
 fname.add("resampled_mask", "{processed_data_dir}/masks_resampled/mask-{mask}_resampled+tlrc.HEAD")
 
-# task_mask_ttested_whole_brain_correlations:
-fname.add("correlations_ttest_masked", "{correlations_ttest_dir}/startvolume-{start_volume}_frequency-{frequency}_masked-{mask}_correlations_ttest+tlrc.HEAD")
-
 # task_apply_masks_to_irfs:
 fname.add("masked_irf", "{processed_data_dir}/masked_irfs/sub-{subject}_masked-{mask}_irf+tlrc.HEAD")
 

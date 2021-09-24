@@ -1495,35 +1495,6 @@ def task_ttest_whole_brain_correlations() -> Dict:
                 out_path=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
                 name=f"sliding sliding window, startvolume--{start_volume}, frequency--{frequency}",
             )
-def task_mask_ttested_whole_brain_correlations() -> Dict:
-    """
-    Apply masks to our correlation results.
-    """
-    masks = [
-        dict(name="calcarine", in_path=fname.resampled_mask(mask="calcarine")),
-        dict(name="occipital", in_path=fname.resampled_mask(mask="occipital")),
-    ]
-    
-    for frequency in FREQUENCIES:
-        for start_volume in START_VOLUMES:
-            for mask in masks:
-                sources = [fname.correlations_ttest(start_volume=start_volume, frequency=frequency)]
-                sources += [mask["in_path"]]
-
-                targets = [fname.correlations_ttest_masked(start_volume=start_volume, frequency=frequency, mask=mask["name"])]
-
-                kwargs = dict(
-                    in_image=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
-                    in_mask=mask["in_path"],
-                    out_prefix=get_prefix(fname.correlations_ttest_masked(start_volume=start_volume, frequency=frequency, mask=mask["name"])),
-                )
-
-                yield dict(
-                    name=f"startvolume--{start_volume}, mask--{mask['name']}, frequency--{frequency}",
-                    actions=[(apply_mask.main, [], kwargs)],
-                    file_dep=sources,
-                    targets=targets,
-                )
 def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     """
     Correlate the time series of each microregion with its image's Oz data.
