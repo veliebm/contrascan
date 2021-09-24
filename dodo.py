@@ -437,6 +437,74 @@ def task_resample_masks() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_apply_masks_to_irfs() -> Dict:
+    """
+    FOR each subject, USING her IRF, USING sub-brick 3, FOR each ROI, APPLY ROI mask to IRF.
+
+    THEORY
+    ------
+    For each subject, we want to compare the most positive blob within the occipital pole with the most negative blob within the calcarine. Get these blobs from the IRFs. Presumable, sub-brick 3 or sub-brick 4.
+		
+	What does it mean to be the most positive blob? Easy. Within the ROI, find all contiguous blobs. I didn't ask whether touching edges count, but I bet they do. Within each contiguous blob, sum the signal of each voxel together. Pick the blob with the largest sum. Or in the case of the calcarine, the lowest sum. Huzzah!
+		
+    Then, use each voxel in that blob in the original correlation test. Maybe make a mask for that blob, then apply the mask to the original correlation t-tests. That's a good idea!
+    """
+    masks = [
+        dict(name="calcarine", in_path=fname.resampled_mask(mask="calcarine")),
+        dict(name="occipital", in_path=fname.resampled_mask(mask="occipital")),
+    ]
+    for subject in SUBJECTS:
+        for mask in masks:
+            sources = [
+                fname.afniproc_resampled_irf(subject=subject),
+                mask["in_path"],
+
+            ]
+            targets = [fname.masked_irf(subject=subject, mask=mask["name"])]
+
+            kwargs = dict(
+                in_image=fname.afniproc_resampled_irf(subject=subject),
+                in_mask=mask["in_path"],
+                out_prefix=get_prefix(fname.masked_irf(subject=subject, mask=mask["name"])),
+            )
+
+            yield dict(
+                name=f"sub--{subject}, mask--{mask['name']}",
+                actions=[(apply_mask.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
+def task_clusterize_irfs() -> Dict:
+    """
+    FOR each subject, FOR each masked IRF, GET all clusters.
+    """
+    regions = "calcarine occipital".split()
+    for subject in SUBJECTS:
+        for region in regions:
+
+            # Get sources.
+            masked_irf = fname.masked_irf(subject=subject, mask=region)
+            sources = [masked_irf]
+
+            # Get targets.
+            clusters = fname.clusters(subject=subject, mask=region)
+            clusters_summary = fname.clusters_summary(subject=subject, mask=region)
+            targets = [clusters, clusters_summary]
+
+            # Get args to run.
+            kwargs = dict(
+                in_image=masked_irf,
+                out_prefix=get_prefix(clusters),
+                out_summary=clusters_summary,
+                subbrick=3,
+            )
+
+            yield dict(
+                name=f"subject--{subject}, region--{region}",
+                actions=[(clusterize.main, [], kwargs)],
+                file_dep=sources,
+                targets=targets,
+            )
 def task_make_micromasks() -> Dict:
     """
     Convert our clusters into bona fide masks! Wow!
@@ -1322,6 +1390,34 @@ def task_correlate_eeg_fmri() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
+def task_correlate_whole_brain_SNRs_and_fmri() -> Dict:
+    """
+    Correlate our oz SNRs with the BOLD signal in each voxel of the functional scan.
+    """
+    for frequency in FREQUENCIES:
+        for subject in SUBJECTS:
+            for start_volume in START_VOLUMES:
+
+                sources = [
+                    fname.final_func(subject=subject, start_volume=start_volume),
+                    fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
+                ]
+                targets = [
+                    fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                ]
+
+                kwargs = dict(
+                    in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
+                    in_eeg_path=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
+                    out_image_path=fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                )
+
+                yield dict(
+                    name=f"sub--{subject}, startvolume--{start_volume}, frequency--{frequency}",
+                    actions=[(correlate_eeg_fmri.main, [], kwargs)],
+                    file_dep=sources,
+                    targets=targets,
+                )
 def task_ttest_eeg_fmri_correlations() -> Dict:
     """
     ttest the correlations we calculated.
@@ -1371,74 +1467,6 @@ def task_apply_masks_to_correlations() -> Dict:
                     file_dep=sources,
                     targets=targets,
                 )
-def task_apply_masks_to_irfs() -> Dict:
-    """
-    FOR each subject, USING her IRF, USING sub-brick 3, FOR each ROI, APPLY ROI mask to IRF.
-
-    THEORY
-    ------
-    For each subject, we want to compare the most positive blob within the occipital pole with the most negative blob within the calcarine. Get these blobs from the IRFs. Presumable, sub-brick 3 or sub-brick 4.
-		
-	What does it mean to be the most positive blob? Easy. Within the ROI, find all contiguous blobs. I didn't ask whether touching edges count, but I bet they do. Within each contiguous blob, sum the signal of each voxel together. Pick the blob with the largest sum. Or in the case of the calcarine, the lowest sum. Huzzah!
-		
-    Then, use each voxel in that blob in the original correlation test. Maybe make a mask for that blob, then apply the mask to the original correlation t-tests. That's a good idea!
-    """
-    masks = [
-        dict(name="calcarine", in_path=fname.resampled_mask(mask="calcarine")),
-        dict(name="occipital", in_path=fname.resampled_mask(mask="occipital")),
-    ]
-    for subject in SUBJECTS:
-        for mask in masks:
-            sources = [
-                fname.afniproc_resampled_irf(subject=subject),
-                mask["in_path"],
-
-            ]
-            targets = [fname.masked_irf(subject=subject, mask=mask["name"])]
-
-            kwargs = dict(
-                in_image=fname.afniproc_resampled_irf(subject=subject),
-                in_mask=mask["in_path"],
-                out_prefix=get_prefix(fname.masked_irf(subject=subject, mask=mask["name"])),
-            )
-
-            yield dict(
-                name=f"sub--{subject}, mask--{mask['name']}",
-                actions=[(apply_mask.main, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
-            )
-def task_clusterize_irfs() -> Dict:
-    """
-    FOR each subject, FOR each masked IRF, GET all clusters.
-    """
-    regions = "calcarine occipital".split()
-    for subject in SUBJECTS:
-        for region in regions:
-
-            # Get sources.
-            masked_irf = fname.masked_irf(subject=subject, mask=region)
-            sources = [masked_irf]
-
-            # Get targets.
-            clusters = fname.clusters(subject=subject, mask=region)
-            clusters_summary = fname.clusters_summary(subject=subject, mask=region)
-            targets = [clusters, clusters_summary]
-
-            # Get args to run.
-            kwargs = dict(
-                in_image=masked_irf,
-                out_prefix=get_prefix(clusters),
-                out_summary=clusters_summary,
-                subbrick=3,
-            )
-
-            yield dict(
-                name=f"subject--{subject}, region--{region}",
-                actions=[(clusterize.main, [], kwargs)],
-                file_dep=sources,
-                targets=targets,
-            )
 def task_average_microregion_voxels() -> Dict:
     """
     Within each microregion of the trimmed trimmed funcs, average together all voxels of that region into their own timeseries.
