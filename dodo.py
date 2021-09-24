@@ -1541,7 +1541,7 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
                         ),
                         name=f"sliding sliding window, subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}"
                     )
-def task_correlate_across_subjects() -> Dict:
+def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> Dict:
     """
     How big is the correlation across ALL subjects for each microROI?
     """
