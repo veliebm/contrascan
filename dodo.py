@@ -1442,7 +1442,7 @@ def task_correlate_eeg_fmri() -> Dict:
                     out_image=fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"sliding sliding window SNR, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
-                )                
+                )
 def task_ttest_eeg_fmri_correlations() -> Dict:
     """
     ttest the correlations we calculated.
