@@ -1467,11 +1467,11 @@ def task_ttest_whole_brain_correlations() -> Dict:
             Name of the task.
         """
         sources = dict(
-            images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
+            images=images,
         )
         
         targets = dict(
-            ttest=fname.correlations_ttest(start_volume=start_volume, frequency=frequency)
+            ttest=out_path,
         )
 
         kwargs = dict(**sources, prefix=get_prefix(targets["ttest"]))
@@ -1483,8 +1483,13 @@ def task_ttest_whole_brain_correlations() -> Dict:
             targets=list(targets.values()),
         )
 
-    for frequency in FREQUENCIES:
-        for start_volume in START_VOLUMES:
+    for start_volume in START_VOLUMES:
+        yield create_task(
+                images=[fname.correlation_whole_brain_alphas(subject=subject, start_volume=start_volume) for subject in SUBJECTS],
+                out_path=fname.correlations_whole_brain_alphas_ttest(start_volume=start_volume),
+                name=f"alphas, startvolume--{start_volume}",
+            )
+        for frequency in FREQUENCIES:
             yield create_task(
                 images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
                 out_path=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
