@@ -1484,7 +1484,7 @@ def task_ttest_whole_brain_correlations() -> Dict:
                 out_path=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
                 name=f"sliding sliding window, startvolume--{start_volume}, frequency--{frequency}",
             )
-def task_apply_masks_to_correlations() -> Dict:
+def task_mask_ttested_whole_brain_correlations() -> Dict:
     """
     Apply masks to our correlation results.
     """
