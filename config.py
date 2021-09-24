@@ -264,10 +264,7 @@ fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_wind
 # task_correlate_whole_brain:
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
 fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_correlation.nii")
-
-# task_correlate_whole_brain_SNRs_and_fmri
-fname.add("correlation_whole_brain_SNR_dir", "{processed_data_dir}/correlation_whole_brain_SNRs")
-fname.add("correlation_whole_brain_SNR_image", "{correlation_whole_brain_SNR_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_SNR_correlation.nii")
+fname.add("correlation_whole_brain_SNR_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_SNR_correlation.nii")
 
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
