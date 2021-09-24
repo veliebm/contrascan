@@ -6,6 +6,7 @@ http://pydoit.org
 All the filenames are defined in config.py
 """
 # Import external modules and libraries.
+from os import PathLike
 from pathlib import Path
 from typing import Dict, Iterable
 import textwrap
@@ -1364,32 +1365,52 @@ def task_freqtag_hilbert() -> Dict:
 # fMRI/EEG correlation tasks.
 def task_correlate_eeg_fmri() -> Dict:
     """
-    This is it! Huzzah! Correlate our EEG and fMRI data across the whole brain.
+    This is it! Huzzah! Correlate EEG and fMRI data across the whole brain. EEG data must be a 1xN or Nx1 .mat file.
     """
+    def create_task(eeg_data: PathLike, in_image: PathLike, out_image: PathLike, name: str) -> dict:
+        """
+        Lets us generalize this task. Just pick some eeg data and name your out image.
+
+        Parameters
+        ----------
+        eeg_data : PathLike
+            Path to a list of numbers in a 1xN or Nx1 MatLab .mat file
+        in_image : PathLike
+            Path to the fMRI image you want to correlate with the EEG data.
+        out_image : PathLike
+            Where you want to write your out image to.
+        name : str
+            Name of the task.
+        """
+        sources = dict(
+            in_image_path=in_image,
+            in_eeg_path=eeg_data,
+        )
+        
+        targets = dict(
+            out_image_path=out_image,
+        )
+
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(correlate_eeg_fmri.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
     for frequency in FREQUENCIES:
         for subject in SUBJECTS:
             for start_volume in START_VOLUMES:
-
-                sources = [
-                    fname.final_func(subject=subject, start_volume=start_volume),
-                    fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
-                ]
-                targets = [
-                    fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
-                ]
-
-                kwargs = dict(
-                    in_image_path=fname.final_func(subject=subject, start_volume=start_volume),
-                    in_eeg_path=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
-                    out_image_path=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                yield create_task(
+                    eeg_data=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
+                    out_image=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
                 )
 
-                yield dict(
-                    name=f"sub--{subject}, startvolume--{start_volume}, frequency--{frequency}",
-                    actions=[(correlate_eeg_fmri.main, [], kwargs)],
-                    file_dep=sources,
-                    targets=targets,
-                )
+                
 def task_correlate_whole_brain_SNRs_and_fmri() -> Dict:
     """
     Correlate our oz SNRs with the BOLD signal in each voxel of the functional scan.
