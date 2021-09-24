@@ -29,6 +29,7 @@ import apply_mask
 import clusterize
 import average_voxels
 import correlate_regions
+import correlate_all_microregions
 
 
 # Configuration for the pydoit tool.
@@ -1548,36 +1549,47 @@ def task_correlate_across_subjects() -> Dict:
     """
     How big is the correlation across ALL subjects for each microROI?
     """
-    regions = "calcarine occipital".split()
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
 
+        Parameters
+        ----------
+        sources : Dict
+            load_tables_from : List[PathLike]
+                Where to get each of our microROI+amplitude tables
+        targets : Dict
+            save_scatter_to : PathLike
+                Where to save our scatter plot.
+            save_table_to : PathLike
+                Where to save the table of data we make from our tiny tables.
+            save_spearman_to : PathLike
+                Where to save our Spearman results.
+            
+        """
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(correlate_all_microregions.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
+    regions = "calcarine occipital".split()
     for frequency in FREQUENCIES:
         for region in regions:
             for start_volume in START_VOLUMES:
-
-                # Get sources.
-                tables_to_be_catenated = [fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS]
-                sources = tables_to_be_catenated
-
-                # Get targets.
-                correlations = fname.correlation_across_subjects(mask=region, frequency=frequency, start_volume=start_volume)
-                table = fname.correlation_across_subjects_table(mask=region, frequency=frequency, start_volume=start_volume)
-                scatter = fname.correlation_across_subjects_scatter(mask=region, frequency=frequency, start_volume=start_volume)
-                targets = [correlations, table, scatter]
-
-                # Get action.
-                action = f"""
-                    python3 correlate_all_microregions.py
-                    --load_tables_from {" ".join(tables_to_be_catenated)}
-                    --save_scatter_to {scatter}
-                    --save_table_to {table}
-                    --save_spearman_to {correlations}
-                """.split()
-
-                yield dict(
-                    name=f"mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
-                    actions=[action],
-                    file_dep=sources,
-                    targets=targets,
+                yield create_task(
+                    sources=dict(
+                        load_tables_from=[fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
+                    ),
+                    targets=dict(
+                        save_scatter_to=fname.correlation_across_subjects_scatter(mask=region, frequency=frequency, start_volume=start_volume),
+                        save_table_to=fname.correlation_across_subjects_table(mask=region, frequency=frequency, start_volume=start_volume),
+                        save_spearman_to=fname.correlation_across_subjects(mask=region, frequency=frequency, start_volume=start_volume),
+                    ),
+                    name=f"sliding sliding window, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
                 )
 
 

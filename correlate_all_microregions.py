@@ -11,7 +11,6 @@ import numpy
 from os import PathLike
 from typing import Dict, List
 import pandas
-import argparse
 import matplotlib.pyplot as plt
 from pathlib import Path
 
@@ -80,19 +79,3 @@ def get_spearman(list1: List[float], list2: List[float], out_path: PathLike) -> 
         io.write(str(correlation))
 
     return correlation
-
-
-if __name__ == "__main__":
-    """
-    This code only runs if this file is called as a script.
-    """
-    parser = argparse.ArgumentParser(description="Correlate the time series for a microregion with its Oz data.")
-
-    parser.add_argument("--load_tables_from", required=True, nargs="+", help="Where to get each of our microROI+amplitude tables")
-    parser.add_argument("--save_scatter_to", required=True, help="Where to save our scatter plot")
-    parser.add_argument("--save_table_to", required=True, help="Where to save the table of data we make from our tiny tables")
-    parser.add_argument("--save_spearman_to", required=True, help="Where to save our Spearman results")
-
-    parsed_args = parser.parse_args()
-    parsed_args_dict = vars(parsed_args)
-    main(**parsed_args_dict)
