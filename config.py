@@ -315,3 +315,6 @@ fname.add("correlation_across_subjects_dir", "{processed_data_dir}/correlation_a
 fname.add("correlation_across_subjects", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_correlation.txt")
 fname.add("correlation_across_subjects_scatter", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_scatter.png")
 fname.add("correlation_across_subjects_table", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregions+amplitudes.csv")
+fname.add("correlation_across_subjects_SNR", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_correlation_SNR.txt")
+fname.add("correlation_across_subjects_SNR_scatter", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_scatter_SNR.png")
+fname.add("correlation_across_subjects_SNR_table", "{correlation_across_subjects_dir}/frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregions+amplitudes_SNR.csv")
