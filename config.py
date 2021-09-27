@@ -306,6 +306,9 @@ fname.add("microregions_correlation_dir", "{processed_data_dir}/microregion_corr
 fname.add("microregions_correlation_results", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion_correlations.txt")
 fname.add("microregions_and_amplitudes", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion+amplitudes.csv")
 fname.add("microregions_correlation_scatter_plot", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_scatter.png")
+fname.add("microregions_correlation_SNR_results", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion_SNR_correlations.txt")
+fname.add("microregions_and_SNR_amplitudes", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_microregion+SNRamplitudes.csv")
+fname.add("microregions_correlation_SNR_scatter_plot", "{microregions_correlation_dir}/sub-{subject}_frequency-{frequency}_source-{mask}_startvolume-{start_volume}_SNR_scatter.png")
 
 # task_correlate_eeg_with_average_microregion_timeseries_across_subjects:
 fname.add("correlation_across_subjects_dir", "{processed_data_dir}/correlation_across_subjects")

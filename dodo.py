@@ -1497,7 +1497,14 @@ def task_ttest_whole_brain_correlations() -> Dict:
             )
 def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     """
-    Correlate the time series of each microregion with its image's Oz data.
+    Correlate the time series of each microregion with EEG data.
+
+    Inputs
+    ------
+    eeg_sliding_sliding_window_oz_amplitudes
+        Amplitudes of the Oz electrode calculated with a sliding sliding window using frequency estimates of 12Hz and 24Hz.
+    eeg_sliding_sliding_window_oz_SNR
+        Signal to noise ratio of the Oz electrode calculated with a sliding sliding window using frequency estimates of 12Hz and 24Hz.
     """
     def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
         """
@@ -1527,10 +1534,9 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
             targets=list(targets.values()),
         )
     
-    regions = "calcarine occipital".split()
     for frequency in FREQUENCIES:
         for subject in SUBJECTS:
-            for region in regions:
+            for region in "calcarine occipital".split():
                 for start_volume in START_VOLUMES:
                     yield create_task(
                         sources=dict(
@@ -1543,6 +1549,18 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
                             save_scatter_to=fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
                         ),
                         name=f"sliding sliding window, subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}"
+                    )
+                    yield create_task(
+                        sources=dict(
+                            load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),
+                            load_amplitudes_from=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
+                        ),
+                        targets=dict(
+                            save_spearman_to=fname.microregions_correlation_SNR_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
+                            save_table_to=fname.microregions_and_SNR_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
+                            save_scatter_to=fname.microregions_correlation_SNR_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
+                        ),
+                        name=f"sliding sliding window SNR, subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}"
                     )
 def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> Dict:
     """
