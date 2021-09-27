@@ -1613,9 +1613,9 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
                         load_tables_from=[fname.microregions_and_SNR_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
                     ),
                     targets=dict(
-                        save_scatter_to=fname.correlation_across_subjects_SNR(mask=region, frequency=frequency, start_volume=start_volume),
-                        save_table_to=fname.correlation_across_subjects_SNR_scatter(mask=region, frequency=frequency, start_volume=start_volume),
-                        save_spearman_to=fname.correlation_across_subjects_SNR_table(mask=region, frequency=frequency, start_volume=start_volume),
+                        save_scatter_to=fname.correlation_across_subjects_SNR_scatter(mask=region, frequency=frequency, start_volume=start_volume),
+                        save_table_to=fname.correlation_across_subjects_SNR_table(mask=region, frequency=frequency, start_volume=start_volume),
+                        save_spearman_to=fname.correlation_across_subjects_SNR(mask=region, frequency=frequency, start_volume=start_volume),
                     ),
                     name=f"sliding sliding window SNR, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
                 )
