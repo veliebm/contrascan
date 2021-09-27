@@ -856,7 +856,7 @@ def task_eeg_get_alphas() -> Dict:
 
         # Get targets.
         targets = dict(
-            values=fname.eeg_alpha_values(subject=subject),
+            values=fname.eeg_alpha(subject=subject, data="values"),
             average_power=fname.average_power(subject=subject),
             write_script_to=fname.eeg_alpha_script(subject=subject),
         )
@@ -1430,11 +1430,12 @@ def task_correlate_whole_brain() -> Dict:
 
     for subject in SUBJECTS:
         for start_volume in START_VOLUMES:
+            alpha_data = "values"
             yield create_task(
-                eeg_data=fname.eeg_alpha_values(subject=subject),
-                out_image=fname.correlation_whole_brain_alphas(subject=subject, start_volume=start_volume),
+                eeg_data=fname.eeg_alpha(subject=subject, data=alpha_data),
+                out_image=fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data),
                 in_image=fname.final_func(subject=subject, start_volume=start_volume),
-                name=f"alphas, sub--{subject}, startvolume--{start_volume}"
+                name=f"alpha, {alpha_data}, sub--{subject}, startvolume--{start_volume}"
             )
             for frequency in FREQUENCIES:
                 yield create_task(
@@ -1484,11 +1485,12 @@ def task_ttest_whole_brain_correlations() -> Dict:
         )
 
     for start_volume in START_VOLUMES:
+        alpha_data = "values"
         yield create_task(
-                images=[fname.correlation_whole_brain_alphas(subject=subject, start_volume=start_volume) for subject in SUBJECTS],
-                out_path=fname.correlations_whole_brain_alphas_ttest(start_volume=start_volume),
-                name=f"alphas, startvolume--{start_volume}",
-            )
+            images=[fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
+            out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
+            name=f"alphas, startvolume--{start_volume}",
+        )
         for frequency in FREQUENCIES:
             yield create_task(
                 images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],

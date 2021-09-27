@@ -180,7 +180,7 @@ fname.add("eeg_flicker_frequencies_trials", "{eeg_flicker_frequencies_dir}/sub-{
 # task_eeg_get_alphas:
 fname.add("eeg_alpha_dir", "{processed_data_dir}/eeg_alphas")
 fname.add("eeg_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_alphas.m")
-fname.add("eeg_alpha_values", "{eeg_alpha_dir}/sub-{subject}_alpha_values.mat")
+fname.add("eeg_alpha", "{eeg_alpha_dir}/sub-{subject}_data-{data}_alphas.mat")
 fname.add("average_power", "{eeg_alpha_dir}/sub-{subject}_average_power.mat")
 
 # task_freqtag_calculate_parameters:
@@ -265,12 +265,12 @@ fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_wind
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
 fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_correlation.nii")
 fname.add("correlation_whole_brain_SNR_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_SNR_correlation.nii")
-fname.add("correlation_whole_brain_alphas", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_alphas_correlation.nii")
+fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_data-{data}_alphas.nii")
 
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
 fname.add("correlations_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
-fname.add("correlations_whole_brain_alphas_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_correlations_alphas_ttest+tlrc.HEAD")
+fname.add("correlations_whole_brain_alpha_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_data-{data}_correlations_alpha_ttest+tlrc.HEAD")
 
 # task_get_occipital_mask:
 fname.add("kastner_mask_dir", "{raw_data_dir}/misc/kastner_cortex_masks/subj_vol_all")
