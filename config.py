@@ -270,6 +270,7 @@ fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_star
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
 fname.add("correlations_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
+fname.add("correlations_SNR_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest_SNR+tlrc.HEAD")
 fname.add("correlations_whole_brain_alpha_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_data-{data}_correlations_alpha_ttest+tlrc.HEAD")
 
 # task_get_occipital_mask:

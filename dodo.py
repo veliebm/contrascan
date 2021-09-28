@@ -1496,6 +1496,11 @@ def task_ttest_whole_brain_correlations() -> Dict:
                 out_path=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
                 name=f"sliding sliding window, startvolume--{start_volume}, frequency--{frequency}",
             )
+            yield create_task(
+                images=[fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
+                out_path=fname.correlations_SNR_ttest(start_volume=start_volume, frequency=frequency),
+                name=f"sliding sliding window SNR, startvolume--{start_volume}, frequency--{frequency}",
+            )
 def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     """
     Correlate the time series of each microregion with EEG data.
