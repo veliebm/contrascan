@@ -14,15 +14,18 @@ function do_all(parameters_file)
 
     for i = 1:numel(all_parameters)
         parameters = all_parameters(i)
-        trim(parameters.subject, parameters.time_delta, parameters.in_filename, parameters.in_dir, parameters.out_dir);
+        trim(parameters.subject, parameters.in_filename, parameters.in_dir, parameters.out_dir);
     end
 end
 
-function EEG = trim(subject, time_delta, in_filename, in_dir, out_dir)
+function EEG = trim(subject, in_filename, in_dir, out_dir)
     eeglab;
     EEG = load_dataset(in_filename, in_dir);
     
-    EEG = pop_rmdat(EEG, {'R128'}, [time_delta 999999], 0);
+    EEG = pop_rmdat(EEG, {'S  2'}, [0 999999], 0); % Trim so EEG starts at first stimulus.
+    EEG = eeg_checkset( EEG );
+
+    EEG = pop_rmdat(EEG, {'S  2'}, [-999999 10], 0); % Trim so EEG ends 10s after the final stimulus.
     EEG = eeg_checkset( EEG );
     
     EEG.setname=sprintf('sub-%s_truncated to fmri start time', subject);

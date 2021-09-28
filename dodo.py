@@ -745,7 +745,6 @@ def task_prepare_to_trim_eeg() -> Dict:
     for subject in SUBJECTS:
         data.append(dict(
             subject=subject,
-            time_delta=10,
             in_filename=Path(fname.preprocessed_eeg(subject=subject)).name,
             in_dir=fname.preprocesseeg_dir,
             out_dir=fname.trimeeg_dir,
@@ -763,10 +762,7 @@ def task_prepare_to_trim_eeg() -> Dict:
     )
 def task_trim_eeg() -> Dict:
     """
-    Make our EEG data start when our trimmed func data starts.
-
-    Trim our preprocessed EEG files to 10s AFTER the fMRI turned on, since that's where we trimmed our funcs to (counting both the afni_proc TR we removed
-    and the 4 other TRs to get the funcs to start at S  2).
+    Make our EEG data start at first stimulus and end 10s after final stimulus.
     """
     sources = [fname.trimeeg_json]
     targets = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
