@@ -1607,10 +1607,21 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
             targets=list(targets.values()),
         )
 
-    regions = "calcarine occipital".split()
-    for frequency in FREQUENCIES:
-        for region in regions:
-            for start_volume in START_VOLUMES:
+    for region in "calcarine occipital".split():
+        for start_volume in START_VOLUMES:
+            for alpha_data in "values".split():
+                yield create_task(
+                    sources=dict(
+                        load_tables_from=[fname.microregions_and_alpha_amplitudes(subject=subject, mask=region, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
+                    ),
+                    targets=dict(
+                        save_scatter_to=fname.correlation_across_subjects_alpha_scatter(mask=region, data=alpha_data, start_volume=start_volume),
+                        save_table_to=fname.correlation_across_subjects_alpha_table(mask=region, data=alpha_data, start_volume=start_volume),
+                        save_spearman_to=fname.correlation_across_subjects_alpha(mask=region, data=alpha_data, start_volume=start_volume),
+                    ),
+                    name=f"alpha, data--{alpha_data}, mask--{region}, start_volume--{start_volume}",
+                )
+            for frequency in FREQUENCIES:
                 yield create_task(
                     sources=dict(
                         load_tables_from=[fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
