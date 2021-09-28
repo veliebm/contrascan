@@ -745,7 +745,7 @@ def task_prepare_to_trim_eeg() -> Dict:
     for subject in SUBJECTS:
         data.append(dict(
             subject=subject,
-            time_delta=-10,
+            time_delta=10,
             in_filename=Path(fname.preprocessed_eeg(subject=subject)).name,
             in_dir=fname.preprocesseeg_dir,
             out_dir=fname.trimeeg_dir,
@@ -763,7 +763,10 @@ def task_prepare_to_trim_eeg() -> Dict:
     )
 def task_trim_eeg() -> Dict:
     """
-    Trim our preprocessed EEG files to the time at which the fMRI turned on.
+    Make our EEG data start when our trimmed func data starts.
+
+    Trim our preprocessed EEG files to 10s AFTER the fMRI turned on, since that's where we trimmed our funcs to (counting both the afni_proc TR we removed
+    and the 4 other TRs to get the funcs to start at S  2).
     """
     sources = [fname.trimeeg_json]
     targets = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
@@ -920,7 +923,7 @@ def task_eeg_sliding_sliding_window() -> Dict:
 
             # Get sources.
             sources = dict(
-                eeg=fname.trimmed_eeg(subject=subject),
+                eeg=fname.preprocessed_eeg(subject=subject),
             )
             sources_list = list(sources.values())
 
@@ -1536,10 +1539,23 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
             targets=list(targets.values()),
         )
     
-    for frequency in FREQUENCIES:
-        for subject in SUBJECTS:
-            for region in "calcarine occipital".split():
-                for start_volume in START_VOLUMES:
+    for subject in SUBJECTS:
+        for region in "calcarine occipital".split():
+            for start_volume in START_VOLUMES:
+                for alpha_data in "values".split():
+                    yield create_task(
+                        sources=dict(
+                            load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),
+                            load_amplitudes_from=fname.eeg_alpha(subject=subject, data=alpha_data),
+                        ),
+                        targets=dict(
+                            save_spearman_to=fname.microregions_correlation_alpha_results(subject=subject, mask=region, start_volume=start_volume, data=alpha_data),
+                            save_table_to=fname.microregions_and_alpha_amplitudes(subject=subject, mask=region, start_volume=start_volume, data=alpha_data),
+                            save_scatter_to=fname.microregions_correlation_alpha_scatter_plot(subject=subject, mask=region, start_volume=start_volume, data=alpha_data),
+                        ),
+                        name=f"alpha, data--{alpha_data}, subject--{subject}, mask--{region}, start_volume--{start_volume}"
+                    )
+                for frequency in FREQUENCIES:
                     yield create_task(
                         sources=dict(
                             load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),

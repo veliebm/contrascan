@@ -9,7 +9,6 @@ import numpy
 from os import PathLike
 from typing import Dict, List
 import pandas
-import argparse
 import matplotlib.pyplot as plt
 from pathlib import Path
 import scipy.io
@@ -46,6 +45,7 @@ def make_table(dictionary: Dict, out_path: PathLike) -> pandas.DataFrame:
     """
     Make a table and also save it to disk.
     """
+    print(dictionary)
     table = pandas.DataFrame(dictionary)
     table.to_csv(out_path)
 
