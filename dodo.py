@@ -793,7 +793,8 @@ def task_eeg_get_flicker_frequencies() -> Dict:
 
         # Get targets.
         targets = dict(
-            trials=fname.eeg_flicker_frequencies_trials(subject=subject),
+            frequencies=fname.eeg_flicker_frequencies(subject=subject, variable="frequencies"),
+            durations=fname.eeg_flicker_frequencies(subject=subject, variable="durations"),
             write_script_to=fname.eeg_flicker_frequencies_script(subject=subject),
         )
         targets_list = list(targets.values())
@@ -808,15 +809,16 @@ def task_eeg_get_flicker_frequencies() -> Dict:
                 durations = get_durations('{sources["dat"]}')
 
                 %% Run functions.
-                trials = [];
+                frequencies = [];
                 for i = 1:numel(durations)
                     duration = durations(i)
-                    trial = 1./(duration/50)
-                    trials = [trials, trial]
+                    frequency = 1./(duration/50)
+                    frequencies = [frequencies, frequency]
                 end
 
                 %% Save output variables.
-                save('{targets["trials"]}', 'trials');
+                save('{targets["frequencies"]}', 'frequencies');
+                save('{targets["durations"]}', 'durations');
             end
 
             function [durations] = get_durations(dat_path)
@@ -1216,7 +1218,7 @@ def task_freqtag_better_sliding_window() -> Dict:
             sampling_rate=fname.freqtag_sampling_rate,
             stimulus_start=fname.freqtag_stimulus_start,
             stimulus_end=fname.freqtag_stimulus_end,
-            trials=fname.eeg_flicker_frequencies_trials(subject=subject)
+            trials=fname.eeg_flicker_frequencies(subject=subject, variable="frequencies")
         )
         sources_list = list(sources.values())
 

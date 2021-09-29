@@ -175,7 +175,7 @@ fname.add("trimmed_eeg", "{trimeeg_dir}/sub-{subject}_eeg.set")
 # task_eeg_get_flicker_frequencies:
 fname.add("eeg_flicker_frequencies_dir", "{processed_data_dir}/eeg_flicker_frequencies")
 fname.add("eeg_flicker_frequencies_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_flicker_frequencies.m")
-fname.add("eeg_flicker_frequencies_trials", "{eeg_flicker_frequencies_dir}/sub-{subject}_trials.mat")
+fname.add("eeg_flicker_frequencies", "{eeg_flicker_frequencies_dir}/sub-{subject}_variable-{variable}.mat")
 
 # task_eeg_get_alphas:
 fname.add("eeg_alpha_dir", "{processed_data_dir}/eeg_alphas")
