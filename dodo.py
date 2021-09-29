@@ -856,6 +856,7 @@ def task_eeg_get_alphas() -> Dict:
         # Get targets.
         targets = dict(
             values=fname.eeg_alpha(subject=subject, data="values"),
+            SNRs=fname.eeg_alpha(subject=subject, data="SNRs"),
             average_power=fname.average_power(subject=subject),
             write_script_to=fname.eeg_alpha_script(subject=subject),
         )
@@ -871,17 +872,22 @@ def task_eeg_get_alphas() -> Dict:
             %% Run functions.
             values = [];
             pows = [];
+            SNRs = [];
             for i = 1000:1000:numel(dataset(1,:))
                 sub_dataset = dataset(:,i-999:i);
                 [pow, phase, freqs] = FFT_spectrum(sub_dataset, 500);
                 alpha = mean(mean(pow([20 31 19 7 8 9 10 ], 18:26)));
+                [SNRdb, SNRratio] = freqtag_simpleSNR(pow, [11:16 28:33])
+                SNR = mean(mean(SNRdb([20 31 19 7 8 9 10 ], 18:26)));
                 values = [values; alpha];
+                SNRs = [values; SNR];
                 pows = cat(3, pows, pow);
             end
             average_power =  mean(pows, 3);
 
             %% Save output variables.
             save('{targets["values"]}', 'values');
+            save('{targets["SNRs"]}', 'SNRs');
             save('{targets["average_power"]}', 'average_power');
             
             function [dataset] = load_dataset(path)
@@ -1429,13 +1435,13 @@ def task_correlate_whole_brain() -> Dict:
 
     for subject in SUBJECTS:
         for start_volume in START_VOLUMES:
-            alpha_data = "values"
-            yield create_task(
-                eeg_data=fname.eeg_alpha(subject=subject, data=alpha_data),
-                out_image=fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data),
-                in_image=fname.final_func(subject=subject, start_volume=start_volume),
-                name=f"alpha, {alpha_data}, sub--{subject}, startvolume--{start_volume}"
-            )
+            for alpha_data in "values SNRs".split():
+                yield create_task(
+                    eeg_data=fname.eeg_alpha(subject=subject, data=alpha_data),
+                    out_image=fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"alpha, {alpha_data}, sub--{subject}, startvolume--{start_volume}"
+                )
             for frequency in FREQUENCIES:
                 yield create_task(
                     eeg_data=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
@@ -1484,7 +1490,7 @@ def task_ttest_whole_brain_correlations() -> Dict:
         )
 
     for start_volume in START_VOLUMES:
-        alpha_data = "values"
+        alpha_data = "values SNRs"
         yield create_task(
             images=[fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
             out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
@@ -1543,7 +1549,7 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     for subject in SUBJECTS:
         for region in "calcarine occipital".split():
             for start_volume in START_VOLUMES:
-                for alpha_data in "values".split():
+                for alpha_data in "values SNRs".split():
                     yield create_task(
                         sources=dict(
                             load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),
@@ -1614,7 +1620,7 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
 
     for region in "calcarine occipital".split():
         for start_volume in START_VOLUMES:
-            for alpha_data in "values".split():
+            for alpha_data in "values SNRs".split():
                 yield create_task(
                     sources=dict(
                         load_tables_from=[fname.microregions_and_alpha_amplitudes(subject=subject, mask=region, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
