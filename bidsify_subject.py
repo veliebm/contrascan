@@ -55,11 +55,12 @@ def write_func_tsv(path_to_vmrk: PathLike, path_to_dat: PathLike, path_to_func: 
     dat_data = Dat(path_to_dat)
 
     onsets = vmrk_data.onsets
-    duration = dat_data.average_duration
+    durations = dat_data.durations
 
     # Prep a dataframe to write to .tsv.
     tsv_tuples = [ ("onset", "duration", "trial_type") ]
-    for onset in onsets:
+    for i, onset in enumerate(onsets):
+        duration = durations[i]
         tsv_tuples.append( (onset, duration, "gabor") )
     tsv_dataframe = pandas.DataFrame(tsv_tuples)
 
