@@ -33,11 +33,12 @@ def main(better_sliding_window: PathLike, sliding_sliding_window: PathLike, even
     # Calculate which volumes to replace.
     volumes_to_replace = calculate_volumes(events_table, sliding_window_series)
 
+    # Read the sliding sliding window amplitudes.
+    sliding_sliding_window_series = get_amplitudes(sliding_sliding_window)
+
     # Downsample onsets into 2s intervals coded based on which trial they belong to. Intervals with no trial contain null or 0.
 
     # Fill trial blocks with sliding window results.
-
-    # Read the sliding sliding window amplitudes.
 
     # Splice the downsampled better sliding window results over the sliding sliding window amplitudes.
 
@@ -93,7 +94,7 @@ def _test_task():
     """
     main(
         "./processed/freqtag_better_sliding_window/sub-122_variable-trialpow_channel-20.mat",
-        "./processed/eeg_sliding_sliding_window/sub-122_frequency-12_amplitudes.fftamp.mat",
+        "./processed/eeg_sliding_sliding_window/sub-104_frequency-12_oz_amplitudes.mat",
         "./processed/bids/sub-122/func/sub-122_task-contrascan_events.tsv",
         "./processed/eeg_sliding_sliding_window_improved/sub-122_improved_amplitudes.m",
     )
