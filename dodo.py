@@ -30,6 +30,7 @@ import clusterize
 import average_voxels
 import correlate_regions
 import correlate_all_microregions
+import improve_sliding_sliding_window
 
 
 # Configuration for the pydoit tool.
@@ -974,6 +975,56 @@ def task_eeg_sliding_sliding_window() -> Dict:
                 file_dep=sources_list,
                 targets=targets_list,
             )
+def task_improve_sliding_sliding_window() -> Dict:
+    """
+    Overwrite the trial parts of the sliding sliding window with more accurate values.
+
+    We have good trial estimates from the sliding window. The sliding sliding window uses poor trial estimates.
+    If we overwrite the bad trial estimates with our good trial estimates, we expect that the sliding sliding
+    window analysis will produce better results.
+    """
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        name : str
+            Name of the task.
+        sources : dict
+            Contains paths to source files for the task.
+                sliding_window : PathLike
+                    Path to the trial sliding window results.
+                sliding_sliding_window : PathLike
+                    Path to the TR sliding window results.
+                events : PathLike
+                    Path to the BIDS events file containing the onset and duration of each trial.
+        targets : dict
+            Contains paths to target files for the task.
+                improved_sliding_sliding_window : PathLike
+                    Where to output improved sliding sliding window results.
+        """
+        kwargs = dict(**sources, **targets)
+
+        return dict(
+            name=name,
+            actions=[(improve_sliding_sliding_window.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+    
+    for subject in SUBJECTS:
+        yield create_task(
+            sources=dict(
+                sliding_window=fname.freqtag_better_sliding_window_trialpow(subject=subject),
+                sliding_sliding_window=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=FREQUENCIES[0]),
+                events=fname.bids_events(subject=subject),
+            ),
+            targets=dict(
+                improved_sliding_sliding_window=fname.eeg_sliding_sliding_window_improved(subject=subject),
+            ),
+            name=f"subject--{subject}"
+        )
 
 
 # Freqtag pipeline.
@@ -1218,7 +1269,7 @@ def task_freqtag_better_sliding_window() -> Dict:
             sampling_rate=fname.freqtag_sampling_rate,
             stimulus_start=fname.freqtag_stimulus_start,
             stimulus_end=fname.freqtag_stimulus_end,
-            trials=fname.eeg_flicker_frequencies(subject=subject, variable="frequencies")
+            frequencies=fname.eeg_flicker_frequencies(subject=subject, variable="frequencies")
         )
         sources_list = list(sources.values())
 
@@ -1247,7 +1298,7 @@ def task_freqtag_better_sliding_window() -> Dict:
                 load('{sources["stimulus_start"]}')
                 load('{sources["stimulus_end"]}')
                 load('{sources["sampling_rate"]}')
-                load('{sources["trials"]}')
+                load('{sources["frequencies"]}')
 
                 %% Run functions.
                 trialpow = [];
@@ -1255,7 +1306,7 @@ def task_freqtag_better_sliding_window() -> Dict:
                 phasestabmat = [];
                 trialSNR = [];
                 for i = 1:numel(dataset(1,1,:))
-                    frequency = trials(i)
+                    frequency = frequencies(i)
                     [minitrialpow,miniwinmat3d,miniphasestabmat,minitrialSNR] = freqtag_slidewin(dataset(:,:,i), 0, stimulus_start:stimulus_end, stimulus_start:stimulus_end, frequency, 600, sampling_rate, 'TEMP');
                     trialpow = [trialpow, minitrialpow];
                     winmat3d = [winmat3d, miniwinmat3d];
@@ -1496,7 +1547,7 @@ def task_ttest_whole_brain_correlations() -> Dict:
         yield create_task(
             images=[fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
             out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
-            name=f"alphas, startvolume--{start_volume}",
+            name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
         )
         for frequency in FREQUENCIES:
             yield create_task(

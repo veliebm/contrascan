@@ -261,6 +261,10 @@ fname.add("eeg_sliding_sliding_window_SNR", "{eeg_sliding_sliding_window_dir}/su
 fname.add("eeg_sliding_sliding_window_oz_SNR", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_SNR.mat")
 fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_amplitudes.mat")
 
+#task_improve_sliding_sliding_window
+fname.add("eeg_sliding_sliding_window_improved_dir", "{processed_data_dir}/eeg_sliding_sliding_window_improved")
+fname.add("eeg_sliding_sliding_window_improved", "{eeg_sliding_sliding_window_improved_dir}/sub-{subject}_improved_amplitudes.m")
+
 # task_correlate_whole_brain:
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
 fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_correlation.nii")
