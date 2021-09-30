@@ -49,13 +49,19 @@ def calculate_volumes(events_table: pandas.DataFrame, sliding_window_series: pan
     Downsample onsets into 2s intervals coded based on which trial they belong to. Intervals with no trial contain null or 0.
     """
     # Calculate beginning and end of each trial.
-
-    # Round begnning and end of each trial to 2s.
-
-    # Divide by 2 to get start and end volumes to replace.
+    trials = pandas.DataFrame(dict(
+        trial_start = events_table["onset"],
+        trial_end = events_table["onset"] + events_table["duration"],
+    ))
+    
+    # Round begnning and end of each trial to 2s. Divide by 2 to get start and end volumes to replace.
+    volumes = trials/2
+    volumes = volumes.round(0)
+    volumes = volumes.astype(int)
 
     # Return DataFrame containing a column of start volumes, end volumes, and sliding window values for those intervals.
-    breakpoint()
+    volumes["amplitude"] = sliding_window_series
+    return volumes
 
 
 def get_events(path_to_events: PathLike) -> pandas.DataFrame:
