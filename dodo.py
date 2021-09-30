@@ -921,6 +921,8 @@ def task_eeg_get_alphas() -> Dict:
 def task_eeg_sliding_sliding_window() -> Dict:
     """
     Run a sliding sliding window analysis on our trimmed, preprocessed EEG files.
+
+    Recall that stead2singtrials.m starts 1s before the first "S  2" stimulus and ends 10s after the final "S  2" stimulus.
     """
     Path(fname.eeg_sliding_sliding_window_dir).mkdir(exist_ok=True, parents=True)
     for subject in SUBJECTS:
