@@ -984,6 +984,12 @@ def task_improve_sliding_sliding_window() -> Dict:
     We have good trial estimates from the sliding window. The sliding sliding window uses poor trial estimates.
     If we overwrite the bad trial estimates with our good trial estimates, we expect that the sliding sliding
     window analysis will produce better results.
+
+    Recall that the sliding sliding window amplitudes start 1s before the first "S  2" stimulus and end 10s after the final "S  2" stimulus.
+    Each amplitude is for a single 2s TR.
+
+    Recall that the events file is trimmed to begin when the fMRI turns on. We should adjust the timings for the events such that they are relative to
+    1s before the first "S  2" stimulus. Then we should downsample the events into 2s intervals.
     """
     def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
         """
@@ -995,8 +1001,8 @@ def task_improve_sliding_sliding_window() -> Dict:
             Name of the task.
         sources : dict
             Contains paths to source files for the task.
-                sliding_window : PathLike
-                    Path to the trial sliding window results.
+                better_sliding_window : PathLike
+                    Path to the better sliding window results.
                 sliding_sliding_window : PathLike
                     Path to the TR sliding window results.
                 events : PathLike
@@ -1018,7 +1024,7 @@ def task_improve_sliding_sliding_window() -> Dict:
     for subject in SUBJECTS:
         yield create_task(
             sources=dict(
-                sliding_window=fname.freqtag_better_sliding_window_trialpow(subject=subject),
+                better_sliding_window=fname.freqtag_better_sliding_window_trialpow(subject=subject),
                 sliding_sliding_window=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=FREQUENCIES[0]),
                 events=fname.bids_events(subject=subject),
             ),
