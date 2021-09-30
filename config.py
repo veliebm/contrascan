@@ -231,6 +231,7 @@ fname.add("freqtag_better_sliding_window_phasestabmat", "{freqtag_better_sliding
 fname.add("freqtag_better_sliding_window_trialSNR", "{freqtag_better_sliding_window_dir}/sub-{subject}_trialSNR.mat")
 fname.add("freqtag_better_sliding_window_outfile", "{freqtag_better_sliding_window_dir}/sub-{subject}_outfile.slidwin.mat")
 fname.add("freqtag_better_sliding_window_meanwinmat", "{freqtag_better_sliding_window_dir}/sub-{subject}_meanwinmat.mat")
+fname.add("freqtag_better_sliding_window_channel", "{freqtag_better_sliding_window_dir}/sub-{subject}_variable-{variable}_channel-{channel}.mat")
 
 # task_freqtag_better_fft_sliding_window:
 fname.add("freqtag_better_fft_sliding_window_script", "{scripts_dir}/TEMP_sub{subject}_better_FFT_sliding_window.m")

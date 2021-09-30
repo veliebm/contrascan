@@ -1289,6 +1289,7 @@ def task_freqtag_better_sliding_window() -> Dict:
             trialSNR=fname.freqtag_better_sliding_window_trialSNR(subject=subject),
             trialpow=fname.freqtag_better_sliding_window_trialpow(subject=subject),
             meanwinmat=fname.freqtag_better_sliding_window_meanwinmat(subject=subject),
+            oz_trialpow=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialpow"),
         )
         targets_list = list(targets.values())
         Path(targets["meanwinmat"]).parent.mkdir(exist_ok=True, parents=True)
@@ -1325,6 +1326,8 @@ def task_freqtag_better_sliding_window() -> Dict:
 
                 %% Save output variables.
                 save('{targets["trialpow"]}', 'trialpow');
+                oz_trialpow = trialpow(20,:);
+                save('{targets["oz_trialpow"]}', 'oz_trialpow');
                 save('{targets["winmat3d"]}', 'winmat3d');
                 save('{targets["phasestabmat"]}', 'phasestabmat');
                 save('{targets["trialSNR"]}', 'trialSNR');
