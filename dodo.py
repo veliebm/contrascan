@@ -1024,7 +1024,7 @@ def task_improve_sliding_sliding_window() -> Dict:
     for subject in SUBJECTS:
         yield create_task(
             sources=dict(
-                better_sliding_window=fname.freqtag_better_sliding_window_trialpow(subject=subject),
+                better_sliding_window=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialpow"),
                 sliding_sliding_window=fname.eeg_sliding_sliding_window_amplitudes(subject=subject, frequency=FREQUENCIES[0]),
                 events=fname.bids_events(subject=subject),
             ),
