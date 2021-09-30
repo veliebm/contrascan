@@ -86,7 +86,7 @@ def _test_task():
     Runs our code with dummy data.
     """
     main(
-        "./processed/freqtag_better_sliding_window/sub-122_trialpow.mat",
+        "./processed/freqtag_better_sliding_window/sub-122_variable-trialpow_channel-20.mat",
         "./processed/eeg_sliding_sliding_window/sub-122_frequency-12_amplitudes.fftamp.mat",
         "./processed/bids/sub-122/func/sub-122_task-contrascan_events.tsv",
         "./processed/eeg_sliding_sliding_window_improved/sub-122_improved_amplitudes.m",
