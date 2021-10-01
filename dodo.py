@@ -1718,6 +1718,18 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
 
     for region in "calcarine occipital".split():
         for start_volume in START_VOLUMES:
+            for variable in "amplitudes SNRs".split():
+                yield create_task(
+                    sources=dict(
+                        load_tables_from=[fname.microregions_and_amplitudes_better(subject=subject, mask=region, start_volume=start_volume, variable=variable) for subject in SUBJECTS],
+                    ),
+                    targets=dict(
+                        save_scatter_to=fname.correlation_across_subjects_scatter_better(mask=region, variable=variable, start_volume=start_volume),
+                        save_table_to=fname.correlation_across_subjects_table_better(mask=region, variable=variable, start_volume=start_volume),
+                        save_spearman_to=fname.correlation_across_subjects_better(mask=region, variable=variable, start_volume=start_volume),
+                    ),
+                    name=f"better sliding sliding window, variable--{variable}, mask--{region}, start_volume--{start_volume}",
+                )
             for alpha_data in "values SNRs".split():
                 yield create_task(
                     sources=dict(
