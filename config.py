@@ -264,7 +264,7 @@ fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_wind
 
 #task_improve_sliding_sliding_window
 fname.add("eeg_sliding_sliding_window_improved_dir", "{processed_data_dir}/eeg_sliding_sliding_window_improved")
-fname.add("eeg_sliding_sliding_window_improved", "{eeg_sliding_sliding_window_improved_dir}/sub-{subject}_improved_amplitudes.m")
+fname.add("eeg_sliding_sliding_window_improved", "{eeg_sliding_sliding_window_improved_dir}/sub-{subject}_improved_amplitudes.mat")
 
 # task_correlate_whole_brain:
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
