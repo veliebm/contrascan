@@ -10,6 +10,7 @@ Created 9/30/2021 By Benjamin Velie, veliebm@ufl.edu
 
 # Import external Python stuff.
 from os import PathLike
+from typing import Dict
 import pandas
 
 # Import custom CSEA stuff.
@@ -40,9 +41,21 @@ def main(better_sliding_window: PathLike, sliding_sliding_window: PathLike, even
     sliding_sliding_window_series = get_amplitudes(sliding_sliding_window)
 
     # Fill trial blocks in sliding sliding window with sliding window results.
-
+    improved_amplitudes = overwrite_sliding_sliding_window(sliding_sliding_window_series, volume_replacements)
 
     # Write the improved amplitudes to a .m file.
+    breakpoint()
+
+
+def overwrite_sliding_sliding_window(sliding_sliding_window_series: pandas.Series, volume_replacements: Dict) -> pandas.Series:
+    """
+    Fill trial blocks in sliding sliding window with sliding window results.
+    """
+    new_series = sliding_sliding_window_series.copy(deep=True)
+    for volume, amplitude in volume_replacements.items():
+        new_series[volume] = amplitude
+    
+    return new_series
 
 
 def calculate_volumes_to_replace(trials_table: pandas.DataFrame) -> pandas.Series:
