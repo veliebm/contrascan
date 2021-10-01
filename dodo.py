@@ -1575,12 +1575,12 @@ def task_ttest_whole_brain_correlations() -> Dict:
         )
 
     for start_volume in START_VOLUMES:
-        alpha_data = "values SNRs"
-        yield create_task(
-            images=[fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
-            out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
-            name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
-        )
+        for alpha_data in "values SNRs".split():
+            yield create_task(
+                images=[fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
+                out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
+                name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
+            )
         for frequency in FREQUENCIES:
             yield create_task(
                 images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
