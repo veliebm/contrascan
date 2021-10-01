@@ -883,7 +883,7 @@ def task_eeg_get_alphas() -> Dict:
                 [SNRdb, SNRratio] = freqtag_simpleSNR(pow, [11:16 28:33]);
                 SNR = mean(mean(SNRdb([20 31 19 7 8 9 10 ], 18:26)));
                 values = [values; alpha];
-                SNRs = [values; SNR];
+                SNRs = [SNRs; SNR];
                 pows = cat(3, pows, pow);
             end
             average_power =  mean(pows, 3);
