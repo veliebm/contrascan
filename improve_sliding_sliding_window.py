@@ -10,8 +10,10 @@ Created 9/30/2021 By Benjamin Velie, veliebm@ufl.edu
 
 # Import external Python stuff.
 from os import PathLike
+from pathlib import Path
 from typing import Dict
 import pandas
+import scipy.io
 
 # Import custom CSEA stuff.
 from read_matlab import get_amplitudes
@@ -44,7 +46,18 @@ def main(better_sliding_window: PathLike, sliding_sliding_window: PathLike, even
     improved_amplitudes = overwrite_sliding_sliding_window(sliding_sliding_window_series, volume_replacements)
 
     # Write the improved amplitudes to a .m file.
-    breakpoint()
+    save_series_to_mat(improved_amplitudes, "improved_amplitudes", improved_sliding_sliding_window)
+
+
+def save_series_to_mat(data: pandas.Series, variable_name: str, out_path: PathLike) -> None:
+    """
+    Save some data to a .mat file.
+    """
+    Path(out_path).parent.mkdir(exist_ok=True, parents=True)
+
+    numpy_data = data.to_numpy()
+
+    scipy.io.savemat(out_path, {variable_name: numpy_data}, appendmat=False)
 
 
 def overwrite_sliding_sliding_window(sliding_sliding_window_series: pandas.Series, volume_replacements: Dict) -> pandas.Series:
@@ -125,5 +138,5 @@ def _test_task():
         "./processed/freqtag_better_sliding_window/sub-122_variable-trialpow_channel-20.mat",
         "./processed/eeg_sliding_sliding_window/sub-104_frequency-12_oz_amplitudes.mat",
         "./processed/bids/sub-122/func/sub-122_task-contrascan_events.tsv",
-        "./processed/eeg_sliding_sliding_window_improved/sub-122_improved_amplitudes.m",
+        "./processed/eeg_sliding_sliding_window_improved/sub-122_improved_amplitudes.mat",
     )
