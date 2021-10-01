@@ -30,24 +30,40 @@ def main(better_sliding_window: PathLike, sliding_sliding_window: PathLike, even
     # Read sliding window data.
     sliding_window_series = get_amplitudes(better_sliding_window)
 
-    # Calculate which volumes to replace.
-    volumes_to_replace = calculate_volumes(events_table, sliding_window_series)
+    # Calculate the start times, end times, and slid win values for each trial.
+    trials_table = calculate_trials(events_table, sliding_window_series)
+
+    # Get exactly which volumes to replace with which values.
+    volume_replacements = calculate_volumes_to_replace(trials_table)
 
     # Read the sliding sliding window amplitudes.
     sliding_sliding_window_series = get_amplitudes(sliding_sliding_window)
 
-    # Downsample onsets into 2s intervals coded based on which trial they belong to. Intervals with no trial contain null or 0.
+    # Fill trial blocks in sliding sliding window with sliding window results.
 
-    # Fill trial blocks with sliding window results.
-
-    # Splice the downsampled better sliding window results over the sliding sliding window amplitudes.
 
     # Write the improved amplitudes to a .m file.
 
 
-def calculate_volumes(events_table: pandas.DataFrame, sliding_window_series: pandas.Series) -> pandas.DataFrame:
+def calculate_volumes_to_replace(trials_table: pandas.DataFrame) -> pandas.Series:
     """
-    Downsample onsets into 2s intervals coded based on which trial they belong to. Intervals with no trial contain null or 0.
+    Get exactly which volumes to replace with which values.
+    """
+    volumes = dict()
+    for i in trials_table.index:
+        start = trials_table["trial_start"][i]
+        end = trials_table["trial_end"][i]
+        amplitude = trials_table["amplitude"][i]
+        volumes_to_replace = list(range(start, end))
+        for volume in volumes_to_replace:
+            volumes[volume] = amplitude
+
+    return volumes
+
+
+def calculate_trials(events_table: pandas.DataFrame, sliding_window_series: pandas.Series) -> pandas.DataFrame:
+    """
+    Calculate the start times, end times, and slid win values for each trial.
     """
     # Calculate beginning and end of each trial.
     trials = pandas.DataFrame(dict(
