@@ -264,13 +264,14 @@ fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_wind
 
 #task_improve_sliding_sliding_window
 fname.add("eeg_sliding_sliding_window_improved_dir", "{processed_data_dir}/eeg_sliding_sliding_window_improved")
-fname.add("eeg_sliding_sliding_window_improved", "{eeg_sliding_sliding_window_improved_dir}/sub-{subject}_improved_amplitudes.mat")
+fname.add("eeg_sliding_sliding_window_improved", "{eeg_sliding_sliding_window_improved_dir}/sub-{subject}_variable-{variable}_improved.mat")
 
 # task_correlate_whole_brain:
 fname.add("correlation_dir", "{processed_data_dir}/correlation_whole_brain")
 fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_correlation.nii")
 fname.add("correlation_whole_brain_SNR_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_SNR_correlation.nii")
 fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_data-{data}_alphas.nii")
+fname.add("correlation_whole_brain_improved", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_improved.nii")
 
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")

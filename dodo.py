@@ -1029,7 +1029,7 @@ def task_improve_sliding_sliding_window() -> Dict:
                 events=fname.bids_events(subject=subject),
             ),
             targets=dict(
-                improved_sliding_sliding_window=fname.eeg_sliding_sliding_window_improved(subject=subject),
+                improved_sliding_sliding_window=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="amplitudes"),
             ),
             name=f"subject--{subject}"
         )
@@ -1497,8 +1497,15 @@ def task_correlate_whole_brain() -> Dict:
             targets=list(targets.values()),
         )
 
-    for subject in SUBJECTS:
+    for subject in SUBJECTS:        
         for start_volume in START_VOLUMES:
+            for variable in "amplitudes".split():
+                yield create_task(
+                    eeg_data=fname.eeg_sliding_sliding_window_improved(subject=subject, variable=variable),
+                    out_image=fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"improved sliding sliding window, sub--{subject}, startvolume--{start_volume}"
+                )
             for alpha_data in "values SNRs".split():
                 yield create_task(
                     eeg_data=fname.eeg_alpha(subject=subject, data=alpha_data),
