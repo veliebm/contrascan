@@ -1031,7 +1031,18 @@ def task_improve_sliding_sliding_window() -> Dict:
             targets=dict(
                 improved_sliding_sliding_window=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="amplitudes"),
             ),
-            name=f"subject--{subject}"
+            name=f"subject--{subject}, variable--amplitudes"
+        )
+        yield create_task(
+            sources=dict(
+                better_sliding_window=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialSNR"),
+                sliding_sliding_window=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=FREQUENCIES[0]),
+                events=fname.bids_events(subject=subject),
+            ),
+            targets=dict(
+                improved_sliding_sliding_window=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="SNRs"),
+            ),
+            name=f"subject--{subject}, variable--SNRs"
         )
 
 
@@ -1290,6 +1301,7 @@ def task_freqtag_better_sliding_window() -> Dict:
             trialpow=fname.freqtag_better_sliding_window_trialpow(subject=subject),
             meanwinmat=fname.freqtag_better_sliding_window_meanwinmat(subject=subject),
             oz_trialpow=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialpow"),
+            oz_trialSNR=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialSNR"),
         )
         targets_list = list(targets.values())
         Path(targets["meanwinmat"]).parent.mkdir(exist_ok=True, parents=True)
@@ -1328,6 +1340,8 @@ def task_freqtag_better_sliding_window() -> Dict:
                 save('{targets["trialpow"]}', 'trialpow');
                 oz_trialpow = trialpow(20,:);
                 save('{targets["oz_trialpow"]}', 'oz_trialpow');
+                oz_trialSNR = trialSNR(20,:);
+                save('{targets["oz_trialSNR"]}', 'oz_trialSNR');
                 save('{targets["winmat3d"]}', 'winmat3d');
                 save('{targets["phasestabmat"]}', 'phasestabmat');
                 save('{targets["trialSNR"]}', 'trialSNR');
@@ -1497,14 +1511,14 @@ def task_correlate_whole_brain() -> Dict:
             targets=list(targets.values()),
         )
 
-    for subject in SUBJECTS:        
+    for subject in SUBJECTS:
         for start_volume in START_VOLUMES:
-            for variable in "amplitudes".split():
+            for variable in "amplitudes SNRs".split():
                 yield create_task(
                     eeg_data=fname.eeg_sliding_sliding_window_improved(subject=subject, variable=variable),
                     out_image=fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable),
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
-                    name=f"improved sliding sliding window, sub--{subject}, startvolume--{start_volume}"
+                    name=f"improved sliding sliding window, sub--{subject}, startvolume--{start_volume}, variable--{variable}"
                 )
             for alpha_data in "values SNRs".split():
                 yield create_task(
