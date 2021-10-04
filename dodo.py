@@ -32,6 +32,7 @@ import correlate_regions
 import correlate_all_microregions
 import improve_sliding_sliding_window
 import correlate_timeseries
+import correlate_tables
 
 
 # Configuration for the pydoit tool.
@@ -929,12 +930,8 @@ def task_correlate_alpha_and_snr() -> Dict:
         sources : Dict
             data_1 : PathLike
                 Path to a 1xN or Nx1 MatLab .mat file containing a list of numbers.
-            data_1_name : str
-                What to name the data of data_1.
             data_2 : PathLike
                 Path to a 1xN or Nx1 MatLab .mat file containing a list of numbers.
-            data_2_name : str
-                What to name the data of data_2.
         targets : Dict
             save_spearman_to : PathLike
                 Where to output our correlation results to.
@@ -942,6 +939,11 @@ def task_correlate_alpha_and_snr() -> Dict:
                 Where to output our scatter plot to.
             save_table_to : PathLike
                 Where to output a table containing both streams of data.
+        other_kwargs : Dict
+            data_1_name : str
+                What to name the data of data_1.
+            data_2_name : str
+                What to name the data of data_2.
         """
         kwargs = {**sources, **targets, **other_kwargs}
 
@@ -969,6 +971,45 @@ def task_correlate_alpha_and_snr() -> Dict:
             ),
             name=f"sub-{subject}",
         )
+def task_correlate_alpha_and_snr_across_subjects() -> Dict:
+    """
+    Correlate the signal and SNR of our alpha data across all subjects.
+    """
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike]) -> dict:
+        """
+        Allows this task to be easily generalizable.
+
+        Parameters
+        ----------
+        sources : Dict
+            load_tables_from : List[PathLike]
+                Where to get each of our microROI+amplitude tables
+        targets : Dict
+            save_scatter_to : PathLike
+                Where to save our scatter plot.
+            save_table_to : PathLike
+                Where to save the table of data we make from our tiny tables.
+            save_spearman_to : PathLike
+                Where to save our Spearman results.
+        """
+        kwargs = {**sources, **targets}
+
+        return dict(
+            actions=[(correlate_tables.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
+    return create_task(
+        sources=dict(
+            load_tables_from=[fname.eeg_correlation_alpha_snr_table(subject=subject) for subject in SUBJECTS],
+        ),
+        targets=dict(
+            save_scatter_to=fname.eeg_correlation_across_subjects_alpha_snr_scatter,
+            save_table_to=fname.eeg_correlation_across_subjects_alpha_snr_table,
+            save_spearman_to=fname.eeg_correlation_across_subjects_alpha_snr_results,
+        ),
+    )
 
 
 # Sliding window analysis.

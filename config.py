@@ -189,6 +189,11 @@ fname.add("eeg_correlation_alpha_snr_table", "{eeg_correlation_alpha_snr_dir}/su
 fname.add("eeg_correlation_alpha_snr_results", "{eeg_correlation_alpha_snr_dir}/sub-{subject}_results.txt")
 fname.add("eeg_correlation_alpha_snr_scatter", "{eeg_correlation_alpha_snr_dir}/sub-{subject}_scatter.png")
 
+# task_correlate_alpha_and_snr_across_subjects
+fname.add("eeg_correlation_across_subjects_alpha_snr_table", "{eeg_correlation_alpha_snr_dir}/across_subjects_table.csv")
+fname.add("eeg_correlation_across_subjects_alpha_snr_results", "{eeg_correlation_alpha_snr_dir}/across_subjects_results.txt")
+fname.add("eeg_correlation_across_subjects_alpha_snr_scatter", "{eeg_correlation_alpha_snr_dir}/across_subjects_scatter.png")
+
 # task_freqtag_calculate_parameters:
 fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")
 fname.add("freqtag_parameters_script", "{scripts_dir}/TEMP_get_params.m")
