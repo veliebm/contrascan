@@ -31,6 +31,7 @@ import average_voxels
 import correlate_regions
 import correlate_all_microregions
 import improve_sliding_sliding_window
+import correlate_timeseries
 
 
 # Configuration for the pydoit tool.
@@ -914,6 +915,59 @@ def task_eeg_get_alphas() -> Dict:
             actions=[action],
             file_dep=sources_list,
             targets=targets_list,
+        )
+def task_correlate_alpha_and_snr() -> Dict:
+    """
+    Correlate the signal and SNR of our alpha data.
+    """
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], other_kwargs: Dict, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        sources : Dict
+            data_1 : PathLike
+                Path to a 1xN or Nx1 MatLab .mat file containing a list of numbers.
+            data_1_name : str
+                What to name the data of data_1.
+            data_2 : PathLike
+                Path to a 1xN or Nx1 MatLab .mat file containing a list of numbers.
+            data_2_name : str
+                What to name the data of data_2.
+        targets : Dict
+            save_spearman_to : PathLike
+                Where to output our correlation results to.
+            save_scatter_to : PathLike
+                Where to output our scatter plot to.
+            save_table_to : PathLike
+                Where to output a table containing both streams of data.
+        """
+        kwargs = {**sources, **targets, **other_kwargs}
+
+        return dict(
+            name=name,
+            actions=[(correlate_timeseries.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+    
+    for subject in SUBJECTS:
+        yield create_task(
+            sources=dict(
+                data_1=fname.eeg_alpha(subject=subject, data="values"),
+                data_2=fname.eeg_alpha(subject=subject, data="SNRs"),
+            ),
+            targets=dict(
+                save_spearman_to=fname.eeg_correlation_alpha_snr_results(subject=subject),
+                save_table_to=fname.eeg_correlation_alpha_snr_table(subject=subject),
+                save_scatter_to=fname.eeg_correlation_alpha_snr_scatter(subject=subject),
+            ),
+            other_kwargs=dict(
+                data_1_name="alpha amplitude",
+                data_2_name="alpha SNR",
+            ),
+            name=f"sub-{subject}",
         )
 
 

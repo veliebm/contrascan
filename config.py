@@ -183,6 +183,12 @@ fname.add("eeg_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_alphas.m"
 fname.add("eeg_alpha", "{eeg_alpha_dir}/sub-{subject}_data-{data}_alphas.mat")
 fname.add("average_power", "{eeg_alpha_dir}/sub-{subject}_average_power.mat")
 
+# task_correlate_alpha_and_snr:
+fname.add("eeg_correlation_alpha_snr_dir", "{processed_data_dir}/correlation_alpha_and_SNRs")
+fname.add("eeg_correlation_alpha_snr_table", "{eeg_correlation_alpha_snr_dir}/sub-{subject}_table.csv")
+fname.add("eeg_correlation_alpha_snr_results", "{eeg_correlation_alpha_snr_dir}/sub-{subject}_results.txt")
+fname.add("eeg_correlation_alpha_snr_scatter", "{eeg_correlation_alpha_snr_dir}/sub-{subject}_scatter.png")
+
 # task_freqtag_calculate_parameters:
 fname.add("freqtag_parameters_dir", "{processed_data_dir}/freqtag_parameters")
 fname.add("freqtag_parameters_script", "{scripts_dir}/TEMP_get_params.m")
