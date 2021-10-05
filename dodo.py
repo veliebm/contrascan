@@ -1806,7 +1806,7 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
 
         return dict(
             name=name,
-            actions=[(correlate_all_microregions.main, [], kwargs)],
+            actions=[(correlate_tables.main, [], kwargs)],
             file_dep=list(sources.values())[0],
             targets=list(targets.values()),
         )
