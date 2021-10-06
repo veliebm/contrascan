@@ -26,12 +26,6 @@ function do_one(file_name, in_directory, out_directory)
         
     EEG = save_dataset(EEG, EEG.filename, out_directory);
 end
-
-function data = extract_epochs(data)
-    % Split our dataset into epochs anchored at "S  2" stimuli with the following range: (-800ms, +4500ms)
-    data = pop_epoch( data, {  'S  2'  }, [-0.8           4.5], 'epochinfo', 'yes');
-    data = eeg_checkset( data );
-end
 function data = load_dataset(file_name, directory)
     % Load a dataset.
     data = pop_loadset('filename',file_name, 'filepath',directory);
