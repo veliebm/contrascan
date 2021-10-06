@@ -21,7 +21,8 @@ function do_one(file_name, in_directory, out_directory)
     eeglab;
     EEG = load_dataset(file_name, in_directory);
     
-    EEG = extract_epochs(EEG);
+    EEG = pop_epoch(EEG, {  'S  2'  }, [-0.8           4.5], 'epochinfo', 'yes');
+    EEG = eeg_checkset( EEG );
         
     EEG = save_dataset(EEG, EEG.filename, out_directory);
 end
