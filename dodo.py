@@ -29,7 +29,7 @@ import apply_mask
 import clusterize
 import average_voxels
 import correlate_regions
-import correlate_all_microregions
+import matlab2
 import improve_sliding_sliding_window
 import correlate_timeseries
 import correlate_tables
@@ -916,6 +916,100 @@ def task_eeg_get_alphas() -> Dict:
             actions=[action],
             file_dep=sources_list,
             targets=targets_list,
+        )
+def task_eeg_get_trial_by_trial_alpha() -> Dict:
+    """
+    Get the amount of alpha present in each trial.
+    """
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        out_dir : PathLike
+            Dir where all outputs will be written.
+        name : str
+            Name of task.
+        sources : Dict
+            Contains paths to inputs of the task.
+                eeg : PathLike
+                    The segmented EEG data for this subject.
+        targets : Dict
+            Contains paths to outputs of the task.
+                values : PathLike
+                    The amplitudes for the trials, stored in a vector in a .m file.
+                SNRs : PathLike
+                    The signal to noise ratio for our amplitudes.
+                average_power : PathLike
+                    Average power over all trials.
+        """
+        out_dir = Path(targets["values"]).parent
+        out_dir.mkdir(exist_ok=True, parents=True)
+
+        script = textwrap.dedent(f"""\
+            %% This script calculates the alpha value for each trial.
+
+            %% Load dataset.
+            dataset = load_dataset('{sources["eeg"]}');
+
+            %% Run functions.
+            values = [];
+            pows = [];
+            SNRs = [];
+            for i = 1:numel(dataset(1,1,:))
+                sub_dataset = dataset(:,:,i);
+                
+                [pow_baseline, phase_baseline, freqs_baseline] = FFT_spectrum3D_singtrial(sub_dataset, 1:400, 500);
+                [pow_post, phase_post, freqs_post] = FFT_spectrum3D_singtrial(sub_dataset, 2083:2482, 500);
+                pow_difference = pow_post - pow_baseline;
+
+                amplitude = mean(mean(pow_difference([20 31 19 7 8 9 10 ], 8:11)));
+
+                [SNRdb, SNRratio] = freqtag_simpleSNR(pow_difference, [5:7 13:15]);
+                SNR = mean(mean(SNRdb([20 31 19 7 8 9 10 ], 8:11)));
+
+                values = [values; amplitude];
+                SNRs = [SNRs; SNR];
+                pows = cat(3, pows, pow_difference);
+            end
+            averagepower =  mean(pows, 3);
+
+            %% Save output variables.
+            save('{targets["values"]}', 'values');
+            save('{targets["SNRs"]}', 'SNRs');
+            save('{targets["averagepower"]}', 'averagepower');
+            
+            function [dataset] = load_dataset(path)
+                % Load a dataset.
+                [parent_dir, stem, suffix] = fileparts(path);
+                eeglab;
+                EEG = pop_loadset('filename', strcat(stem, suffix), 'filepath', parent_dir);
+                EEG = eeg_checkset(EEG);
+                dataset = double(EEG.data);
+            end
+            """)
+
+        return dict(
+            name=name,
+            actions=[(matlab2.main, [], dict(script_contents=script, write_script_to=targets["write_script_to"]))],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+
+    for subject in SUBJECTS:
+        yield create_task(
+            sources = dict(
+                eeg=fname.segmented_eeg(subject=subject)
+            ),
+            targets = dict(
+                values=fname.eeg_trial_alpha(subject=subject, data="values"),
+                SNRs=fname.eeg_trial_alpha(subject=subject, data="SNRs"),
+                averagepower=fname.eeg_trial_alpha(subject=subject, data="averagepower"),
+                write_script_to=fname.eeg_trial_alpha_script(subject=subject),
+            ),
+            name=f"subject--{subject}",
         )
 def task_correlate_alpha_and_snr() -> Dict:
     """

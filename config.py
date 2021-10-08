@@ -183,6 +183,11 @@ fname.add("eeg_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_alphas.m"
 fname.add("eeg_alpha", "{eeg_alpha_dir}/sub-{subject}_data-{data}_alphas.mat")
 fname.add("average_power", "{eeg_alpha_dir}/sub-{subject}_average_power.mat")
 
+# task_eeg_get_trial_by_trial_alpha:
+fname.add("eeg_trial_alpha_dir", "{processed_data_dir}/eeg_trial_alphas")
+fname.add("eeg_trial_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_trial_alphas.m")
+fname.add("eeg_trial_alpha", "{eeg_trial_alpha_dir}/sub-{subject}_data-{data}_trial_alpha.mat")
+
 # task_correlate_alpha_and_snr:
 fname.add("eeg_correlation_alpha_snr_dir", "{processed_data_dir}/correlation_alpha_and_SNRs")
 fname.add("eeg_correlation_alpha_snr_table", "{eeg_correlation_alpha_snr_dir}/sub-{subject}_table.csv")
