@@ -33,6 +33,7 @@ import matlab2
 import improve_sliding_sliding_window
 import correlate_timeseries
 import correlate_tables
+import func_get_trials
 
 
 # Configuration for the pydoit tool.
@@ -321,6 +322,48 @@ def task_trim_func_images_again() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_get_trial_func_amplitudes() -> Dict:
+    """
+    Get the biggest amplitude of the BOLD signal for each trial.
+
+    For each S  2 stimulus, get its TR. Then look at the next 4 TRs after that. Select the TR containing the largest value.
+    Then subtract from it the signal of the TR containing the S  2.
+    """
+    def create_task(sources: Dict[str, PathLike], targets: Dict[str, PathLike], name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        name : str
+            Name of task.
+        sources : Dict
+            Contains paths to inputs of the task.
+        targets : Dict
+            Contains paths to outputs of the task.
+        """
+
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(func_get_trials.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+
+    for subject in SUBJECTS:
+        yield create_task(
+            sources = dict(
+                onsets_path=fname.afniproc_onsets(subject=subject),
+                func_path=fname.resampled_func(subject=subject),
+            ),
+            targets = dict(
+                trials_path=fname.func_trial_amplitudes(subject=subject)
+            ),
+            name=f"subject--{subject}",
+        )
 
 
 # fMRI-only analysis.

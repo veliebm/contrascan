@@ -144,6 +144,10 @@ fname.add("afniproc_func", "{afniproc_subject_dir}/{subject}.results/all_runs.{s
 fname.add("final_funcs_dir", "{processed_data_dir}/func_final_trim")
 fname.add("final_func", "{final_funcs_dir}/sub-{subject}_startvolume-{start_volume}_func+tlrc.HEAD")
 
+# task_get_trial_func_amplitudes:
+fname.add("func_trial_amplitudes_dir", "{processed_data_dir}/func_trial_amplitudes")
+fname.add("func_trial_amplitudes", "{func_trial_amplitudes_dir}/sub-{subject}_trials.nii")
+
 # task_convert_eeg:
 fname.add("converteeg_dir", "{processed_data_dir}/eeg_convert_from_brainvision")
 fname.add("converteeg_script", "{scripts_dir}/TEMP_convert_eeg_sub{subject}.m")
