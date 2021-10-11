@@ -1813,6 +1813,12 @@ def task_ttest_whole_brain_correlations() -> Dict:
                 out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
                 name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
             )
+        for variable in "amplitudes SNRs".split():
+            yield create_task(
+                images=[fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable) for subject in SUBJECTS],
+                out_path=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable=variable),
+                name=f"improved sliding sliding window, startvolume--{start_volume}, variable--{variable}",
+            )
         for frequency in FREQUENCIES:
             yield create_task(
                 images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
