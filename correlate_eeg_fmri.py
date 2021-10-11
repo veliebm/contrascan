@@ -79,3 +79,10 @@ def convert_to_dataframe(func_image: nibabel.brikhead.AFNIImage, trim_volumes: i
     func_dataframe = pandas.DataFrame(future_dataframe)
 
     return func_dataframe
+
+
+def _test_module() -> None:
+    """
+    Test this module.
+    """
+    return main(**{'in_image_path': './processed/func_final_trim/sub-104_startvolume-1_func+tlrc.HEAD', 'in_eeg_path': './processed/eeg_sliding_sliding_window/sub-104_frequency-12_oz_amplitudes.mat', 'out_image_path': './processed/correlation_whole_brain/sub-104_frequency-12_startvolume-1_correlation.nii'})
