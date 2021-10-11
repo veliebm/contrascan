@@ -8,7 +8,7 @@ Created 7/28/2021 by Ben Velie, veliebm@ufl.edu
 """
 # Import external libraries and modules.
 from os import PathLike
-from typing import Iterable
+from typing import Iterable, Tuple
 from pathlib import Path
 import pandas
 import nibabel
@@ -55,10 +55,15 @@ def correlate_subject(func_image: nibabel.brikhead.AFNIImage, data_to_correlate:
         correlation_array[x,y,z] = correlation
 
     # Convert numpy array into a nibabel image.
-    print(f"Saving image to {out_path}")
-    affine = func_image.affine
-    correlation_image = nibabel.Nifti1Image(correlation_array, affine)
-    correlation_image.to_filename(out_path)
+    save_array_to_nifti(func_image.affine, correlation_array, out_path)
+
+
+def save_array_to_nifti(affine: Tuple, array: numpy.array, out_path: PathLike) -> None:
+    """
+    Save a numpy array as a nifti image.
+    """
+    image = nibabel.Nifti1Image(array, affine)
+    image.to_filename(out_path)
 
 
 def convert_to_dataframe(func_image: nibabel.brikhead.AFNIImage, trim_volumes: int) -> pandas.DataFrame:
