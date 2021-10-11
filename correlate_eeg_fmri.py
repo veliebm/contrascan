@@ -10,7 +10,7 @@ Created 7/28/2021 by Ben Velie, veliebm@ufl.edu
 from os import PathLike
 from typing import Iterable, Tuple
 from pathlib import Path
-import pandas
+from scipy.stats import spearmanr
 import nibabel
 import numpy
 
@@ -24,10 +24,14 @@ def main(in_image_path: PathLike, in_eeg_path: PathLike, out_image_path: PathLik
 
     The Oz electrode is number 20 in MatLab.
     """
+    # Load data.
     amplitudes = get_amplitudes(in_eeg_path)
     func_image = nibabel.load(in_image_path)
+
+    # Make out directory if it doesn't exist.
     Path(out_image_path).parent.mkdir(exist_ok=True, parents=True)
 
+    # Correlate data.
     correlate_subject(func_image, amplitudes, out_image_path)
 
 
@@ -37,25 +41,16 @@ def correlate_subject(func_image: nibabel.brikhead.AFNIImage, data_to_correlate:
 
     The vector of numbers must be the same length as the time domain of the func image.
     """
-
     # Get func image as dataframe. Trim so it's the same length as our EEG time series. Keys = coordinates, values = series.
-    print(f"Converting func image into a DataFrame")
-    func_dataframe = convert_to_dataframe(func_image, trim_volumes=len(data_to_correlate))
+    print(f"Trimming array to length {len(data_to_correlate)}")
+    trimmed_array = func_image.dataobj[:,:,:,:len(data_to_correlate)]
 
     # For each voxel, record correlation value.
     print("Running Spearman correlation")
-    correlation_results = func_dataframe.corrwith(data_to_correlate, method='spearman')
-
-    # Convert correlation results into a numpy array.
-    print(f"Correlations complete! Converting into a numpy array")
-    x_length, y_length, z_length, __ = func_image.dataobj[:,:,:,:len(data_to_correlate)].shape
-    correlation_array = numpy.empty((x_length, y_length, z_length))
-    for point, correlation in correlation_results.iteritems():
-        x, y, z = point
-        correlation_array[x,y,z] = correlation
+    correlation_results = numpy.apply_along_axis(spearmanr, 3, trimmed_array, b=data_to_correlate)
 
     # Convert numpy array into a nibabel image.
-    save_array_to_nifti(func_image.affine, correlation_array, out_path)
+    save_array_to_nifti(func_image.affine, correlation_results, out_path)
 
 
 def save_array_to_nifti(affine: Tuple, array: numpy.array, out_path: PathLike) -> None:
@@ -64,26 +59,6 @@ def save_array_to_nifti(affine: Tuple, array: numpy.array, out_path: PathLike) -
     """
     image = nibabel.Nifti1Image(array, affine)
     image.to_filename(out_path)
-
-
-def convert_to_dataframe(func_image: nibabel.brikhead.AFNIImage, trim_volumes: int) -> pandas.DataFrame:
-    """
-    Convert a func image to a dataframe. Trim time axis to specified point.
-    """
-    print(f"Func shape: {func_image.dataobj.shape}")
-    print(f"Length of data to correlate with func: {trim_volumes}")
-    trimmed_func = func_image.dataobj[:,:,:,:trim_volumes]
-    print(f"New func shape: {trimmed_func.shape}")
-
-    future_dataframe = {}
-    x_length, y_length, z_length, __ = trimmed_func.shape
-    for x in range(x_length):
-        for y in range(y_length):
-            for z in range(z_length):
-                future_dataframe[(x, y, z)] = trimmed_func[x, y, z, :]
-    func_dataframe = pandas.DataFrame(future_dataframe)
-
-    return func_dataframe
 
 
 def _test_module() -> None:
