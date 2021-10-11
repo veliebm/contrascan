@@ -22,7 +22,7 @@ import trim_func_images
 import align
 import resample
 import write_json
-import correlate_eeg_fmri
+import correlate_whole_brain
 import ttest
 import combine_masks
 import apply_mask
@@ -1738,7 +1738,7 @@ def task_correlate_whole_brain() -> Dict:
 
         return dict(
             name=name,
-            actions=[(correlate_eeg_fmri.main, [], kwargs)],
+            actions=[(correlate_whole_brain.main, [], kwargs)],
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
