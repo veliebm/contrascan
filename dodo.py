@@ -1797,7 +1797,10 @@ def task_ttest_whole_brain_correlations() -> Dict:
             ttest=out_path,
         )
 
-        kwargs = dict(**sources, prefix=get_prefix(targets["ttest"]))
+        kwargs = dict(
+            images=[f"{path}[0]" for path in sources["images"]],
+            prefix=get_prefix(targets["ttest"])
+        )
 
         return dict(
             name=name,
