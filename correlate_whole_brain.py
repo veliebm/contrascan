@@ -42,8 +42,10 @@ def correlate_subject(func_image: nibabel.brikhead.AFNIImage, data_to_correlate:
     The vector of numbers must be the same length as the time domain of the func image.
     """
     # Get func image as dataframe. Trim so it's the same length as our EEG time series. Keys = coordinates, values = series.
-    print(f"Trimming array to length {len(data_to_correlate)}")
+    print(f"Pre-trimmed array shape: {func_image.dataobj.shape}")
+    print(f"Trimming to data to correlate length: {len(data_to_correlate)}")
     trimmed_array = func_image.dataobj[:,:,:,:len(data_to_correlate)]
+    print(f"Post-trimmed array shape: {trimmed_array.shape}")
 
     # For each voxel, record correlation value.
     print("Running Spearman correlation")
