@@ -12,7 +12,7 @@ from typing import Dict, Iterable
 import textwrap
 
 # Import internal modules and libraries.
-from config import FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES
+from config import EXPANDED_START_VOLUMES, FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES
 
 # Import tasks
 import create_bids_root
@@ -1756,7 +1756,7 @@ def task_correlate_whole_brain() -> Dict:
                 in_image=fname.func_trial_amplitudes(subject=subject),
                 name=f"trial sliding window amplitudes with trial funcs, sub--{subject}"
         )
-        for start_volume in START_VOLUMES:
+        for start_volume in EXPANDED_START_VOLUMES:
             for variable in "amplitudes SNRs".split():
                 yield create_task(
                     eeg_data=fname.eeg_sliding_sliding_window_improved(subject=subject, variable=variable),
@@ -1764,6 +1764,7 @@ def task_correlate_whole_brain() -> Dict:
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"improved sliding sliding window, sub--{subject}, startvolume--{start_volume}, variable--{variable}"
                 )
+        for start_volume in START_VOLUMES:
             for alpha_data in "values SNRs".split():
                 yield create_task(
                     eeg_data=fname.eeg_alpha(subject=subject, data=alpha_data),
@@ -1827,18 +1828,19 @@ def task_ttest_whole_brain_correlations() -> Dict:
             out_path=fname.correlations_whole_brain_trials_ttest(variable=variable),
             name=f"trials, variable--{variable}",
         )
+    for start_volume in EXPANDED_START_VOLUMES:
+        for variable in "amplitudes SNRs".split():
+            yield create_task(
+                images=[fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable) for subject in SUBJECTS],
+                out_path=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable=variable),
+                name=f"improved sliding sliding window, startvolume--{start_volume}, variable--{variable}",
+            )
     for start_volume in START_VOLUMES:
         for alpha_data in "values SNRs".split():
             yield create_task(
                 images=[fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=alpha_data) for subject in SUBJECTS],
                 out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
                 name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
-            )
-        for variable in "amplitudes SNRs".split():
-            yield create_task(
-                images=[fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable) for subject in SUBJECTS],
-                out_path=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable=variable),
-                name=f"improved sliding sliding window, startvolume--{start_volume}, variable--{variable}",
             )
         for frequency in FREQUENCIES:
             yield create_task(

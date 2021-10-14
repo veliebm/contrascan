@@ -30,6 +30,7 @@ FREQUENCIES = "12 24".split()
 
 # Which volumes to start our EEG/fMRI correlation from.
 START_VOLUMES = range(1, 5)
+EXPANDED_START_VOLUMES = range(1, 9)
 
 # Which ICA components to remove for each subject.
 COMPONENTS_TO_REMOVE = {
