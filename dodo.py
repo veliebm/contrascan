@@ -1750,6 +1750,12 @@ def task_correlate_whole_brain() -> Dict:
                 in_image=fname.func_trial_amplitudes(subject=subject),
                 name=f"trial alphas with trial funcs, sub--{subject}"
         )
+        yield create_task(
+                eeg_data=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialpow"),
+                out_image=fname.correlation_whole_brain_trials(subject=subject, variable="slidewinamp"),
+                in_image=fname.func_trial_amplitudes(subject=subject),
+                name=f"trial sliding window amplitudes with trial funcs, sub--{subject}"
+        )
         for start_volume in START_VOLUMES:
             for variable in "amplitudes SNRs".split():
                 yield create_task(
