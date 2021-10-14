@@ -292,6 +292,7 @@ fname.add("correlation_image", "{correlation_dir}/sub-{subject}_frequency-{frequ
 fname.add("correlation_whole_brain_SNR_image", "{correlation_dir}/sub-{subject}_frequency-{frequency}_startvolume-{start_volume}_SNR_correlation.nii")
 fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_data-{data}_alphas.nii")
 fname.add("correlation_whole_brain_improved", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_improved.nii")
+fname.add("correlation_whole_brain_trials", "{correlation_dir}/sub-{subject}_trials.nii")
 
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
