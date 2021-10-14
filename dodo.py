@@ -304,7 +304,7 @@ def task_trim_func_images_again() -> Dict:
 
         sources = [fname.trimmed_func(subject=subject)]
 
-        for volumes_to_remove in START_VOLUMES:
+        for volumes_to_remove in EXPANDED_START_VOLUMES:
 
             targets = [
                 fname.final_func(subject=subject, start_volume=volumes_to_remove),
