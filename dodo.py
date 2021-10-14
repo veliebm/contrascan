@@ -1746,7 +1746,7 @@ def task_correlate_whole_brain() -> Dict:
     for subject in SUBJECTS:
         yield create_task(
                 eeg_data=fname.eeg_trial_alpha(subject=subject, data="values"),
-                out_image=fname.correlation_whole_brain_trials(subject=subject),
+                out_image=fname.correlation_whole_brain_trials(subject=subject, variable="alpha"),
                 in_image=fname.func_trial_amplitudes(subject=subject),
                 name=f"trial alphas with trial funcs, sub--{subject}"
         )
@@ -1815,6 +1815,12 @@ def task_ttest_whole_brain_correlations() -> Dict:
             targets=list(targets.values()),
         )
 
+    for variable in "alpha".split():
+        yield create_task(
+            images=[fname.correlation_whole_brain_trials(subject=subject, variable=variable) for subject in SUBJECTS],
+            out_path=fname.correlations_whole_brain_trials_ttest(variable=variable),
+            name=f"trials, variable--{variable}",
+        )
     for start_volume in START_VOLUMES:
         for alpha_data in "values SNRs".split():
             yield create_task(
