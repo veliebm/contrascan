@@ -2058,6 +2058,14 @@ def task_mask_and_average_correlations() -> Dict:
                         from_mask=fname.micromask(subject=subject, mask=mask),
                         name=f"sub--{subject}, startvolume--{start_volume}, mask--{mask}, data--{data}",
                     )
+            for start_volume in EXPANDED_START_VOLUMES:
+                for variable in "amplitudes SNRs".split():
+                    yield create_task(
+                        from_image=fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable),
+                        to_text_file=fname.correlation_improved_sliding_sliding_window_average(subject=subject, start_volume=start_volume, mask=mask, variable=variable),
+                        from_mask=fname.micromask(subject=subject, mask=mask),
+                        name=f"sub--{subject}, startvolume--{start_volume}, mask--{mask}, variable--{variable}",
+                    )
 
 
 # Helper functions.
