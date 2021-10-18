@@ -361,3 +361,7 @@ fname.add("correlation_across_subjects_alpha_table", "{correlation_across_subjec
 fname.add("correlation_across_subjects_better", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_variable-{variable}_correlation_better.txt")
 fname.add("correlation_across_subjects_scatter_better", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_variable-{variable}_scatter_better.png")
 fname.add("correlation_across_subjects_table_better", "{correlation_across_subjects_dir}/source-{mask}_startvolume-{start_volume}_variable-{variable}_table_better.csv")
+
+# task_mask_and_average_correlations
+fname.add("correlation_averages_dir", "{processed_data_dir}/correlation_averages")
+fname.add("correlation_alpha_average", "{correlation_averages_dir}/sub-{subject}_startvolume-{start_volume}_source-{mask}_data-{data}_correlation_average.txt")

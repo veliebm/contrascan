@@ -14,7 +14,7 @@ import textwrap
 # Import internal modules and libraries.
 from config import EXPANDED_START_VOLUMES, FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES
 
-# Import tasks
+# Import actions for tasks to use.
 import create_bids_root
 import bidsify_subject
 import afniproc
@@ -34,6 +34,7 @@ import improve_sliding_sliding_window
 import correlate_timeseries
 import correlate_tables
 import func_get_trials
+import maskave
 
 
 # Configuration for the pydoit tool.
@@ -2026,6 +2027,37 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
                     ),
                     name=f"sliding sliding window SNR, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
                 )
+def task_mask_and_average_correlations() -> Dict:
+    """
+    Get the average correlation within a specific ROI.
+
+    Uses AFNI's 3dmaskave: https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/programs/3dmaskave_sphx.html#ahelp-3dmaskave
+    """
+    def create_task(from_image: PathLike, to_text_file: PathLike, from_mask: PathLike, name: str):
+        """
+        Allows this task to easily be generalizable.
+        """
+        sources = dict(from_image=from_image, from_mask=from_mask)
+        targets = dict(to_text_file=to_text_file)
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(maskave.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for subject in SUBJECTS:
+        for start_volume in START_VOLUMES:
+            for mask in "calcarine occipital".split():
+                for data in "values SNRs".split():
+                    yield create_task(
+                        from_image=fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=data),
+                        to_text_file=fname.correlation_alpha_average(subject=subject, start_volume=start_volume, mask=mask, data=data),
+                        from_mask=fname.micromask(subject=subject, mask=mask),
+                        name=f"sub--{subject}, startvolume--{start_volume}, mask--{mask}, data--{data}",
+                    )
 
 
 # Helper functions.
