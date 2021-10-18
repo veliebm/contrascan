@@ -2049,8 +2049,8 @@ def task_mask_and_average_correlations() -> Dict:
         )
 
     for subject in SUBJECTS:
-        for start_volume in START_VOLUMES:
-            for mask in "calcarine occipital".split():
+        for mask in "calcarine occipital".split():
+            for start_volume in START_VOLUMES:
                 for data in "values SNRs".split():
                     yield create_task(
                         from_image=fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=data),
