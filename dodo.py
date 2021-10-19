@@ -8,7 +8,7 @@ All the filenames are defined in config.py
 # Import external modules and libraries.
 from os import PathLike
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 import textwrap
 
 # Import internal modules and libraries.
@@ -35,6 +35,7 @@ import correlate_timeseries
 import correlate_tables
 import func_get_trials
 import maskave
+import ttest_averages
 
 
 # Configuration for the pydoit tool.
@@ -2066,6 +2067,42 @@ def task_mask_and_average_correlations() -> Dict:
                         from_mask=fname.micromask(subject=subject, mask=mask),
                         name=f"sub--{subject}, startvolume--{start_volume}, mask--{mask}, variable--{variable}",
                     )
+def task_ttest_averages() -> Dict:
+    """
+    ttest the correlation averages.
+    """
+    def create_task(from_text_files: List[PathLike], to_table: PathLike, to_statistics: PathLike, name: str) -> Dict:
+        """
+        Allows this task to easily be generalizable.
+        """
+        sources = dict(from_text_files=from_text_files)
+        targets = dict(to_table=to_table, to_statistics=to_statistics)
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(ttest_averages.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+    
+    for mask in "calcarine occipital".split():
+        for start_volume in START_VOLUMES:
+            for data in "values SNRs".split():
+                yield create_task(
+                    from_text_files=[fname.correlation_alpha_average(subject=subject, start_volume=start_volume, mask=mask, data=data) for subject in SUBJECTS],
+                    to_table=fname.ttest_averages(variable=data, start_volume=start_volume, mask=mask, analysis="alpha", outfile="table"),
+                    to_statistics=fname.ttest_averages(variable=data, start_volume=start_volume, mask=mask, analysis="alpha", outfile="results"),
+                    name=f"startvolume--{start_volume}, mask--{mask}, variable--{data}, analysis--alpha",
+                )
+        for start_volume in EXPANDED_START_VOLUMES:
+            for variable in "amplitudes SNRs".split():
+                yield create_task(
+                    from_text_files=[fname.correlation_improved_sliding_sliding_window_average(subject=subject, start_volume=start_volume, mask=mask, variable=variable) for subject in SUBJECTS],
+                    to_table=fname.ttest_averages(variable=variable, start_volume=start_volume, mask=mask, analysis="improvedslidslidwin", outfile="table"),
+                    to_statistics=fname.ttest_averages(variable=variable, start_volume=start_volume, mask=mask, analysis="improvedslidslidwin", outfile="results"),
+                    name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}",
+                )
 
 
 # Helper functions.
