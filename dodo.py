@@ -1711,6 +1711,9 @@ def task_freqtag_hilbert() -> Dict:
 def task_correlate_whole_brain() -> Dict:
     """
     This is it! Huzzah! Correlate EEG and fMRI data across the whole brain. EEG data must be a 1xN or Nx1 .mat file.
+
+    1st subbrick will be the correlation coefficient.
+    2nd subbrick will be its p value.
     """
     def create_task(eeg_data: PathLike, in_image: PathLike, out_image: PathLike, name: str) -> dict:
         """
