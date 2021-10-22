@@ -41,7 +41,7 @@ def correlate_subject(func_image: nibabel.brikhead.AFNIImage, data_to_correlate:
 
     The vector of numbers must be the same length as the time domain of the func image.
     """
-    # Get func image as dataframe. Trim so it's the same length as our EEG time series. Keys = coordinates, values = series.
+    # Get func as a numpy array. Trim so it's the same length as our EEG time series.
     print(f"Pre-trimmed array shape: {func_image.dataobj.shape}")
     print(f"Trimming to data to correlate length: {len(data_to_correlate)}")
     trimmed_array = func_image.dataobj[:,:,:,:len(data_to_correlate)]
