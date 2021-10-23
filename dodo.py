@@ -1819,9 +1819,17 @@ def task_fisher_transform_whole_brain() -> Dict:
     for subject in SUBJECTS:
         for start_volume in EXPANDED_START_VOLUMES:
             for variable in "amplitudes SNRs".split():
-                analysis = "improvedslidslidwin"
+                analysis = "slidslidwin_improved"
                 yield create_task(
                     in_correlation_path=fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable),
+                    out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
+                    name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+                )
+        for start_volume in START_VOLUMES:
+            for variable in "values SNRs".split():
+                analysis = "alpha"
+                yield create_task(
+                    in_correlation_path=fname.correlation_whole_brain_alpha(subject=subject, start_volume=start_volume, data=variable),
                     out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
                     name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
                 )
