@@ -37,6 +37,7 @@ import func_get_trials
 import maskave
 import ttest_averages
 import fisher_transform
+import cohens
 
 
 # Configuration for the pydoit tool.
@@ -1884,6 +1885,47 @@ def task_ttest_whole_brain_fishers() -> Dict:
             yield create_task(
                 images=[fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis) for subject in SUBJECTS],
                 out_path=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
+def task_cohens_d_whole_brain() -> Dict:
+    """
+    Calculate Cohen's d for each voxel in our ttests.
+    """
+    def create_task(in_ttest: PathLike, out_cohen: PathLike, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+        """
+        sources = dict(
+            in_ttest=in_ttest,
+        )
+
+        targets = dict(
+            out_cohen=out_cohen,
+        )
+
+        kwargs = {**sources, **targets, "n_samples": len(SUBJECTS)}
+
+        return dict(
+            name=name,
+            actions=[(cohens.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+    
+    for start_volume in EXPANDED_START_VOLUMES:
+        for variable in "amplitudes SNRs".split():
+            analysis = "slidslidwin_improved"
+            yield create_task(
+                in_ttest=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                out_cohen=fname.correlations_cohens_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
+    for start_volume in START_VOLUMES:
+        for variable in "values SNRs".split():
+            analysis = "alpha"
+            yield create_task(
+                in_ttest=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                out_cohen=fname.correlations_cohens_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
                 name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
             )
 def task_ttest_whole_brain_correlations() -> Dict:

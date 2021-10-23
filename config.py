@@ -303,6 +303,10 @@ fname.add("correlation_fisher", "{correlation_fisher_dir}/subject-{subject}_star
 fname.add("correlations_ttest_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher_ttest")
 fname.add("correlations_ttest_fisher", "{correlations_ttest_fisher_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_fisher_ttest.nii")
 
+# task_cohens_d_whole_brain:
+fname.add("correlations_cohens_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher_cohens")
+fname.add("correlations_cohens_fisher", "{correlations_cohens_fisher_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_fisher_cohens.nii")
+
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
 fname.add("correlations_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")
