@@ -299,6 +299,10 @@ fname.add("correlation_whole_brain_trials", "{correlation_dir}/sub-{subject}_var
 fname.add("correlation_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher")
 fname.add("correlation_fisher", "{correlation_fisher_dir}/subject-{subject}_startvolume-{start_volume}_variable-{variable}_{analysis}_fisher.nii")
 
+# task_ttest_whole_brain_fishers:
+fname.add("correlations_ttest_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher_ttest")
+fname.add("correlations_ttest_fisher", "{correlations_ttest_fisher_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_fisher_ttest.nii")
+
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")
 fname.add("correlations_ttest", "{correlations_ttest_dir}/frequency-{frequency}_startvolume-{start_volume}_correlations_ttest+tlrc.HEAD")

@@ -1833,6 +1833,59 @@ def task_fisher_transform_whole_brain() -> Dict:
                     out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
                     name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
                 )
+def task_ttest_whole_brain_fishers() -> Dict:
+    """
+    t-test the fisher transformed correlations.
+    """
+    def create_task(images: PathLike, out_path: PathLike, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        images : PathLike
+            List of paths to images to ttest against each other.
+        out_path : PathLike
+            Where to write our ttest results to.
+        name : str
+            Name of the task.
+        """
+        sources = dict(
+            images=images,
+        )
+        
+        targets = dict(
+            ttest=out_path,
+        )
+
+        kwargs = dict(
+            images=[f"{path}[0]" for path in sources["images"]],
+            prefix=targets["ttest"]
+        )
+
+        return dict(
+            name=name,
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+    
+    for start_volume in EXPANDED_START_VOLUMES:
+        for variable in "amplitudes SNRs".split():
+            analysis = "slidslidwin_improved"
+            yield create_task(
+                images=[fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis) for subject in SUBJECTS],
+                out_path=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
+    for start_volume in START_VOLUMES:
+        for variable in "values SNRs".split():
+            analysis = "alpha"
+            yield create_task(
+                images=[fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis) for subject in SUBJECTS],
+                out_path=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
 def task_ttest_whole_brain_correlations() -> Dict:
     """
     ttest the correlations we calculated.
