@@ -283,7 +283,7 @@ fname.add("eeg_sliding_sliding_window_SNR", "{eeg_sliding_sliding_window_dir}/su
 fname.add("eeg_sliding_sliding_window_oz_SNR", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_SNR.mat")
 fname.add("eeg_sliding_sliding_window_oz_amplitudes", "{eeg_sliding_sliding_window_dir}/sub-{subject}_frequency-{frequency}_oz_amplitudes.mat")
 
-#task_improve_sliding_sliding_window
+# task_improve_sliding_sliding_window:
 fname.add("eeg_sliding_sliding_window_improved_dir", "{processed_data_dir}/eeg_sliding_sliding_window_improved")
 fname.add("eeg_sliding_sliding_window_improved", "{eeg_sliding_sliding_window_improved_dir}/sub-{subject}_variable-{variable}_improved.mat")
 
@@ -294,6 +294,10 @@ fname.add("correlation_whole_brain_SNR_image", "{correlation_dir}/sub-{subject}_
 fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_data-{data}_alphas.nii")
 fname.add("correlation_whole_brain_improved", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_improved.nii")
 fname.add("correlation_whole_brain_trials", "{correlation_dir}/sub-{subject}_variable-{variable}_trials.nii")
+
+# task_fisher_transform_whole_brain:
+fname.add("correlation_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher")
+fname.add("correlation_fisher", "{correlation_fisher_dir}/subject-{subject}_startvolume-{start_volume}_variable-{variable}_{analysis}_fisher.nii")
 
 # task_ttest_whole_brain_correlations:
 fname.add("correlations_ttest_dir", "{processed_data_dir}/correlation_whole_brain_ttest")

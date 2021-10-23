@@ -36,6 +36,7 @@ import correlate_tables
 import func_get_trials
 import maskave
 import ttest_averages
+import fisher_transform
 
 
 # Configuration for the pydoit tool.
@@ -1789,6 +1790,40 @@ def task_correlate_whole_brain() -> Dict:
                     out_image=fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"sliding sliding window SNR, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
+                )
+def task_fisher_transform_whole_brain() -> Dict:
+    """
+    Apply the Fisher Z transform to our whole brain correlation so we can do more valid t-tests.
+    """
+    def create_task(in_correlation_path: PathLike, out_fisher_path: PathLike, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+        """
+        sources = dict(
+            in_correlation_path=in_correlation_path,
+        )
+        
+        targets = dict(
+            out_fisher_path=out_fisher_path,
+        )
+
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(fisher_transform.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for subject in SUBJECTS:
+        for start_volume in EXPANDED_START_VOLUMES:
+            for variable in "amplitudes SNRs".split():
+                analysis = "improvedslidslidwin"
+                yield create_task(
+                    in_correlation_path=fname.correlation_whole_brain_improved(subject=subject, start_volume=start_volume, variable=variable),
+                    out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
+                    name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
                 )
 def task_ttest_whole_brain_correlations() -> Dict:
     """
