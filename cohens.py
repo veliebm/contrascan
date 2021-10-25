@@ -66,5 +66,5 @@ def _test_module() -> None:
     """
     Test this module.
     """
-    kwargs = {'in_ttest': './processed/correlation_whole_brain_fisher_ttest/startvolume-1_variable-values_alpha_fisher_ttest.nii', 'out_cohen': './processed/correlation_whole_brain_fisher_cohens/startvolume-1_variable-values_alpha_fisher_cohens.nii', 'n_samples': 18}
+    kwargs = {'in_ttest': './processed/correlation_whole_brain_fisher_ttest/startvolume-1_variable-values_alpha_fisher_ttest.nii', 'out_cohen': './processed/correlation_whole_brain_fisher_cohens/startvolume-1_variable-values_alpha_fisher_cohens.nii', 'n_samples': 18}  # nopep8
     return main(**kwargs)
