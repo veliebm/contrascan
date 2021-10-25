@@ -34,7 +34,7 @@ def apply_cohens(a: numpy.array, n_samples: int) -> numpy.array:
     """
     Calculate Cohen's d for each voxel in an array of t-test values.
 
-    To convert from a z score to d: d = t/sqrt(n-1)
+    To convert from a t value to d: d = t/sqrt(n-1)
     (from https://www.researchgate.net/post/Is_cohen_d_equal_to_z_statistics_How_can_I_calculate_cohen_d_using_Z_scores)
     """  # nopep8
     cohens_results = a / numpy.sqrt(n_samples - 1)
