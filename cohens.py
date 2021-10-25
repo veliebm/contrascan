@@ -20,7 +20,7 @@ def main(in_ttest: PathLike, out_cohen: PathLike, n_samples: int) -> None:
     func_image = nibabel.load(in_ttest)
 
     transformed_array = apply_cohens(
-        a=func_image.dataobj[:, :, :, 0],
+        a=func_image.dataobj[:, :, :, :, 1],
         n_samples=n_samples)
 
     save_array_to_nifti(
@@ -34,10 +34,10 @@ def apply_cohens(a: numpy.array, n_samples: int) -> numpy.array:
     """
     Calculate Cohen's d for each voxel in an array of t-test values.
 
-    To convert from a z score to d: d = z/sqrt(n)
+    To convert from a z score to d: d = t/sqrt(n-1)
     (from https://www.researchgate.net/post/Is_cohen_d_equal_to_z_statistics_How_can_I_calculate_cohen_d_using_Z_scores)
     """  # nopep8
-    cohens_results = a / numpy.sqrt(n_samples)
+    cohens_results = a / numpy.sqrt(n_samples - 1)
 
     return cohens_results
 
@@ -66,4 +66,5 @@ def _test_module() -> None:
     """
     Test this module.
     """
-    return main()
+    kwargs = {'in_ttest': './processed/correlation_whole_brain_fisher_ttest/startvolume-1_variable-values_alpha_fisher_ttest.nii', 'out_cohen': './processed/correlation_whole_brain_fisher_cohens/startvolume-1_variable-values_alpha_fisher_cohens.nii', 'n_samples': 18}
+    return main(**kwargs)
