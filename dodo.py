@@ -1779,19 +1779,6 @@ def task_correlate_whole_brain() -> Dict:
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"alpha, {alpha_data}, sub--{subject}, startvolume--{start_volume}"
                 )
-            for frequency in FREQUENCIES:
-                yield create_task(
-                    eeg_data=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
-                    out_image=fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency),
-                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
-                    name=f"sliding sliding window, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
-                )
-                yield create_task(
-                    eeg_data=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
-                    out_image=fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency),
-                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
-                    name=f"sliding sliding window SNR, sub--{subject}, startvolume--{start_volume}, frequency--{frequency}"
-                )
 def task_fisher_transform_whole_brain() -> Dict:
     """
     Apply the Fisher Z transform to our whole brain correlation so we can do more valid t-tests.
@@ -1985,17 +1972,6 @@ def task_ttest_whole_brain_correlations() -> Dict:
                 out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
                 name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
             )
-        for frequency in FREQUENCIES:
-            yield create_task(
-                images=[fname.correlation_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
-                out_path=fname.correlations_ttest(start_volume=start_volume, frequency=frequency),
-                name=f"sliding sliding window, startvolume--{start_volume}, frequency--{frequency}",
-            )
-            yield create_task(
-                images=[fname.correlation_whole_brain_SNR_image(subject=subject, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
-                out_path=fname.correlations_SNR_ttest(start_volume=start_volume, frequency=frequency),
-                name=f"sliding sliding window SNR, startvolume--{start_volume}, frequency--{frequency}",
-            )
 def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     """
     Correlate the time series of each microregion with EEG data.
@@ -2064,31 +2040,6 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
                         ),
                         name=f"alpha, data--{alpha_data}, subject--{subject}, mask--{region}, start_volume--{start_volume}"
                     )
-                for frequency in FREQUENCIES:
-                    yield create_task(
-                        sources=dict(
-                            load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),
-                            load_amplitudes_from=fname.eeg_sliding_sliding_window_oz_amplitudes(subject=subject, frequency=frequency),
-                        ),
-                        targets=dict(
-                            save_spearman_to=fname.microregions_correlation_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
-                            save_table_to=fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
-                            save_scatter_to=fname.microregions_correlation_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
-                        ),
-                        name=f"sliding sliding window, subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}"
-                    )
-                    yield create_task(
-                        sources=dict(
-                            load_microROI_from=fname.microregion_average(subject=subject, mask=region, start_volume=start_volume),
-                            load_amplitudes_from=fname.eeg_sliding_sliding_window_oz_SNR(subject=subject, frequency=frequency),
-                        ),
-                        targets=dict(
-                            save_spearman_to=fname.microregions_correlation_SNR_results(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
-                            save_table_to=fname.microregions_and_SNR_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
-                            save_scatter_to=fname.microregions_correlation_SNR_scatter_plot(subject=subject, mask=region, start_volume=start_volume, frequency=frequency),
-                        ),
-                        name=f"sliding sliding window SNR, subject--{subject}, mask--{region}, frequency--{frequency}, start_volume--{start_volume}"
-                    )
 def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> Dict:
     """
     How big is the correlation across ALL subjects for each microROI?
@@ -2145,29 +2096,6 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
                         save_spearman_to=fname.correlation_across_subjects_alpha(mask=region, data=alpha_data, start_volume=start_volume),
                     ),
                     name=f"alpha, data--{alpha_data}, mask--{region}, start_volume--{start_volume}",
-                )
-            for frequency in FREQUENCIES:
-                yield create_task(
-                    sources=dict(
-                        load_tables_from=[fname.microregions_and_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
-                    ),
-                    targets=dict(
-                        save_scatter_to=fname.correlation_across_subjects_scatter(mask=region, frequency=frequency, start_volume=start_volume),
-                        save_table_to=fname.correlation_across_subjects_table(mask=region, frequency=frequency, start_volume=start_volume),
-                        save_spearman_to=fname.correlation_across_subjects(mask=region, frequency=frequency, start_volume=start_volume),
-                    ),
-                    name=f"sliding sliding window, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
-                )
-                yield create_task(
-                    sources=dict(
-                        load_tables_from=[fname.microregions_and_SNR_amplitudes(subject=subject, mask=region, start_volume=start_volume, frequency=frequency) for subject in SUBJECTS],
-                    ),
-                    targets=dict(
-                        save_scatter_to=fname.correlation_across_subjects_SNR_scatter(mask=region, frequency=frequency, start_volume=start_volume),
-                        save_table_to=fname.correlation_across_subjects_SNR_table(mask=region, frequency=frequency, start_volume=start_volume),
-                        save_spearman_to=fname.correlation_across_subjects_SNR(mask=region, frequency=frequency, start_volume=start_volume),
-                    ),
-                    name=f"sliding sliding window SNR, mask--{region}, frequency--{frequency}, start_volume--{start_volume}",
                 )
 def task_mask_and_average_correlations() -> Dict:
     """
