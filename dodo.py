@@ -1931,6 +1931,14 @@ def task_cohens_d_whole_brain() -> Dict:
                 out_cohen=fname.correlations_cohens_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
                 name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
             )
+    for start_volume in "na".split():
+        for variable in "alpha slidewinamp".split():
+            analysis = "trials"
+            yield create_task(
+                in_ttest=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                out_cohen=fname.correlations_cohens_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
 def task_ttest_whole_brain_correlations() -> Dict:
     """
     ttest the correlations we calculated.
