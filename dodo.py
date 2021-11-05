@@ -1821,13 +1821,14 @@ def task_fisher_transform_whole_brain() -> Dict:
                     out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
                     name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
                 )
-        for variable in "alpha slidewinamp".split():
-            analysis = "trials"
-            yield create_task(
-                in_correlation_path=fname.correlation_whole_brain_trials(subject=subject, variable=variable),
-                out_fisher_path=fname.correlation_fisher(subject=subject, start_volume="na", variable=variable, analysis=analysis),
-                name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
-            )
+        for start_volume in "na".split():
+            for variable in "alpha slidewinamp".split():
+                analysis = "trials"
+                yield create_task(
+                    in_correlation_path=fname.correlation_whole_brain_trials(subject=subject, variable=variable),
+                    out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
+                    name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+                )
 def task_ttest_whole_brain_fishers() -> Dict:
     """
     t-test the fisher transformed correlations.
@@ -1876,6 +1877,14 @@ def task_ttest_whole_brain_fishers() -> Dict:
     for start_volume in START_VOLUMES:
         for variable in "values SNRs".split():
             analysis = "alpha"
+            yield create_task(
+                images=[fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis) for subject in SUBJECTS],
+                out_path=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
+    for start_volume in "na".split():
+        for variable in "alpha slidewinamp".split():
+            analysis = "trials"
             yield create_task(
                 images=[fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis) for subject in SUBJECTS],
                 out_path=fname.correlations_ttest_fisher(start_volume=start_volume, variable=variable, analysis=analysis),
