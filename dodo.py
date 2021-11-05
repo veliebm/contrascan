@@ -1821,6 +1821,13 @@ def task_fisher_transform_whole_brain() -> Dict:
                     out_fisher_path=fname.correlation_fisher(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis),
                     name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
                 )
+        for variable in "alpha slidewinamp".split():
+            analysis = "trials"
+            yield create_task(
+                in_correlation_path=fname.correlation_whole_brain_trials(subject=subject, variable=variable),
+                out_fisher_path=fname.correlation_fisher(subject=subject, start_volume="na", variable=variable, analysis=analysis),
+                name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
 def task_ttest_whole_brain_fishers() -> Dict:
     """
     t-test the fisher transformed correlations.
