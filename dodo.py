@@ -356,14 +356,13 @@ def task_get_trial_func_amplitudes() -> Dict:
             targets=list(targets.values()),
         )
 
-
     for subject in SUBJECTS:
         yield create_task(
-            sources = dict(
+            sources=dict(
                 onsets_path=fname.afniproc_onsets(subject=subject),
                 func_path=fname.resampled_func(subject=subject),
             ),
-            targets = dict(
+            targets=dict(
                 trials_path=fname.func_trial_amplitudes(subject=subject)
             ),
             name=f"subject--{subject}",
@@ -427,9 +426,9 @@ def task_get_occipital_mask() -> Dict:
     for hemisphere in "lr":
         for roi_number in [4, 6]:
             sources.append(fname.kastner_mask(roi_number=roi_number, hemisphere=hemisphere))
-    
+
     targets = [fname.occipital_pole_mask]
-    
+
     kwargs = dict(
         in_masks=sources,
         out_prefix=get_prefix(fname.occipital_pole_mask),
@@ -448,9 +447,9 @@ def task_get_calcarine_mask() -> Dict:
     sources = []
     for hemisphere in "lr":
         sources.append(fname.kastner_mask(roi_number=1, hemisphere=hemisphere))
-    
+
     targets = [fname.calcarine_mask]
-    
+
     kwargs = dict(
         in_masks=sources,
         out_prefix=get_prefix(fname.calcarine_mask),
@@ -477,7 +476,6 @@ def task_resample_masks() -> Dict:
         ]
         targets = [mask["out_path"]]
 
-
         kwargs = dict(
             from_image=mask["in_path"],
             to_image=fname.resampled_template,
@@ -497,9 +495,9 @@ def task_apply_masks_to_irfs() -> Dict:
     THEORY
     ------
     For each subject, we want to compare the most positive blob within the occipital pole with the most negative blob within the calcarine. Get these blobs from the IRFs. Presumable, sub-brick 3 or sub-brick 4.
-		
-	What does it mean to be the most positive blob? Easy. Within the ROI, find all contiguous blobs. I didn't ask whether touching edges count, but I bet they do. Within each contiguous blob, sum the signal of each voxel together. Pick the blob with the largest sum. Or in the case of the calcarine, the lowest sum. Huzzah!
-		
+
+    What does it mean to be the most positive blob? Easy. Within the ROI, find all contiguous blobs. I didn't ask whether touching edges count, but I bet they do. Within each contiguous blob, sum the signal of each voxel together. Pick the blob with the largest sum. Or in the case of the calcarine, the lowest sum. Huzzah!
+
     Then, use each voxel in that blob in the original correlation test. Maybe make a mask for that blob, then apply the mask to the original correlation t-tests. That's a good idea!
     """
     masks = [
@@ -656,7 +654,7 @@ def task_convert_eeg() -> Dict:
     Convert brainvision files to EEGLAB files.
     """
     Path(fname.converteeg_dir).mkdir(exist_ok=True, parents=True)
-    
+
     for subject in SUBJECTS:
 
         # Get sources.
@@ -726,7 +724,7 @@ def task_preprocess_eeg() -> Dict:
     sources = [fname.preprocesseeg_json]
     targets = [fname.preprocessed_eeg(subject=subject) for subject in SUBJECTS]
 
-    path_to_script="preprocess_eegs.m"
+    path_to_script = "preprocess_eegs.m"
     action = f"""
         python3 matlab.py
         --run_script_at {path_to_script}
@@ -772,7 +770,7 @@ def task_segment_eeg() -> Dict:
     sources = [fname.segmenteeg_json]
     targets = [fname.segmented_eeg(subject=subject) for subject in SUBJECTS]
 
-    path_to_script="segment_eegs.m"
+    path_to_script = "segment_eegs.m"
     action = f"""
         python3 matlab.py
         --run_script_at {path_to_script}
@@ -785,7 +783,7 @@ def task_segment_eeg() -> Dict:
     )
 def task_prepare_to_trim_eeg() -> Dict:
     """
-    Write a JSON file that will be read later by a MatLab script I wrote to trim our 
+    Write a JSON file that will be read later by a MatLab script I wrote to trim our
     preprocessed EEG files to the time at which the fMRI turned on.
     """
     sources = [fname.preprocessed_eeg(subject=subject) for subject in SUBJECTS]
@@ -817,7 +815,7 @@ def task_trim_eeg() -> Dict:
     sources = [fname.trimeeg_json]
     targets = [fname.trimmed_eeg(subject=subject) for subject in SUBJECTS]
 
-    path_to_script="trim_eegs.m"
+    path_to_script = "trim_eegs.m"
     action = f"""
         python3 matlab.py
         --run_script_at {path_to_script}
@@ -941,7 +939,7 @@ def task_eeg_get_alphas() -> Dict:
             save('{targets["values"]}', 'values');
             save('{targets["SNRs"]}', 'SNRs');
             save('{targets["average_power"]}', 'average_power');
-            
+
             function [dataset] = load_dataset(path)
                 % Load a dataset.
                 [parent_dir, stem, suffix] = fileparts(path);
@@ -1006,7 +1004,7 @@ def task_eeg_get_trial_by_trial_alpha() -> Dict:
             SNRs = [];
             for i = 1:numel(dataset(1,1,:))
                 sub_dataset = dataset(:,:,i);
-                
+
                 [pow_baseline, phase_baseline, freqs_baseline] = FFT_spectrum3D_singtrial(sub_dataset, 1:400, 500);
                 [pow_post, phase_post, freqs_post] = FFT_spectrum3D_singtrial(sub_dataset, 2083:2482, 500);
                 pow_difference = pow_post - pow_baseline;
@@ -1026,7 +1024,7 @@ def task_eeg_get_trial_by_trial_alpha() -> Dict:
             save('{targets["values"]}', 'values');
             save('{targets["SNRs"]}', 'SNRs');
             save('{targets["averagepower"]}', 'averagepower');
-            
+
             function [dataset] = load_dataset(path)
                 % Load a dataset.
                 [parent_dir, stem, suffix] = fileparts(path);
@@ -1044,13 +1042,12 @@ def task_eeg_get_trial_by_trial_alpha() -> Dict:
             targets=list(targets.values()),
         )
 
-
     for subject in SUBJECTS:
         yield create_task(
-            sources = dict(
+            sources=dict(
                 eeg=fname.segmented_eeg(subject=subject)
             ),
-            targets = dict(
+            targets=dict(
                 values=fname.eeg_trial_alpha(subject=subject, data="values"),
                 SNRs=fname.eeg_trial_alpha(subject=subject, data="SNRs"),
                 averagepower=fname.eeg_trial_alpha(subject=subject, data="averagepower"),
@@ -1094,7 +1091,7 @@ def task_correlate_alpha_and_snr() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
-    
+
     for subject in SUBJECTS:
         yield create_task(
             sources=dict(
@@ -1185,7 +1182,7 @@ def task_eeg_sliding_sliding_window() -> Dict:
             # Make the script to run.
             script = textwrap.dedent(f"""\
                 % Gets a SLIDING sliding window average for a subject.
-                
+
                 %% Main script.
 
                 eeglab;
@@ -1256,7 +1253,7 @@ def task_improve_sliding_sliding_window() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
-    
+
     for subject in SUBJECTS:
         yield create_task(
             sources=dict(
@@ -1628,7 +1625,7 @@ def task_freqtag_better_fft_sliding_window() -> Dict:
             freqs=fname.freqtag_better_fft_sliding_window_freqs(subject=subject),
         )
         targets_list = list(targets.values())
-        
+
         Path(targets["pow"]).parent.mkdir(exist_ok=True, parents=True)
 
         # Make MatLab script.
@@ -1641,7 +1638,7 @@ def task_freqtag_better_fft_sliding_window() -> Dict:
             load('{sources["meanwinmat"]}');
 
             %% Run functions.
-            [pow, phase, freqs] = freqtag_FFT(meanwinmat, 600); 
+            [pow, phase, freqs] = freqtag_FFT(meanwinmat, 600);
 
             %% Save output variables.
             save('{targets["pow"]}', 'pow');
@@ -1736,7 +1733,7 @@ def task_correlate_whole_brain() -> Dict:
             in_image_path=in_image,
             in_eeg_path=eeg_data,
         )
-        
+
         targets = dict(
             out_image_path=out_image,
         )
@@ -1790,7 +1787,7 @@ def task_fisher_transform_whole_brain() -> Dict:
         sources = dict(
             in_correlation_path=in_correlation_path,
         )
-        
+
         targets = dict(
             out_fisher_path=out_fisher_path,
         )
@@ -1849,7 +1846,7 @@ def task_ttest_whole_brain_fishers() -> Dict:
         sources = dict(
             images=images,
         )
-        
+
         targets = dict(
             ttest=out_path,
         )
@@ -1865,7 +1862,7 @@ def task_ttest_whole_brain_fishers() -> Dict:
             file_dep=list(sources.values())[0],
             targets=list(targets.values()),
         )
-    
+
     for start_volume in EXPANDED_START_VOLUMES:
         for variable in "amplitudes SNRs".split():
             analysis = "slidslidwin_improved"
@@ -1914,7 +1911,7 @@ def task_cohens_d_whole_brain() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
-    
+
     for start_volume in EXPANDED_START_VOLUMES:
         for variable in "amplitudes SNRs".split():
             analysis = "slidslidwin_improved"
@@ -1959,7 +1956,7 @@ def task_ttest_whole_brain_correlations() -> Dict:
         sources = dict(
             images=images,
         )
-        
+
         targets = dict(
             ttest=out_path,
         )
@@ -2034,7 +2031,7 @@ def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
             file_dep=list(sources.values()),
             targets=list(targets.values()),
         )
-    
+
     for subject in SUBJECTS:
         for region in "calcarine occipital".split():
             for start_volume in START_VOLUMES:
@@ -2084,7 +2081,6 @@ def task_correlate_eeg_with_average_microregion_timeseries_across_subjects() -> 
                 Where to save the table of data we make from our tiny tables.
             save_spearman_to : PathLike
                 Where to save our Spearman results.
-            
         """
         kwargs = {**sources, **targets}
 
@@ -2178,7 +2174,7 @@ def task_ttest_averages() -> Dict:
             file_dep=list(sources.values())[0],
             targets=list(targets.values()),
         )
-    
+
     for mask in "calcarine occipital".split():
         for start_volume in START_VOLUMES:
             for data in "values SNRs".split():
@@ -2199,7 +2195,7 @@ def task_ttest_averages() -> Dict:
 
 
 # Helper functions.
-def _print_paths(paths: Iterable, name: str=None) -> None:
+def _print_paths(paths: Iterable, name: str = None) -> None:
     """
     Prints an iterable and whether its paths exist.
 
@@ -2242,5 +2238,5 @@ def encode_dict_in_bash(dictionary: dict) -> str:
     pairs = []
     for key, value in dictionary.items():
         pairs.append(f"{key}={value}")
-    
+
     return " ".join(pairs)
