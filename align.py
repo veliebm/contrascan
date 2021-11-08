@@ -7,7 +7,7 @@ from os import PathLike
 from pathlib import Path
 from typing import List
 
-def main(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, to_dir: PathLike) -> None:
+def main(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, to_dir: PathLike, suffix: str = "_aligned") -> None:
     """
     Aligns 2 datasets together.
     """
@@ -18,9 +18,9 @@ def main(from_images: List[PathLike], from_template: PathLike, to_template: Path
 
     to_dir.mkdir(parents=True, exist_ok=True)
 
-    align_using_templates(from_images, from_template, to_template, to_dir)
+    align_using_templates(from_images, from_template, to_template, to_dir, suffix)
 
-def align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike) -> Path:
+def align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike, suffix: str) -> Path:
     """
     Using two template images, align an image from one template space to another.
     """
@@ -32,7 +32,7 @@ def align_using_templates(from_images: List[PathLike], from_template: PathLike, 
         -dset1to2
         -dset1_strip None
         -dset2_strip None
-        -suffix _aligned
+        -suffix {suffix}
         -child_dset1
         """.split()
     command += from_images
