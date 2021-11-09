@@ -32,7 +32,7 @@ def _get_start_time(onsets_path: PathLike) -> float:
     """
     with open(onsets_path, "r") as f:
         onsets = f.readlines()
-    
+
     return float(onsets[0])
 
 
