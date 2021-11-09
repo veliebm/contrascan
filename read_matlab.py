@@ -3,6 +3,7 @@ Functions to read matlab files from Python.
 """
 
 from os import PathLike
+from pathlib import Path
 import pandas
 import scipy.io
 import numpy
@@ -16,19 +17,19 @@ def get_amplitudes(mat_path: PathLike) -> pandas.Series:
     ----------
     mat_path : PathLike
         Path to a .mat file.
-    
+
     Returns
     -------
     pandas.Series
         Series of numbers extracted from the mat file.
-    
+
     Raises
     ------
     TypeError
         When the mat file contains data that isn't an Nx1 vector.
     """
     mat = load_mat_file(mat_path)
-    
+
     _check_array_is_vector(mat)
 
     return pandas.Series(mat.reshape(-1))
@@ -36,7 +37,7 @@ def get_amplitudes(mat_path: PathLike) -> pandas.Series:
 
 def _check_array_is_vector(array: numpy.array) -> None:
     """
-    Raises TypeError if the array is not 1xN or Nx1.
+    Raises TypeError if the array is not 1xN or Nx1 or 1-dimensional.
 
     Parameters
     ----------
@@ -48,17 +49,18 @@ def _check_array_is_vector(array: numpy.array) -> None:
     TypeError
         Array is not 2 dimensional or is not shaped correctly.
     """
-    shape = array.shape
-    
-    try:
-        assert len(shape) == 2
-    except AssertionError:
-        raise TypeError(f"Array is constructed inappropriately: {shape}")
-    
-    try:
-        assert shape[0] == 1 or shape[1] == 1
-    except AssertionError:
-        raise TypeError(f"Array is not vector shaped: {shape}")
+    if array.ndim > 1:
+        shape = array.shape
+
+        try:
+            assert len(shape) == 2
+        except AssertionError:
+            raise TypeError(f"Array is constructed inappropriately: {shape}")
+
+        try:
+            assert shape[0] == 1 or shape[1] == 1
+        except AssertionError:
+            raise TypeError(f"Array is not vector shaped: {shape}")
 
 
 def load_mat_file(path: PathLike) -> numpy.array:
@@ -69,7 +71,7 @@ def load_mat_file(path: PathLike) -> numpy.array:
     ----------
     path : PathLike
         Path to a mat file.
-    
+
     Returns
     -------
     numpy.array
@@ -91,3 +93,23 @@ def load_mat_file(path: PathLike) -> numpy.array:
     value = values[0]
 
     return value
+
+
+def save_series_to_mat(data: pandas.Series, variable_name: str, out_path: PathLike) -> None:
+    """
+    Save some data to a .mat file.
+    """
+    make_parent_dir(out_path)
+
+    numpy_data = data.to_numpy()
+
+    _check_array_is_vector(numpy_data)
+
+    scipy.io.savemat(out_path, {variable_name: numpy_data}, appendmat=False)
+
+
+def make_parent_dir(path: PathLike) -> None:
+    """
+    Create the parent directory for a path.
+    """
+    Path(path).parent.mkdir(exist_ok=True, parents=True)
