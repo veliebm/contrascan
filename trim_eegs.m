@@ -1,4 +1,4 @@
-% Truncate an EEG dataset to start exactly 8s before the fMRI turned on.
+% Truncate an EEG dataset to start at first stimulus and end 10s after last stimulus.
 %
 % Created by Benjamin Velie on 7/27/2021.
 % veliebm@ufl.edu
