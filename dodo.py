@@ -38,6 +38,7 @@ import maskave
 import ttest_averages
 import fisher_transform
 import cohens
+import get_canonical
 
 
 # Configuration for the pydoit tool.
@@ -2192,6 +2193,30 @@ def task_ttest_averages() -> Dict:
                     to_statistics=fname.ttest_averages(variable=variable, start_volume=start_volume, mask=mask, analysis="improvedslidslidwin", outfile="results"),
                     name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}",
                 )
+def task_get_canonical_bold() -> Dict:
+    """
+    For each subject, calculate the canonical BOLD expected based on stimulus times alone.
+    """
+    def create_task(from_onsets: PathLike, to_trs: PathLike, write_script_to: PathLike, name: str) -> Dict:
+        """Make this task generalizable."""
+        sources = dict(from_onsets=from_onsets)
+        targets = dict(to_trs=to_trs)
+        kwargs = {**sources, **targets, "write_script_to": write_script_to}
+
+        return dict(
+            name=name,
+            actions=[(get_canonical.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for subject in SUBJECTS:
+        yield create_task(
+            from_onsets=fname.afniproc_onsets(subject=subject),
+            to_trs=fname.canonical(subject=subject),
+            write_script_to=fname.canonical_script(subject=subject),
+            name=f"subject--{subject}"
+        )
 
 
 # Helper functions.

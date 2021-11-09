@@ -382,3 +382,8 @@ fname.add("correlation_improved_sliding_sliding_window_average", "{correlation_a
 # task_ttest_averages:
 fname.add("ttest_averages_dir", "{processed_data_dir}/correlation_averages_ttests")
 fname.add("ttest_averages", "{ttest_averages_dir}/variable-{variable}_startvolume-{start_volume}_mask-{mask}_analysis-{analysis}_outfile-{outfile}.csv")
+
+# task_get_canonical_bold:
+fname.add("canonical_dir", "{processed_data_dir}/canonical_bold_response")
+fname.add("canonical", "{canonical_dir}/sub-{subject}_canonical.mat")
+fname.add("canonical_script", "{scripts_dir}/TEMP_sub{subject}_canonical.m")

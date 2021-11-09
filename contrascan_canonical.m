@@ -12,12 +12,26 @@ for x = 1:410
     kernel(x) = exp(x./100);
 end
 
-for onset = 1: length(onsets)
-    onsetindexvec(onset) = find(round(time.*100-onsets(onset)*100) == 0);
-    contrast(onsetindexvec(onset):onsetindexvec(onset)+409) = kernel; 
+for i = 1: length(onsets)
+    onset = onsets(i);
+    % Find the location within the time vector at which the onset happens.
+    try
+        onsetindexvec(i) = find(round(time.*100-onset*100) == 0);
+    catch error
+        switch error.identifier
+            case 'MATLAB:matrix:singleSubscriptNumelMismatch'
+                warning('Could not match onset to location within time vector. Approximating location.');
+                onsetindexvec(i) = find(round(time.*100-onset*100) == 1);
+            otherwise
+                rethrow(error)
+        end
+    end
+    
+    % Do something with that time vector location.
+    contrast(onsetindexvec(i):onsetindexvec(i)+409) = kernel; 
 end
 
-onsets(1:4)                             % these are for testing that everything is as expected 
+onsets(1:4);                             % these are for testing that everything is as expected 
 %plot(time, contrast)                   % we should see the contrast function ramping up at the onset times
 %plot(time(1:10000), contrast(1:10000)) 
 
