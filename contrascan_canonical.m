@@ -18,8 +18,8 @@ for onset = 1: length(onsets)
 end
 
 onsets(1:4)                             % these are for testing that everything is as expected 
-plot(time, contrast)                   % we should see the contrast function ramping up at the onset times
-plot(time(1:10000), contrast(1:10000)) 
+%plot(time, contrast)                   % we should see the contrast function ramping up at the onset times
+%plot(time(1:10000), contrast(1:10000)) 
 
 % now we could be done, but that stuff will never correlate with BOLD
 % because it is at the wrong times (BOLD happens much later) and has this
@@ -29,9 +29,9 @@ plot(time(1:10000), contrast(1:10000))
 % we concolve the contrast time series with a canonical hemodynamic response function 
 canonicalHRF = gampdf(0.0:0.01:18, 6); % 18 seconds long, gamma function, sampled at the same rate as time above
 canonical = conv(contrast,canonicalHRF, 'same'); 
-plot(0.0:0.01:18, canonicalHRF)
-plot(canonical)
+%plot(0.0:0.01:18, canonicalHRF)
+%plot(canonical)
 
 % now we resample to match actual TR
 canonical4BOLD = resample(canonical,1,200); 
-plot(canonical4BOLD)
+%plot(canonical4BOLD)
