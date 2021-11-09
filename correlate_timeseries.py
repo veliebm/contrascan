@@ -39,7 +39,7 @@ def main(data_1: PathLike, data_1_name: str, data_2: PathLike, data_2_name: str,
         table=table,
         out_path=save_scatter_to,
     )
- 
+
 
 def make_table(dictionary: Dict, out_path: PathLike) -> pandas.DataFrame:
     """
@@ -67,7 +67,7 @@ def make_scatter_plot(table: pandas.DataFrame, out_path: PathLike) -> None:
     print(f"\n{label}\n")
 
     plt.plot(x, m*x + b, label=label)
-    plt.legend()    
+    plt.legend()
     plt.savefig(out_path)
 
 
@@ -94,19 +94,19 @@ def get_amplitudes(mat_path: PathLike) -> pandas.DataFrame:
     ----------
     mat_path : PathLike
         Path to a .mat file.
-    
+
     Returns
     -------
     pandas.Series
         Series of numbers extracted from the mat file.
-    
+
     Raises
     ------
     TypeError
         When the mat file contains data that isn't an Nx1 vector.
     """
     mat = load_mat_file(mat_path)
-    
+
     _check_array_is_vector(mat)
 
     return pandas.Series(mat.reshape(-1))
@@ -127,12 +127,12 @@ def _check_array_is_vector(array: numpy.array) -> None:
         Array is not 2 dimensional or is not shaped correctly.
     """
     shape = array.shape
-    
+
     try:
         assert len(shape) == 2
     except AssertionError:
         raise TypeError(f"Array is constructed inappropriately: {shape}")
-    
+
     try:
         assert shape[0] == 1 or shape[1] == 1
     except AssertionError:
@@ -147,7 +147,7 @@ def load_mat_file(path: PathLike) -> numpy.array:
     ----------
     path : PathLike
         Path to a mat file.
-    
+
     Returns
     -------
     numpy.array
