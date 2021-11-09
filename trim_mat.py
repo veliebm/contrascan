@@ -42,5 +42,5 @@ def _test_module() -> None:
     """
     Test this module.
     """
-    kwargs = {'from_mat': './processed/canonical_bold_response/sub-125_canonical.mat', 'to_trimmed_mat': './processed/canonical_bold_response_trimmed/sub-125_canonical.mat', 'start_index': 1}
+    kwargs = {'from_mat': './processed/canonical_bold_response/sub-125_canonical.mat', 'to_trimmed_mat': './processed/canonical_bold_response_trimmed/sub-125_canonical.mat', 'start_index': 4, 'end_index': -2}
     main(**kwargs)
