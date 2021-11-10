@@ -294,6 +294,7 @@ fname.add("correlation_whole_brain_SNR_image", "{correlation_dir}/sub-{subject}_
 fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_data-{data}_alphas.nii")
 fname.add("correlation_whole_brain_improved", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_improved.nii")
 fname.add("correlation_whole_brain_trials", "{correlation_dir}/sub-{subject}_variable-{variable}_trials.nii")
+fname.add("correlation_whole_brain_canonical", "{correlation_dir}/sub-{subject}_canonical.nii")
 
 # task_fisher_transform_whole_brain:
 fname.add("correlation_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher")
