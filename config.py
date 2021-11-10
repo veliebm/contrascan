@@ -387,3 +387,7 @@ fname.add("ttest_averages", "{ttest_averages_dir}/variable-{variable}_startvolum
 fname.add("canonical_dir", "{processed_data_dir}/canonical_bold_response")
 fname.add("canonical", "{canonical_dir}/sub-{subject}_canonical.mat")
 fname.add("canonical_script", "{scripts_dir}/TEMP_sub{subject}_canonical.m")
+
+# task_trim_canonical_bold:
+fname.add("canonical_trimmed_dir", "{processed_data_dir}/canonical_bold_response_trimmed")
+fname.add("canonical_trimmed", "{canonical_trimmed_dir}/sub-{subject}_canonical.mat")

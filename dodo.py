@@ -39,6 +39,7 @@ import ttest_averages
 import fisher_transform
 import cohens
 import get_canonical
+import trim_mat
 
 
 # Configuration for the pydoit tool.
@@ -2215,6 +2216,33 @@ def task_get_canonical_bold() -> Dict:
             from_onsets=fname.afniproc_onsets(subject=subject),
             to_trs=fname.canonical(subject=subject),
             write_script_to=fname.canonical_script(subject=subject),
+            name=f"subject--{subject}"
+        )
+def task_trim_canonical_bold() -> Dict:
+    """
+    Trim canonical bolds to mirror what we trimmed our actual images to - begin at first stim and have 370 volumes.
+    """
+    def create_task(from_mat: PathLike, to_trimmed_mat: PathLike, start_index: int, end_index: int, name: str) -> Dict:
+        """
+        Make this task generalizable.
+        """
+        sources = dict(from_mat=from_mat)
+        targets = dict(to_trimmed_mat=to_trimmed_mat)
+        kwargs = {**sources, **targets, "start_index": start_index, "end_index": end_index}
+
+        return dict(
+            name=name,
+            actions=[(trim_mat.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for subject in SUBJECTS:
+        yield create_task(
+            from_mat=fname.canonical(subject=subject),
+            to_trimmed_mat=fname.canonical_trimmed(subject=subject),
+            start_index=4,
+            end_index=-2,
             name=f"subject--{subject}"
         )
 
