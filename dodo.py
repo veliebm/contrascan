@@ -2220,7 +2220,7 @@ def task_get_canonical_bold() -> Dict:
         )
 def task_trim_canonical_bold() -> Dict:
     """
-    Trim canonical bolds to mirror what we trimmed our actual images to - begin at first stim and have 370 volumes.
+    Trim canonical bolds to mirror the afni_proc.py outputs.
     """
     def create_task(from_mat: PathLike, to_trimmed_mat: PathLike, name: str, start_index: int = None, end_index: int = None) -> Dict:
         """
