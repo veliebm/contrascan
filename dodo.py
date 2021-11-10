@@ -2245,6 +2245,33 @@ def task_trim_canonical_bold() -> Dict:
             end_index=-2,
             name=f"subject--{subject}"
         )
+def task_trim_canonical_bold_again() -> Dict:
+    """
+    Now trim canonical BOLDs to time lags that match our EEG analyses.
+    """
+    def create_task(from_mat: PathLike, to_trimmed_mat: PathLike, start_index: int, name: str) -> Dict:
+        """
+        Make this task generalizable.
+        """
+        sources = dict(from_mat=from_mat)
+        targets = dict(to_trimmed_mat=to_trimmed_mat)
+        kwargs = {**sources, **targets, "start_index": start_index}
+
+        return dict(
+            name=name,
+            actions=[(trim_mat.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for subject in SUBJECTS:
+        for start_volume in EXPANDED_START_VOLUMES:
+            yield create_task(
+                from_mat=fname.canonical_trimmed(subject=subject),
+                to_trimmed_mat=fname.canonical_lagged(subject=subject, start_volume=start_volume),
+                start_index=start_volume,
+                name=f"subject--{subject}, startvolume--{start_volume}"
+            )
 
 
 # Helper functions.

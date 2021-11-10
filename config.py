@@ -391,3 +391,7 @@ fname.add("canonical_script", "{scripts_dir}/TEMP_sub{subject}_canonical.m")
 # task_trim_canonical_bold:
 fname.add("canonical_trimmed_dir", "{processed_data_dir}/canonical_bold_response_trimmed")
 fname.add("canonical_trimmed", "{canonical_trimmed_dir}/sub-{subject}_canonical.mat")
+
+# task_trim_canonical_bold_again:
+fname.add("canonical_lagged_dir", "{processed_data_dir}/canonical_bold_response_lagged")
+fname.add("canonical_lagged", "{canonical_lagged_dir}/sub-{subject}_startvolume-{start_volume}_canonical.mat")
