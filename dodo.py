@@ -927,10 +927,14 @@ def task_eeg_get_alphas() -> Dict:
             SNRs = [];
             for i = 1000:1000:numel(dataset(1,:))
                 sub_dataset = dataset(:,i-999:i);
+
                 [pow, phase, freqs] = FFT_spectrum(sub_dataset, 500);
+
                 alpha = mean(mean(pow([20 31 19 7 8 9 10 ], 18:26)));
+
                 [SNRdb, SNRratio] = freqtag_simpleSNR(pow, [11:16 28:33]);
                 SNR = mean(mean(SNRdb([20 31 19 7 8 9 10 ], 18:26)));
+
                 values = [values; alpha];
                 SNRs = [SNRs; SNR];
                 pows = cat(3, pows, pow);
