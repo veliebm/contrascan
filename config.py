@@ -315,6 +315,7 @@ fname.add("correlations_SNR_ttest", "{correlations_ttest_dir}/frequency-{frequen
 fname.add("correlations_whole_brain_alpha_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_data-{data}_correlations_alpha_ttest+tlrc.HEAD")
 fname.add("correlations_improved_whole_brain_ttest", "{correlations_ttest_dir}/startvolume-{start_volume}_variable-{variable}_improved_correlations_ttest+tlrc.HEAD")
 fname.add("correlations_whole_brain_trials_ttest", "{correlations_ttest_dir}/variable-{variable}_trials_correlations_ttest+tlrc.HEAD")
+fname.add("correlations_whole_brain_canonical_ttest", "{correlations_ttest_dir}/canonical_correlations_ttest+tlrc.HEAD")
 
 # task_get_occipital_mask:
 fname.add("kastner_mask_dir", "{raw_data_dir}/misc/kastner_cortex_masks/subj_vol_all")
