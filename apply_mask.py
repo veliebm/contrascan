@@ -22,7 +22,7 @@ def main(in_image: PathLike, in_mask: PathLike, out_prefix: PathLike) -> None:
         -float
         -a {in_image}
         -b {in_mask}
-        -expr a*b
+        -expr 'a*step(b)'
         -prefix {out_prefix}
         """.split()
     print(args)
