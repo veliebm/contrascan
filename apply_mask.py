@@ -30,7 +30,8 @@ def main(in_image: PathLike, in_mask: PathLike, out_prefix: PathLike) -> None:
 
 
 def mask_images(images: List[PathLike], mask: PathLike) -> None:
-    """Apply a mask to each image within a list of images.
+    """
+    Apply a mask to each image within a list of images.
 
     Args:
         images (List[PathLike]): Images to mask.
@@ -42,7 +43,8 @@ def mask_images(images: List[PathLike], mask: PathLike) -> None:
 
 
 def get_prefix(filename: str) -> str:
-    """Returns the prefix of an AFNI file. (Everything before the final "+".)
+    """
+    Returns the prefix of an AFNI file. (Everything before the final "+".)
 
     Args:
         filename (str): Path to an AFNI file.
@@ -59,7 +61,8 @@ def get_prefix(filename: str) -> str:
 
 
 def is_afni(filename: PathLike) -> bool:
-    """Returns true if the input path is an AFNI path.
+    """
+    Returns true if the input path is an AFNI path.
 
     Args:
         filename (PathLike): Path to a file.
