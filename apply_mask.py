@@ -51,7 +51,7 @@ def get_prefix(filename: str) -> str:
         str: Prefix of the file. Includes parent dirs in path.
     """
     if is_afni(filename):
-        return "".join(filename.split("+")[:-1])
+        return "".join(str(filename).split("+")[:-1])
     else:
         path = Path(filename)
         stem = path.stem
