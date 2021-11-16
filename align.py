@@ -7,6 +7,7 @@ from os import PathLike
 from pathlib import Path
 from typing import List
 
+
 def main(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, to_dir: PathLike, suffix: str = "_aligned") -> None:
     """
     Using two template images, align images from one template space to another.
@@ -19,6 +20,7 @@ def main(from_images: List[PathLike], from_template: PathLike, to_template: Path
     to_dir.mkdir(parents=True, exist_ok=True)
 
     _align_using_templates(from_images, from_template, to_template, to_dir, suffix)
+
 
 def _align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike, suffix: str) -> Path:
     """
