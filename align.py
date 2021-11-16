@@ -18,9 +18,9 @@ def main(from_images: List[PathLike], from_template: PathLike, to_template: Path
 
     to_dir.mkdir(parents=True, exist_ok=True)
 
-    align_using_templates(from_images, from_template, to_template, to_dir, suffix)
+    _align_using_templates(from_images, from_template, to_template, to_dir, suffix)
 
-def align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike, suffix: str) -> Path:
+def _align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike, suffix: str) -> Path:
     """
     Using two template images, align images from one template space to another. Requires that input paths be full paths.
     """
