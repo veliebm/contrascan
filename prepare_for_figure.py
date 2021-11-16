@@ -22,7 +22,7 @@ def main(
 
     Args:
         in_image (PathLike): Image to process.
-        apply_matrix (PathLike, optional): Path to 1D file to apply. Defaults to "data/misc/kastner_cortex_masks/MNI152_T1_1mm_TTN27_mat.aff12.1D".
+        in_matrix (PathLike, optional): Path to 1D file to apply. Defaults to "data/misc/kastner_cortex_masks/MNI152_T1_1mm_TTN27_mat.aff12.1D".
         mask_to (PathLike, optional): Path to 2.5mm mask to apply. Defaults to "data/misc/kastner_cortex_masks/TT_N27_2.5mm.nii".
     """
     prefix = get_prefix(in_image)
