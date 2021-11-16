@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Align 2 datasets together.
+Using two template images, align images from one template space to another.
 """
 import subprocess
 from os import PathLike
