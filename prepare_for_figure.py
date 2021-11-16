@@ -6,19 +6,24 @@ NOT SUITABLE FOR PIPELINE USE. SUITABLE FOR INTERACTIVE USE.
 Created 11/16/2021 by Benjamin Velie.
 veliebm@ufl.edu
 """
+# Import external code..
 from os import PathLike
+from pathlib import Path
+
+# Import custom CSEA code.
 import apply_matrix
 import apply_mask
-from pathlib import Path
+import copy_image
 
 
 def main(
     in_image: PathLike,
     in_matrix: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_1mm_TTN27_mat.aff12.1D",
     mask_to: PathLike = "data/misc/kastner_cortex_masks/TT_N27_2.5mm.nii",
+    get_underlay_from: PathLike = "data/misc/kastner_cortex_masks/TT_N27.nii.gz",
 ) -> None:
     """
-    Align a 2.5mm image from Kastner to the TT_N27 brain then mask it.
+    Align a 2.5mm image from Kastner to the TT_N27 brain then mask it. Copy an underlay to the dir.
 
     Args:
         in_image (PathLike): Image to process.
@@ -26,6 +31,9 @@ def main(
         mask_to (PathLike, optional): Path to 2.5mm mask to apply. Defaults to "data/misc/kastner_cortex_masks/TT_N27_2.5mm.nii".
     """
     prefix = get_prefix(in_image)
+
+    copy_underlay_to = prefix.parent / Path(get_underlay_from).name
+    copy_image.main(get_underlay_from, copy_underlay_to)
 
     aligned_image = prefix.parent / (prefix.name + "_aligned.nii.gz")
     apply_matrix.main(in_image=in_image, in_matrix=in_matrix, out_prefix=aligned_image)
