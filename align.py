@@ -11,6 +11,13 @@ from typing import List
 def main(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, to_dir: PathLike, suffix: str = "_aligned") -> None:
     """
     Using two template images, align images from one template space to another.
+
+    Args:
+        from_images (List[PathLike]): Paths to images you want to align.
+        from_template (PathLike): Template the input images are aligned to.
+        to_template (PathLike): What to align the images to.
+        to_dir (PathLike): Where you want the results to be written to.
+        suffix (str, optional): Suffix to append to filenames. Defaults to "_aligned".
     """
     from_images = [Path(from_image).resolve() for from_image in from_images]
     from_template = Path(from_template).resolve()
