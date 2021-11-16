@@ -22,7 +22,7 @@ def main(in_image: PathLike, in_mask: PathLike, out_prefix: PathLike) -> None:
         -float
         -a {in_image}
         -b {in_mask}
-        -expr 'a*step(b)'
+        -expr a*step(b)
         -prefix {out_prefix}
         """.split()
     print(args)
@@ -36,7 +36,7 @@ def mask_images(images: List[PathLike], mask: PathLike) -> None:
         images (List[PathLike]): Images to mask.
         mask (PathLike): Path to mask to apply.
     """
-    paths = {image: f"{get_prefix(image)}_masked" for image in images}
+    paths = {image: f"{get_prefix(image)}_masked.nii.gz" for image in images}
     for in_path, out_prefix in paths.items():
         main(in_path, mask, out_prefix)
 
