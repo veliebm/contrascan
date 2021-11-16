@@ -16,7 +16,7 @@ def main(from_image: PathLike, to_image: PathLike, to_prefix: PathLike) -> None:
     """
     to_dir = Path(to_prefix).parent
     to_dir.mkdir(exist_ok=True, parents=True)
-    
+
     command = f"""
         3dresample
         -master {to_image}
@@ -32,7 +32,7 @@ def main2(from_image: PathLike, to_prefix: PathLike, dx: str, dy: str, dz: str) 
     """
     to_dir = Path(to_prefix).parent
     to_dir.mkdir(exist_ok=True, parents=True)
-    
+
     command = f"""
         3dresample
         -dxyz {dx} {dy} {dz}
