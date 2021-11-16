@@ -22,9 +22,16 @@ def main(from_images: List[PathLike], from_template: PathLike, to_template: Path
     _align_using_templates(from_images, from_template, to_template, to_dir, suffix)
 
 
-def _align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike, suffix: str) -> Path:
+def _align_using_templates(from_images: List[PathLike], from_template: PathLike, to_template: PathLike, cwd: PathLike, suffix: str) -> None:
     """
     Using two template images, align images from one template space to another. Requires that input paths be full paths.
+
+    Args:
+        from_images (List[PathLike]): Paths to images you want to align.
+        from_template (PathLike): Template the input images are aligned to.
+        to_template (PathLike): What to align the images to.
+        cwd (PathLike): Where you want the results to be written to.
+        suffix (str): Suffix to append to filenames.
     """
     print(f"Aligning images to {to_template}")
     command = f"""
