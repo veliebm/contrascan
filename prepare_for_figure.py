@@ -16,7 +16,7 @@ import apply_mask
 import copy_image
 
 
-def main(
+def prep_TTN27(
     in_image: PathLike,
     in_matrix: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_1mm_TTN27_mat.aff12.1D",
     mask_to: PathLike = "data/misc/kastner_cortex_masks/TT_N27_2.5mm.nii",
@@ -43,7 +43,7 @@ def main(
     apply_mask.main(in_image=aligned_image, in_mask=mask_to, out_prefix=masked_image)
 
 
-def main2(
+def prep_MNI(
     in_image: PathLike,
     mask_to: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_2.5mm_full_mask.nii.gz",
     get_underlay_from: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz",
