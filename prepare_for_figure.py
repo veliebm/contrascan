@@ -61,7 +61,7 @@ def prep_MNI(
     copy_underlay_to = prefix.parent / Path(get_underlay_from).name
     copy_image.main(get_underlay_from, copy_underlay_to)
 
-    masked_image = prefix.parent / (prefix.name + "_aligned_masked.nii.gz")
+    masked_image = prefix.parent / (prefix.name + "_masked.nii.gz")
     apply_mask.main(in_image=in_image, in_mask=mask_to, out_prefix=masked_image)
 
 
