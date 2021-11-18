@@ -40,6 +40,7 @@ import fisher_transform
 import cohens
 import get_canonical
 import trim_mat
+import compare_images
 
 
 # Configuration for the pydoit tool.
@@ -2258,6 +2259,41 @@ def task_trim_canonical_bold() -> Dict:
             to_trimmed_mat=fname.canonical_trimmed(subject=subject),
             end_index=-2,
             name=f"subject--{subject}"
+        )
+def task_subtract_canonical_bold() -> Dict:
+    """
+    Subtract the mean canonical BOLD correlation from the mean alpha and mean ssVEP correlations.
+    """
+    def create_task(minuend: PathLike, out_prefix: PathLike, name: str, subtrahend: PathLike = fname.correlations_whole_brain_canonical_ttest) -> Dict:
+        """
+        Make this task generalizable.
+        """
+        sources = dict(minuend=minuend, subtrahend=subtrahend)
+        targets = dict(out_prefix=out_prefix)
+        kwargs = {
+            "minuend": minuend + "[0]",
+            "subtrahend": subtrahend + "[0]",
+            "out_prefix": out_prefix,
+        }
+
+        return dict(
+            name=name,
+            actions=[(compare_images.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for start_volume in START_VOLUMES:
+        yield create_task(
+            minuend=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data="values"),
+            out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable="amplitude", analysis="alpha"),
+            name=f"analysis--alpha, variable--amplitude, start_volume--{start_volume}",
+        )
+    for start_volume in EXPANDED_START_VOLUMES:
+        yield create_task(
+            minuend=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable="amplitudes"),
+            out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable="amplitude", analysis="ssvep"),
+            name=f"analysis--ssvep, variable--amplitude, start_volume--{start_volume}",
         )
 
 

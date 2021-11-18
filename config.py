@@ -397,3 +397,7 @@ fname.add("canonical_trimmed", "{canonical_trimmed_dir}/sub-{subject}_canonical.
 # task_trim_canonical_bold_again:
 fname.add("canonical_lagged_dir", "{processed_data_dir}/canonical_bold_response_lagged")
 fname.add("canonical_lagged", "{canonical_lagged_dir}/sub-{subject}_startvolume-{start_volume}_canonical.mat")
+
+# task_subtract_canonical_bold:
+fname.add("compared_to_canonical_dir", "{processed_data_dir}/compare_to_canonical")
+fname.add("compared_to_canonical", "{compared_to_canonical_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_baselinecorrected.nii")
