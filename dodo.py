@@ -1768,6 +1768,12 @@ def task_correlate_whole_brain() -> Dict:
                 name=f"trial sliding window amplitudes with trial funcs, sub--{subject}"
         )
         yield create_task(
+                eeg_data=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialSNR"),
+                out_image=fname.correlation_whole_brain_trials(subject=subject, variable="slidewinSNR"),
+                in_image=fname.func_trial_amplitudes(subject=subject),
+                name=f"trial sliding window SNR with trial funcs, sub--{subject}"
+        )
+        yield create_task(
                 eeg_data=fname.canonical_trimmed(subject=subject),
                 out_image=fname.correlation_whole_brain_canonical(subject=subject),
                 in_image=fname.resampled_func(subject=subject),
