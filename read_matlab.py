@@ -95,11 +95,12 @@ def load_mat_file(path: PathLike) -> numpy.array:
     return value
 
 
-def save_series_to_mat(data: pandas.Series, variable_name: str, out_path: PathLike) -> None:
+def save_series_to_mat(data: pandas.Series, variable_name: str, out_path: PathLike, make_parent_dir: bool = True) -> None:
     """
     Save some data to a .mat file.
     """
-    make_parent_dir(out_path)
+    if make_parent_dir is True:
+        make_parent_dir(out_path)
 
     numpy_data = data.to_numpy()
 
