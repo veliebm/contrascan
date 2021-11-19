@@ -2343,6 +2343,14 @@ def task_scramble_data() -> Dict:
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
 
+            start_volume = 5
+            analysis = "ssvep"
+            yield create_task(
+                in_series=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="amplitudes"),
+                out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+            )
+
 
 # Helper functions.
 def _print_paths(paths: Iterable, name: str = None) -> None:
