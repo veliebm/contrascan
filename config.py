@@ -28,6 +28,9 @@ SUBJECTS = "104 106 107 108 109 110 111 112 113 115 116 117 120 121 122 123 124 
 # Which frequencies to use in our frequencies analyses.
 FREQUENCIES = "12 24".split()
 
+# Number of permutations to use for thresholding.
+PERMUTATIONS = range(1, 201)
+
 # Which volumes to start our EEG/fMRI correlation from.
 START_VOLUMES = range(1, 5)
 EXPANDED_START_VOLUMES = range(1, 9)
@@ -401,3 +404,7 @@ fname.add("canonical_lagged", "{canonical_lagged_dir}/sub-{subject}_startvolume-
 # task_subtract_canonical_bold:
 fname.add("compared_to_canonical_dir", "{processed_data_dir}/compare_to_canonical")
 fname.add("compared_to_canonical", "{compared_to_canonical_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_baselinecorrected.nii")
+
+# Permutation testing:
+fname.add("scrambled_series_dir", "{processed_data_dir}/scrambled_series")
+fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_{analysis}_scrambled_{permutation}.mat")

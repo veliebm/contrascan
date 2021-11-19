@@ -12,7 +12,7 @@ from typing import Dict, Iterable, List
 import textwrap
 
 # Import internal modules and libraries.
-from config import EXPANDED_START_VOLUMES, FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES
+from config import EXPANDED_START_VOLUMES, FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES, PERMUTATIONS
 
 # Import actions for tasks to use.
 import create_bids_root
@@ -41,6 +41,7 @@ import cohens
 import get_canonical
 import trim_mat
 import compare_images
+import scramble_series
 
 
 # Configuration for the pydoit tool.
@@ -2301,6 +2302,46 @@ def task_subtract_canonical_bold() -> Dict:
             out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable="amplitude", analysis="ssvep"),
             name=f"analysis--ssvep, variable--amplitude, start_volume--{start_volume}",
         )
+
+
+# Permutation testing.
+def task_scramble_data() -> Dict:
+    """
+    Scramble our ssVEP and alpha time series so we can use them for permutation thresholding.
+    """
+    def create_task(in_series: PathLike, out_series: PathLike, name: str) -> Dict:
+        """
+        Make this task generalizable.
+
+        Args:
+            in_series (PathLike): Path to series to scramble.
+            out_series (PathLike): Where to write scrambled series.
+            name (str): Name of the sub-task.
+
+        Returns:
+            Dict: Placeholder dict used by pydoit.
+        """
+        sources = dict(in_series=in_series)
+        targets = dict(out_series=out_series)
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(scramble_series.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    for subject in SUBJECTS:
+        for permutation in PERMUTATIONS:
+            start_volume = 4
+            variable = "amplitude"
+            analysis = "alpha"
+            yield create_task(
+                in_series=fname.eeg_alpha(subject=subject, data="values"),
+                out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+            )
 
 
 # Helper functions.
