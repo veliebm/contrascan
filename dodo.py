@@ -1997,7 +1997,7 @@ def task_ttest_whole_brain_correlations() -> Dict:
         out_path=fname.correlations_whole_brain_canonical_ttest,
         name=f"canonical BOLD",
     )
-    for variable in "alpha slidewinamp".split():
+    for variable in "alpha slidewinamp slidewinSNR".split():
         yield create_task(
             images=[fname.correlation_whole_brain_trials(subject=subject, variable=variable) for subject in SUBJECTS],
             out_path=fname.correlations_whole_brain_trials_ttest(variable=variable),
