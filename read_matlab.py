@@ -97,7 +97,13 @@ def load_mat_file(path: PathLike) -> numpy.array:
 
 def save_series_to_mat(data: pandas.Series, variable_name: str, out_path: PathLike, make_parent_dir: bool = True) -> None:
     """
-    Save some data to a .mat file.
+    Save a pandas series to a mat file.
+
+    Args:
+        data (pandas.Series): Series to save.
+        variable_name (str): What to name the series within the mat file.
+        out_path (PathLike): Where to save the mat file.
+        make_parent_dir (bool, optional): Whether to make the parent dir of the mat file or not. Defaults to True.
     """
     if make_parent_dir is True:
         make_parent_dir(out_path)
