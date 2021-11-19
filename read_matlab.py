@@ -95,7 +95,7 @@ def load_mat_file(path: PathLike) -> numpy.array:
     return value
 
 
-def save_series_to_mat(data: pandas.Series, out_path: PathLike, variable_name: str = "vector", make_parent_dir: bool = True) -> None:
+def save_series_to_mat(data: pandas.Series, out_path: PathLike, variable_name: str = "vector", make_parents: bool = True) -> None:
     """
     Save a pandas series to a mat file.
 
@@ -103,9 +103,9 @@ def save_series_to_mat(data: pandas.Series, out_path: PathLike, variable_name: s
         data (pandas.Series): Series to save.
         out_path (PathLike): Where to save the mat file.
         variable_name (str, optional): What to name the series within the mat file. Defaults to "vector".
-        make_parent_dir (bool, optional): Whether to make the parent dir of the mat file or not. Defaults to True.
+        make_parents (bool, optional): Whether to make the parent dirs of the mat file or not. Defaults to True.
     """
-    if make_parent_dir is True:
+    if make_parents is True:
         make_parent_dir(out_path)
 
     numpy_data = data.to_numpy()
