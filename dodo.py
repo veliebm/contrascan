@@ -12,7 +12,7 @@ from typing import Dict, Iterable, List
 import textwrap
 
 # Import internal modules and libraries.
-from config import EXPANDED_START_VOLUMES, FREQUENCIES, fname, SUBJECTS, n_jobs, COMPONENTS_TO_REMOVE, START_VOLUMES, PERMUTATIONS
+from config import EXPANDED_START_VOLUMES, FREQUENCIES, fname, SUBJECTS, COMPONENTS_TO_REMOVE, START_VOLUMES, PERMUTATIONS
 
 # Import actions for tasks to use.
 import create_bids_root
@@ -48,9 +48,6 @@ import scramble_series
 DOIT_CONFIG = dict(
     # While running scripts, output everything the script is printing to the screen.
     verbosity=2,
-
-    # Tell doit to use all processors I've said this machine has.
-    num_process=n_jobs,
 
     # When the user executes "doit list", list the tasks in the order they are defined in this file, instead of alphabetically.
     sort='definition',

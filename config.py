@@ -6,17 +6,12 @@ Config file
 
 Configuration parameters for the study.
 """
-import os
 from fnames import FileNames
 
 ###############################
-# Set number of cores to use and stuff.
+# Set raw data dir.
 
 raw_data_dir = "./data"
-n_jobs = 1
-
-# For BLAS to use the right amount of cores
-os.environ["OMP_NUM_THREADS"] = str(n_jobs)
 
 
 ###############################################################################
