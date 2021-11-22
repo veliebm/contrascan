@@ -1796,6 +1796,25 @@ def task_correlate_whole_brain() -> Dict:
                     in_image=fname.final_func(subject=subject, start_volume=start_volume),
                     name=f"alpha, {alpha_data}, sub--{subject}, startvolume--{start_volume}"
                 )
+        for permutation in PERMUTATIONS:
+            start_volume = 4
+            variable = "amplitude"
+            analysis = "alpha"
+            yield create_task(
+                    eeg_data=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    out_image=fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"permutation correlation, sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}"
+                )
+
+            start_volume = 5
+            analysis = "ssvep"
+            yield create_task(
+                    eeg_data=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    out_image=fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"permutation correlation, sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}"
+                )
 def task_fisher_transform_whole_brain() -> Dict:
     """
     Apply the Fisher Z transform to our whole brain correlation so we can do more valid t-tests.

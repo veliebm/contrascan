@@ -298,6 +298,8 @@ fname.add("correlation_whole_brain_alpha", "{correlation_dir}/sub-{subject}_star
 fname.add("correlation_whole_brain_improved", "{correlation_dir}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_improved.nii")
 fname.add("correlation_whole_brain_trials", "{correlation_dir}/sub-{subject}_variable-{variable}_trials.nii")
 fname.add("correlation_whole_brain_canonical", "{correlation_dir}/sub-{subject}_canonical.nii")
+fname.add("correlation_whole_brain_permutation", "{correlation_dir}/permutation_testing/sub-{subject}_startvolume-{start_volume}_variable-{variable}_{analysis}_{permutation}.nii.gz")
+
 
 # task_fisher_transform_whole_brain:
 fname.add("correlation_fisher_dir", "{processed_data_dir}/correlation_whole_brain_fisher")
