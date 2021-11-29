@@ -401,6 +401,7 @@ fname.add("canonical_lagged", "{canonical_lagged_dir}/sub-{subject}_startvolume-
 # task_subtract_canonical_bold:
 fname.add("compared_to_canonical_dir", "{processed_data_dir}/compare_to_canonical")
 fname.add("compared_to_canonical", "{compared_to_canonical_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_baselinecorrected.nii")
+fname.add("compared_permutations_to_canonical", "{compared_to_canonical_dir}/permutations/{analysis}/startvolume-{start_volume}_variable-{variable}_{analysis}_baselinecorrected_{permutation}.nii")
 
 # Permutation testing:
 fname.add("scrambled_series_dir", "{processed_data_dir}/scrambled_series")

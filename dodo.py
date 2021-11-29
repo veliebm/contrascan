@@ -2335,6 +2335,23 @@ def task_subtract_canonical_bold() -> Dict:
             out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable="amplitude", analysis="ssvep"),
             name=f"analysis--ssvep, variable--amplitude, start_volume--{start_volume}",
         )
+    for permutation in PERMUTATIONS:
+        start_volume = 4
+        variable = "amplitude"
+        analysis = "alpha"
+        yield create_task(
+            minuend=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+            out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+            name=f"permutations, analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
+        )
+
+        start_volume = 5
+        analysis = "ssvep"
+        yield create_task(
+            minuend=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+            out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+            name=f"permutations, analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
+        )
 
 
 # Permutation testing.
