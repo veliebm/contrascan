@@ -384,6 +384,7 @@ fname.add("correlation_across_subjects_table_better", "{correlation_across_subje
 fname.add("correlation_averages_dir", "{processed_data_dir}/correlation_averages")
 fname.add("correlation_alpha_average", "{correlation_averages_dir}/sub-{subject}_startvolume-{start_volume}_source-{mask}_data-{data}_correlation_average_alpha.txt")
 fname.add("correlation_improved_sliding_sliding_window_average", "{correlation_averages_dir}/sub-{subject}_startvolume-{start_volume}_source-{mask}_variable-{variable}_correlation_average_improved_slidslidwin.txt")
+fname.add("correlation_permutation_average", "{correlation_averages_dir}/permutations/sub-{subject}/{analysis}/sub-{subject}_startvolume-{start_volume}_source-{mask}_variable-{variable}_analysis-{analysis}_correlation_average_{permutation}.txt")
 
 # task_ttest_averages:
 fname.add("ttest_averages_dir", "{processed_data_dir}/correlation_averages_ttests")
