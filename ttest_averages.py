@@ -21,7 +21,7 @@ def main(from_text_files: List[PathLike], to_table: PathLike, to_statistics: Pat
 
     # Extract correlation average from each text file.
     correlations = {source_file: extract_correlation(source_file) for source_file in from_text_files}
-    
+
     # Concatenate the correlations into a summary pandas table.
     labelled_correlations = dict()
     labelled_correlations["filename"] = correlations.keys()
