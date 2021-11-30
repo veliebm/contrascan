@@ -42,6 +42,7 @@ import get_canonical
 import trim_mat
 import compare_images
 import scramble_series
+import mean
 
 
 # Configuration for the pydoit tool.
@@ -414,6 +415,36 @@ def task_ttest_deconvolutions() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_get_IRF_mean() -> Dict:
+    """
+    Calculate the mean IRF.
+    """
+    def create_task(images: PathLike, out_prefix: PathLike) -> Dict:
+        """
+        Calculate the mean of some images.
+
+        Args:
+            images (PathLike): Path to images to mean together.
+            out_prefix (PathLike): Where to write the outfile to.
+            name (str): Name of the task.
+
+        Returns:
+            Dict: [description]
+        """
+        sources = dict(images=images)
+        targets = dict(out_prefix=out_prefix)
+        kwargs = {**sources, **targets}
+
+        return dict(
+            actions=[(mean.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
+    return create_task(
+        images=[fname.afniproc_resampled_irf(subject=subject) for subject in SUBJECTS],
+        out_prefix=fname.IRF_mean
+    )
 
 
 # Getting masks.

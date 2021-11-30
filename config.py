@@ -130,6 +130,9 @@ fname.add("afniproc_aligned_irf", "{afniproc_subject_dir}/{subject}.results/ires
 # task_resample_afniproc_irfs:
 fname.add("afniproc_resampled_irf", "{processed_data_dir}/IRF_resample/sub-{subject}_IRF_resampled+tlrc.HEAD")
 
+# task_get_IRF_mean:
+fname.add("IRF_mean", "{processed_data_dir}/IRF_mean/IRF_mean+tlrc.HEAD")
+
 # task_resample_func_images:
 fname.add("resampled_func", "{processed_data_dir}/func_resample/sub-{subject}_func_resampled+tlrc.HEAD")
 
