@@ -46,7 +46,7 @@ def prep_TTN27(
 def prep_MNI(
     in_image: PathLike,
     mask_to: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_2.5mm_full_mask.nii.gz",
-    get_underlay_from: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_1mm.nii.gz",
+    get_underlay_from: PathLike = "data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
 ) -> None:
     """
     Mask an image to the brain used by the Kastner atlas. Copy the atlas to the dir if it isn't already present.
