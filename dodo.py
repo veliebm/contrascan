@@ -401,7 +401,7 @@ def task_ttest_deconvolutions() -> Dict:
     """
     Here we t-test our 3dDeconvolve results. Onward!
     """
-    for subbrick in range(1, 9):
+    for subbrick in range(18):
         sources = [fname.afniproc_deconvolved_resampled(subject=subject) for subject in SUBJECTS]
         targets = [fname.afniproc_ttest_result(subbrick=subbrick)]
 
