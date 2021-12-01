@@ -43,6 +43,7 @@ import trim_mat
 import compare_images
 import scramble_series
 import mean
+import mean_means
 
 
 # Configuration for the pydoit tool.
@@ -2272,6 +2273,57 @@ def task_mask_and_average_correlations() -> Dict:
                     from_mask=fname.micromask(subject=subject, mask=mask),
                     name=f"sub--{subject}, startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
                 )
+def task_average_averages() -> Dict:
+    """
+    Average the ROI correlation averages. (Do across subjects.)
+
+    Returns:
+        Dict: Dummy pydoit dict.
+    """
+    def create_task(from_text_files: List[PathLike], to_table: PathLike, to_result: PathLike, name: str) -> Dict:
+        """
+        Average ROI correlations from a list of ROI correlation results.
+
+        Args:
+            from_text_files (List[PathLike]): List of ROI correlation results for individual subjects.
+            to_table (PathLike): Big table to help us check that we got the right results.
+            to_result (PathLike): Average correlation across subjects.
+            name (str): What to name pydoit subtask.
+
+        Returns:
+            Dict: Pydoit dummy dict.
+        """
+        sources = dict(from_text_files=from_text_files)
+        targets = dict(to_table=to_table, to_result=to_result)
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(mean_means.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
+    for mask in "calcarine occipital".split():
+        for start_volume in START_VOLUMES:
+            analysis = "alpha"
+            variable = "amplitude"
+            yield create_task(
+                from_text_files=[fname.correlation_alpha_average(subject=subject, start_volume=start_volume, mask=mask, data="values") for subject in SUBJECTS],
+                to_table=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
+                to_result=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
+                name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}",
+            )
+        for start_volume in EXPANDED_START_VOLUMES:
+            variable = "amplitude"
+            analysis = "ssvep"
+            yield create_task(
+                from_text_files=[fname.correlation_improved_sliding_sliding_window_average(subject=subject, start_volume=start_volume, mask=mask, variable="amplitudes") for subject in SUBJECTS],
+                to_table=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
+                to_result=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
+                name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}",
+            )
+
 def task_ttest_averages() -> Dict:
     """
     ttest the correlation averages.
