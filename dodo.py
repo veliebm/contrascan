@@ -2323,7 +2323,25 @@ def task_average_averages() -> Dict:
                 to_result=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
                 name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}",
             )
+        for permutation in PERMUTATIONS:
+            start_volume = 4
+            variable = "amplitude"
+            analysis = "alpha"
+            yield create_task(
+                from_text_files=[fname.correlation_permutation_average(subject=subject, analysis=analysis, start_volume=start_volume, mask=mask, variable=variable, permutation=permutation) for subject in SUBJECTS],
+                to_table=fname.average_averages_correlation_permutation(permutation=permutation, variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
+                to_result=fname.average_averages_correlation_permutation(permutation=permutation, variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
+                name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+            )
 
+            start_volume = 5
+            analysis = "ssvep"
+            yield create_task(
+                from_text_files=[fname.correlation_permutation_average(subject=subject, analysis=analysis, start_volume=start_volume, mask=mask, variable=variable, permutation=permutation) for subject in SUBJECTS],
+                to_table=fname.average_averages_correlation_permutation(permutation=permutation, variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
+                to_result=fname.average_averages_correlation_permutation(permutation=permutation, variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
+                name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+            )
 def task_ttest_averages() -> Dict:
     """
     ttest the correlation averages.

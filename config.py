@@ -393,6 +393,7 @@ fname.add("ttest_averages", "{ttest_averages_dir}/variable-{variable}_startvolum
 # task_average_averages:
 fname.add("average_averages_dir", "{processed_data_dir}/correlation_average_averages")
 fname.add("average_averages_correlation", "{average_averages_dir}/variable-{variable}_startvolume-{start_volume}_mask-{mask}_analysis-{analysis}_{outfile}.csv")
+fname.add("average_averages_correlation_permutation", "{average_averages_dir}/permutations/{analysis}/variable-{variable}_startvolume-{start_volume}_mask-{mask}_analysis-{analysis}_{outfile}_{permutation}.csv")
 
 # task_get_canonical_bold:
 fname.add("canonical_dir", "{processed_data_dir}/canonical_bold_response")
