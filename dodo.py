@@ -44,6 +44,7 @@ import compare_images
 import scramble_series
 import mean
 import mean_means
+import test_permutations
 
 
 # Configuration for the pydoit tool.
@@ -2528,6 +2529,57 @@ def task_scramble_data() -> Dict:
                 out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
+def task_threshold_results() -> Dict:
+    """
+    Read the results of our average averages. Rank them. Output the percentile the actual correlation is in.
+
+    Returns:
+        Dict: Dummy pydoit dict.
+    """
+    def create_task(in_permutation_results: List[PathLike], in_actual_result: PathLike, out_table: PathLike, name: str) -> Dict:
+        """
+        Create a task to test an actual result against permutation results.
+
+        Args:
+            in_permutation_results (List[PathLike]): List of paths to the permutation results.
+            in_actual_result (PathLike): Path to our actual result.
+            out_table (PathLike): Where to write a table to help us check our work.
+            out_result (PathLike): Where to write the results of this task. Should include percentile and rank.
+            name (str): What to name the subtask.
+
+        Returns:
+            Dict: Dummy pydoit dict. Ignore.
+        """
+        sources = [*in_permutation_results, in_actual_result]
+        targets = dict(out_table=out_table)
+        kwargs = {**targets, "in_permutation_results": in_permutation_results, "in_actual_result": in_actual_result}
+
+        return dict(
+            name=name,
+            actions=[(test_permutations.main, [], kwargs)],
+            file_dep=sources,
+            targets=list(targets.values()),
+        )
+
+    for mask in "calcarine occipital".split():
+        start_volume = 4
+        variable = "amplitude"
+        analysis = "alpha"
+        yield create_task(
+            in_permutation_results=[fname.average_averages_correlation_permutation(permutation=permutation, variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results") for permutation in PERMUTATIONS],
+            in_actual_result=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
+            out_table=fname.threshold_outfile(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
+            name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}",
+        )
+
+        start_volume = 5
+        analysis = "ssvep"
+        yield create_task(
+            in_permutation_results=[fname.average_averages_correlation_permutation(permutation=permutation, variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results") for permutation in PERMUTATIONS],
+            in_actual_result=fname.average_averages_correlation(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="results"),
+            out_table=fname.threshold_outfile(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
+            name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}",
+        )
 
 
 # Helper functions.
