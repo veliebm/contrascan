@@ -45,6 +45,7 @@ import scramble_series
 import mean
 import mean_means
 import test_permutations
+import cat_images
 
 
 # Configuration for the pydoit tool.
@@ -2017,13 +2018,13 @@ def task_ttest_whole_brain_correlations() -> Dict:
     """
     ttest the correlations we calculated.
     """
-    def create_task(images: PathLike, out_path: PathLike, name: str) -> dict:
+    def create_task(images: List[PathLike], out_path: PathLike, name: str) -> dict:
         """
         Allows this task to easily be generalizable.
 
         Parameters
         ----------
-        images : PathLike
+        images : List[PathLike]
             List of paths to images to ttest against each other.
         out_path : PathLike
             Where to write our ttest results to.
@@ -2580,6 +2581,58 @@ def task_threshold_results() -> Dict:
             out_table=fname.threshold_outfile(variable=variable, start_volume=start_volume, mask=mask, analysis=analysis, outfile="table"),
             name=f"startvolume--{start_volume}, mask--{mask}, variable--{variable}, analysis--{analysis}",
         )
+def task_cat_permutations() -> Dict:
+    """
+    Concatenate our permutation correlations together.
+    """
+    def create_task(images: List[PathLike], out_prefix: PathLike, name: str) -> dict:
+        """
+        Use 3dTcat to concatenate permutation correlations together.
+
+        Args:
+            images (List[PathLike]): List of paths to our permutation correlations.
+            out_prefix (PathLike): Where to write our concatenated permutations to.
+            name (str): What to name the task.
+
+        Returns:
+            dict: Dummy dict for pydoit.
+        """
+        sources = dict(
+            images=images,
+        )
+
+        targets = dict(
+            out_prefix=out_prefix,
+        )
+
+        kwargs = dict(
+            images=[f"{path}[0]" for path in sources["images"]],
+            out_prefix=out_prefix
+        )
+
+        return dict(
+            name=name,
+            actions=[(cat_images.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
+    start_volume = 4
+    variable = "amplitude"
+    analysis = "alpha"
+    yield create_task(
+        images=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+        out_prefix=fname.catenated_permutations(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+    )
+
+    start_volume = 5
+    analysis = "ssvep"
+    yield create_task(
+        images=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+        out_prefix=fname.catenated_permutations(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+    )
 
 
 # Helper functions.

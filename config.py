@@ -420,3 +420,7 @@ fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/s
 # task_threshold_results:
 fname.add("thresholding_results_dir", "{processed_data_dir}/thresholding_results")
 fname.add("threshold_outfile", "{thresholding_results_dir}/variable-{variable}_startvolume-{start_volume}_mask-{mask}_analysis-{analysis}_{outfile}.csv")
+
+# task_cat_permutations:
+fname.add("catenated_permutations_dir", "{processed_data_dir}/catenated_permutations")
+fname.add("catenated_permutations", "{catenated_permutations_dir}/variable-{variable}_startvolume-{start_volume}_analysis-{analysis}_catenated.nii.gz")
