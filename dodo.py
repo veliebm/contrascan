@@ -2515,11 +2515,18 @@ def task_scramble_data() -> Dict:
 
     for subject in SUBJECTS:
         for permutation in PERMUTATIONS:
-            start_volume = 4
             variable = "amplitude"
+
             analysis = "alpha"
+            start_volume = 4
             yield create_task(
                 in_series=fname.eeg_alpha(subject=subject, data="values"),
+                out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+            )
+            start_volume = "na"
+            yield create_task(
+                in_series=fname.eeg_trial_alpha(subject=subject, data="values"),
                 out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
