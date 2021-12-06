@@ -46,6 +46,7 @@ import mean
 import mean_means
 import test_permutations
 import cat_images
+import calc_percentiles
 
 
 # Configuration for the pydoit tool.
@@ -2631,6 +2632,52 @@ def task_cat_permutations() -> Dict:
     yield create_task(
         images=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
         out_prefix=fname.catenated_permutations(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+    )
+def task_calc_percentiles() -> Dict:
+    """
+    Calculate percentiles for each voxel based on the permutations we have.
+    """
+    def create_task(catenated_permutations: PathLike, actual_correlation: PathLike, out_percentiles: PathLike, name: str) -> Dict:
+        """
+        Create task to calculate a percentile for each voxel based on the permutations we have.
+
+        Args:
+            catenated_permutations (PathLike): Path to an image of catenated permutation correlations.
+            actual_correlation (PathLike): Path to an image of actual correlations.
+            out_percentiles (PathLike): Where to write our percentiles image to.
+            name (str): What to name the task.
+
+        Returns:
+            Dict: Dummy pydoit dict.
+        """
+        sources = dict(catenated_permutations=catenated_permutations, actual_correlation=actual_correlation)
+        targets = dict(out_percentiles=out_percentiles)
+        kwargs = {**targets, **sources}
+
+        return dict(
+            name=name,
+            actions=[(calc_percentiles.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    start_volume = 4
+    variable = "amplitude"
+    analysis = "alpha"
+    yield create_task(
+        catenated_permutations=fname.catenated_permutations(start_volume=start_volume, variable=variable, analysis=analysis),
+        actual_correlation=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data="values"),
+        out_percentiles=fname.whole_brain_percentiles(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
+    )
+
+    start_volume = 5
+    analysis = "ssvep"
+    yield create_task(
+        catenated_permutations=fname.catenated_permutations(start_volume=start_volume, variable=variable, analysis=analysis),
+        actual_correlation=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable="amplitudes"),
+        out_percentiles=fname.whole_brain_percentiles(start_volume=start_volume, variable=variable, analysis=analysis),
         name=f"startvolume--{start_volume}, variable--{variable}, analysis--{analysis}",
     )
 

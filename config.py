@@ -424,3 +424,7 @@ fname.add("threshold_outfile", "{thresholding_results_dir}/variable-{variable}_s
 # task_cat_permutations:
 fname.add("catenated_permutations_dir", "{processed_data_dir}/catenated_permutations")
 fname.add("catenated_permutations", "{catenated_permutations_dir}/variable-{variable}_startvolume-{start_volume}_analysis-{analysis}_catenated.nii.gz")
+
+# task_calc_percentiles:
+fname.add("whole_brain_percentiles_dir", "{processed_data_dir}/whole_brain_percentiles")
+fname.add("whole_brain_percentiles", "{whole_brain_percentiles_dir}/variable-{variable}_startvolume-{start_volume}_analysis-{analysis}_percentiles.nii.gz")
