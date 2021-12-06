@@ -2531,10 +2531,16 @@ def task_scramble_data() -> Dict:
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
 
-            start_volume = 5
             analysis = "ssvep"
+            start_volume = 5
             yield create_task(
                 in_series=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="amplitudes"),
+                out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+            )
+            start_volume = "na"
+            yield create_task(
+                in_series=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialpow"),
                 out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
