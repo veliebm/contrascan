@@ -4,6 +4,8 @@ The point of this snakemake script is to let you programmatically view and save 
 Created 12/7/2021 by Benjamin Velie.
 veliebm@gmail.com
 """
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 from os import PathLike
 from typing import List
