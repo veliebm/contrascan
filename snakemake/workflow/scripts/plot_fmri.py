@@ -34,7 +34,7 @@ def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: Pat
     overlay_subimage = nilearn.image.index_img(overlay_image, overlay_subbrick)
     view.add_overlay(overlay_subimage, threshold=threshold)
 
-    view.savefig(save_to_path)     
+    view.savefig(save_to_path)
     view.close()
 
 
