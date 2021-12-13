@@ -14,7 +14,7 @@ container: "continuumio/miniconda3"
 
 rule all:
     input:
-        expand("plots/startvolume-{startvolume}.png", startvolume=config["trim alpha volumes"])
+        expand("results/plots/startvolume-{startvolume}.png", startvolume=config["trim alpha volumes"])
 
 
 rule plot_on_anat:
@@ -22,13 +22,11 @@ rule plot_on_anat:
         underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
         overlay="../processed/correlation_whole_brain_ttest/startvolume-{startvolume}_data-values_correlations_alpha_ttest+tlrc.HEAD"
     output:
-        plot="plots/startvolume-{startvolume}.png"
+        plot="results/plots/startvolume-{startvolume}.png"
     params:
         threshold=0.1,
         coordinates=config["occipital coordinates"],
         overlay_subbrick=0
-    log:
-        "logs/plot_on_anat_{startvolume}.log"
     conda:
         "envs/neuroimaging.yaml"
     script:
