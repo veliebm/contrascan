@@ -1,0 +1,16 @@
+name: neuroimaging
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - numpy=1.20
+  - pandas=1.2
+  - python=3.9
+  - scipy=1.6
+  - matplotlib=3.4
+  - pip=21.1
+  - pip:
+    - nibabel==3.2
+    - nilearn==0.8
+    - scikit-learn==0.24
