@@ -20,6 +20,8 @@ rule plot_on_anat:
         threshold=0.1,
         coordinates=config["occipital coordinates"],
         overlay_subbrick=0
+    log:
+        "logs/plot_on_anat_{startvolume}.log"
     conda:
         "envs/neuroimaging.yaml"
     script:
