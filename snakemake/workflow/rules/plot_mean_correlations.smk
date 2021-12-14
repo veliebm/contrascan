@@ -26,8 +26,7 @@ def get_poorly_named_input(wildcards) -> Path:
     try:
         return Path("../processed/correlation_whole_brain_ttest") / filename
     except NameError:
-        print("No matching filename found.")
-        breakpoint()
+        raise NameError(f"No matching filename found: {wildcards}")
 
 
 rule standardize_filenames:
