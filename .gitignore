@@ -3,6 +3,7 @@ logs
 processed
 data
 figures
+results
 __pycache__
 .vscode
 .REML_cmd
