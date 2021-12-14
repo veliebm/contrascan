@@ -86,7 +86,7 @@ rule plot_occipital:
     output:
         plot="results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png"
     params:
-        threshold=0.1,
+        threshold=.08,
         coordinates=config["occipital coordinates"],
     conda:
         "../envs/neuroimaging.yaml"
