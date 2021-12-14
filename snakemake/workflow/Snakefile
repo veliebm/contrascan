@@ -15,6 +15,28 @@ container: "continuumio/miniconda3"
 include: "rules/plot_mean_correlations.smk"
 
 
+def all_inputs(_):
+    """
+    Return all files we want from this analysis.
+    """
+    inputs = expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
+        startvolume=config["analyses"]["ssvep"]["continuous"]["volumes"] + config["analyses"]["ssvep"]["trialwise"]["volumes"],
+        variable=config["analyses"]["ssvep"]["variables"],
+        analysis="ssvep")
+
+    inputs += expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
+        startvolume=config["analyses"]["alpha"]["continuous"]["volumes"],
+        variable=config["analyses"]["alpha"]["continuous"]["variables"],
+        analysis="alpha")
+
+    inputs += expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
+        startvolume=config["analyses"]["alpha"]["trialwise"]["volumes"],
+        variable=config["analyses"]["alpha"]["trialwise"]["variables"],
+        analysis="alpha")
+    
+    return inputs
+
+
 rule all:
     input:
-        expand("results/plots/startvolume-{startvolume}.png", startvolume=config["trim alpha volumes"])
+        all_inputs

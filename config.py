@@ -417,6 +417,10 @@ fname.add("compared_permutations_to_canonical", "{compared_to_canonical_dir}/per
 fname.add("scrambled_series_dir", "{processed_data_dir}/scrambled_series")
 fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_{analysis}_scrambled_{permutation}.mat")
 
+# task_get_maxes_mins_and_quantiles:
+fname.add("maxes_mins_quantiles_dir", "{processed_data_dir}/maxes_mins_quantiles")
+fname.add("maxes_mins_quantiles_table", "{maxes_mins_quantiles_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_table.csv")
+
 # task_threshold_results:
 fname.add("thresholding_results_dir", "{processed_data_dir}/thresholding_results")
 fname.add("threshold_outfile", "{thresholding_results_dir}/variable-{variable}_startvolume-{start_volume}_mask-{mask}_analysis-{analysis}_{outfile}.csv")
