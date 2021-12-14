@@ -38,7 +38,7 @@ rule standardize_filenames:
     output:
         "results/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.nii.gz"
     log:
-        "results/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.log"
+        "logs/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.log"
     shell:
         "3dcopy '{input}' '{output}' 2> {log}"
 
