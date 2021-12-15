@@ -47,6 +47,7 @@ import mean_means
 import test_permutations
 import cat_images
 import calc_percentiles
+import get_maxes_and_mins_and_quantiles
 
 
 # Configuration for the pydoit tool.
@@ -2558,6 +2559,55 @@ def task_scramble_data() -> Dict:
                 out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
+def task_get_maxes_mins_and_quantiles() -> Dict:
+    """
+    Get the maxes, mins, 1% quantiles, and 99% quantiles of each permutation and the actual data.
+
+    Returns:
+        Dict: Dummy pydoit dict.
+    """
+    def create_task(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_table: PathLike, name: str) -> Dict:
+        """
+        Create a task to get the maxes, mins, 1% quantiles, and 99% quantiles of each permutation and the actual data.
+
+        Args:
+            in_actual_correlation (PathLike): Path to actual correlation image.
+            in_permutations (List[PathLike]): Paths to permutation correlations.
+            out_table (PathLike): Where to write our results to.
+            name (str): What to name the task.
+
+        Returns:
+            Dict: Dummy pydoit dict.
+        """
+        sources = [in_actual_correlation, *in_permutations]
+        targets = dict(out_table=out_table)
+        kwargs = {**targets, "in_actual_correlation": in_actual_correlation, "in_permutations": in_permutations}
+
+        return dict(
+            name=name,
+            actions=[(get_maxes_and_mins_and_quantiles.main, [], kwargs)],
+            file_dep=sources,
+            targets=list(targets.values()),
+        )
+    variable = "amplitude"
+
+    analysis = "alpha"
+    start_volume = 4
+    yield create_task(
+        in_actual_correlation=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data="values"),
+        in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+        out_table=fname.maxes_mins_quantiles_table(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+    )
+
+    analysis = "ssvep"
+    start_volume = 5
+    yield create_task(
+        in_actual_correlation=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable="amplitudes"),
+        in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+        out_table=fname.maxes_mins_quantiles_table(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+    )
 def task_threshold_results() -> Dict:
     """
     Read the results of our average averages. Rank them. Output the percentile the actual correlation is in.
