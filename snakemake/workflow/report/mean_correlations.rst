@@ -1,0 +1,1 @@
+Mean correlation across subjects.
