@@ -16,7 +16,7 @@ import pandas
 from pathlib import Path
 
 
-def main(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_table: PathLike) -> None:
+def main(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_table: PathLike, out_thresholds: PathLike) -> None:
     """
     Create a task to get the maxes, mins, 1% quantiles, and 99% quantiles of each permutation and the actual data.
 
@@ -53,6 +53,7 @@ def main(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_t
     logging.debug("Saving results to disk.")
     make_parent_dir(out_table)
     percentiled_quantiles_dataframe.to_csv(out_table)
+    quantiles_dataframe.to_csv(out_thresholds)
 
 
 def _test_module():

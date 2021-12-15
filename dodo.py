@@ -2566,7 +2566,7 @@ def task_get_maxes_mins_and_quantiles() -> Dict:
     Returns:
         Dict: Dummy pydoit dict.
     """
-    def create_task(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_table: PathLike, name: str) -> Dict:
+    def create_task(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_table: PathLike, out_thresholds: PathLike, name: str) -> Dict:
         """
         Create a task to get the maxes, mins, 1% quantiles, and 99% quantiles of each permutation and the actual data.
 
@@ -2574,13 +2574,14 @@ def task_get_maxes_mins_and_quantiles() -> Dict:
             in_actual_correlation (PathLike): Path to actual correlation image.
             in_permutations (List[PathLike]): Paths to permutation correlations.
             out_table (PathLike): Where to write our results to.
+            out_table (PathLike): Where to write a table of thresholding values to for debugging purposes.
             name (str): What to name the task.
 
         Returns:
             Dict: Dummy pydoit dict.
         """
         sources = [in_actual_correlation, *in_permutations]
-        targets = dict(out_table=out_table)
+        targets = dict(out_table=out_table, out_thresholds=out_thresholds)
         kwargs = {**targets, "in_actual_correlation": in_actual_correlation, "in_permutations": in_permutations}
 
         return dict(
@@ -2589,6 +2590,7 @@ def task_get_maxes_mins_and_quantiles() -> Dict:
             file_dep=sources,
             targets=list(targets.values()),
         )
+    
     variable = "amplitude"
 
     analysis = "alpha"
@@ -2597,6 +2599,7 @@ def task_get_maxes_mins_and_quantiles() -> Dict:
         in_actual_correlation=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data="values"),
         in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
         out_table=fname.maxes_mins_quantiles_table(start_volume=start_volume, variable=variable, analysis=analysis),
+        out_thresholds=fname.maxes_mins_quantiles_thresholds(start_volume=start_volume, variable=variable, analysis=analysis),
         name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
     )
 
@@ -2606,6 +2609,7 @@ def task_get_maxes_mins_and_quantiles() -> Dict:
         in_actual_correlation=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable="amplitudes"),
         in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
         out_table=fname.maxes_mins_quantiles_table(start_volume=start_volume, variable=variable, analysis=analysis),
+        out_thresholds=fname.maxes_mins_quantiles_thresholds(start_volume=start_volume, variable=variable, analysis=analysis),
         name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
     )
 def task_threshold_results() -> Dict:

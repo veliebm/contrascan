@@ -420,6 +420,7 @@ fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/s
 # task_get_maxes_mins_and_quantiles:
 fname.add("maxes_mins_quantiles_dir", "{processed_data_dir}/maxes_mins_quantiles")
 fname.add("maxes_mins_quantiles_table", "{maxes_mins_quantiles_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_table.csv")
+fname.add("maxes_mins_quantiles_thresholds", "{maxes_mins_quantiles_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_thresholds.csv")
 
 # task_threshold_results:
 fname.add("thresholding_results_dir", "{processed_data_dir}/thresholding_results")
