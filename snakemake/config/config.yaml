@@ -1,15 +1,20 @@
 occipital coordinates: [15, -98, 0]
 analyses:
   ssvep:
-    variables: ["SNR", "amplitude"]
     continuous:
       volumes: [1, 2, 3, 4, 5, 6, 7, 8]
+      variables: ["SNR", "amplitude"]
+      compare to baseline: ["false"]
     trialwise:
       volumes: ["na"]
+      variables: ["SNR", "amplitude"]
+      compare to baseline: ["false"]
   alpha:
     continuous:
       volumes: [1, 2, 3, 4]
       variables: ["SNR", "amplitude"]
+      compare to baseline: ["false"]
     trialwise:
       volumes: ["na"]
       variables: ["amplitude"]
+      compare to baseline: ["false"]
