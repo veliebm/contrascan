@@ -19,21 +19,16 @@ def all_inputs(_):
     """
     Return all files we want from this analysis.
     """
-    inputs = expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
-        startvolume=config["analyses"]["ssvep"]["continuous"]["volumes"] + config["analyses"]["ssvep"]["trialwise"]["volumes"],
-        variable=config["analyses"]["ssvep"]["variables"],
-        analysis="ssvep")
+    inputs = []
+    for analysis in "ssvep alpha".split():
+        for volume_type in "continuous trialwise".split():
+            inputs += expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png",
+                analysis=analysis,
+                startvolume=config["analyses"][analysis][volume_type]["volumes"],
+                variable=config["analyses"][analysis][volume_type]["variables"],
+                baselined=config["analyses"][analysis][volume_type]["compare to baseline"],
+            )
 
-    inputs += expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
-        startvolume=config["analyses"]["alpha"]["continuous"]["volumes"],
-        variable=config["analyses"]["alpha"]["continuous"]["variables"],
-        analysis="alpha")
-
-    inputs += expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
-        startvolume=config["analyses"]["alpha"]["trialwise"]["volumes"],
-        variable=config["analyses"]["alpha"]["trialwise"]["variables"],
-        analysis="alpha")
-    
     return inputs
 
 
