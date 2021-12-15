@@ -18,7 +18,7 @@ def main():
     make_plot(
         underlay_path=snakemake.input.underlay,
         overlay_path=snakemake.input.overlay,
-        save_to_path=snakemake.output,
+        save_to_path=snakemake.output.plot,
         threshold=snakemake.params.threshold,
         coordinates=snakemake.params.coordinates,
     )
