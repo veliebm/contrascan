@@ -18,7 +18,7 @@ def main():
     make_plot(
         underlay_path=snakemake.input.underlay,
         overlay_path=snakemake.input.overlay,
-        save_to_path=snakemake.output.plot,
+        save_to_path=snakemake.output,
         threshold=snakemake.params.threshold,
         coordinates=snakemake.params.coordinates,
     )
@@ -30,7 +30,7 @@ def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: Pat
     """
     view = nilearn.plotting.plot_anat(underlay_path, cut_coords=coordinates, draw_cross=False, annotate=False)
     overlay_image = load_as_nifti(overlay_path)
-    view.add_overlay(overlay_image, threshold=threshold)
+    view.add_overlay(overlay_image, threshold=threshold, colorbar=True)
 
     view.savefig(save_to_path)
     view.close()
