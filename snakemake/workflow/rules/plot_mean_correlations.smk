@@ -84,7 +84,12 @@ rule plot_occipital:
         underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
         overlay="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_{analysis}.nii.gz",
     output:
-        plot="results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png"
+        report(
+            "results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
+            caption="../report/mean_correlations.rst",
+            category="{analysis}",
+            subcategory="{variable}",
+        ),
     params:
         threshold=.08,
         coordinates=config["occipital coordinates"],
