@@ -47,7 +47,7 @@ import mean_means
 import test_permutations
 import cat_images
 import calc_percentiles
-import get_maxes_and_mins_and_quantiles
+import get_maxes_and_mins
 
 
 # Configuration for the pydoit tool.
@@ -2559,34 +2559,33 @@ def task_scramble_data() -> Dict:
                 out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                 name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
             )
-def task_get_maxes_mins_and_quantiles() -> Dict:
+def task_get_maxes_and_mins() -> Dict:
     """
-    Get the maxes, mins, 1% quantiles, and 99% quantiles of each permutation and the actual data.
+    Get distributions of our maxes and mins for our permutations.
 
     Returns:
         Dict: Dummy pydoit dict.
     """
-    def create_task(in_actual_correlation: PathLike, in_permutations: List[PathLike], out_table: PathLike, out_thresholds: PathLike, name: str) -> Dict:
+    def create_task(in_permutations: List[PathLike], out_maxes: PathLike, out_mins: PathLike, name: str) -> Dict:
         """
-        Create a task to get the maxes, mins, 1% quantiles, and 99% quantiles of each permutation and the actual data.
+        Get distributions of our maxes and mins for our permutations.
 
         Args:
-            in_actual_correlation (PathLike): Path to actual correlation image.
-            in_permutations (List[PathLike]): Paths to permutation correlations.
-            out_table (PathLike): Where to write our results to.
-            out_table (PathLike): Where to write a table of thresholding values to for debugging purposes.
+            in_permutations (List[PathLike]): List of paths to permutation images.
+            out_maxes (PathLike): Table of max values from those images.
+            out_mins (PathLike): Table of min values from those images.
             name (str): What to name the task.
 
         Returns:
             Dict: Dummy pydoit dict.
         """
-        sources = [in_actual_correlation, *in_permutations]
-        targets = dict(out_table=out_table, out_thresholds=out_thresholds)
-        kwargs = {**targets, "in_actual_correlation": in_actual_correlation, "in_permutations": in_permutations}
+        sources = [*in_permutations]
+        targets = dict(out_maxes=out_maxes, out_mins=out_mins)
+        kwargs = {**targets, "in_permutations": in_permutations}
 
         return dict(
             name=name,
-            actions=[(get_maxes_and_mins_and_quantiles.main, [], kwargs)],
+            actions=[(get_maxes_and_mins.main, [], kwargs)],
             file_dep=sources,
             targets=list(targets.values()),
         )
@@ -2596,20 +2595,18 @@ def task_get_maxes_mins_and_quantiles() -> Dict:
     analysis = "alpha"
     start_volume = 4
     yield create_task(
-        in_actual_correlation=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data="values"),
         in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
-        out_table=fname.maxes_mins_quantiles_table(start_volume=start_volume, variable=variable, analysis=analysis),
-        out_thresholds=fname.maxes_mins_quantiles_thresholds(start_volume=start_volume, variable=variable, analysis=analysis),
+        out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
+        out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
         name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
     )
 
     analysis = "ssvep"
     start_volume = 5
     yield create_task(
-        in_actual_correlation=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable="amplitudes"),
         in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
-        out_table=fname.maxes_mins_quantiles_table(start_volume=start_volume, variable=variable, analysis=analysis),
-        out_thresholds=fname.maxes_mins_quantiles_thresholds(start_volume=start_volume, variable=variable, analysis=analysis),
+        out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
+        out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
         name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
     )
 def task_threshold_results() -> Dict:
