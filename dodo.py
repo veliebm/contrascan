@@ -8,7 +8,7 @@ All the filenames are defined in config.py
 # Import external modules and libraries.
 from os import PathLike
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Tuple
 import textwrap
 
 # Import internal modules and libraries.
@@ -48,6 +48,7 @@ import test_permutations
 import cat_images
 import calc_percentiles
 import get_maxes_and_mins
+import plot_distribution
 
 
 # Configuration for the pydoit tool.
@@ -2609,6 +2610,40 @@ def task_get_maxes_and_mins() -> Dict:
         out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
         name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
     )
+def task_plot_maxes_and_mins_distributions() -> Dict:
+    """
+    Plot the distributions of our maxes and mins.
+    """
+    def create_task(in_distribution: PathLike, out_plot: PathLike, title: str, xlim: Tuple[float, float], ylim: Tuple[float, float], name: str) -> Dict:
+        """
+        Make task to plot the distributions of our maxes and mins.
+        """
+        sources = dict(in_distribution=in_distribution)
+        targets = dict(out_plot=out_plot)
+        kwargs = {**targets, **sources, "title": title, "xlim": xlim, "ylim": ylim}
+
+        return dict(
+            name=name,
+            actions=[(plot_distribution.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    xlims = (-1, 101)
+    variable = "amplitude"
+    ylims = {"maxes": (0, .1), "mins": (-.1, 0)}
+    start_volumes = {"alpha": 4, "ssvep": 5}
+
+    for outfile, ylim in ylims.items():
+        for analysis, start_volume in start_volumes.items():
+            yield create_task(
+                in_distribution=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile=outfile),
+                out_plot=fname.maxes_mins_plot(start_volume=start_volume, variable=variable, analysis=analysis, outfile=outfile),
+                title=f"Distribution of {analysis} {outfile}",
+                xlim=xlims,
+                ylim=ylim,
+                name=f"analysis--{analysis}, outfile--{outfile}",
+            )
 def task_threshold_results() -> Dict:
     """
     Read the results of our average averages. Rank them. Output the percentile the actual correlation is in.

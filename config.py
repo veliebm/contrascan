@@ -421,6 +421,9 @@ fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/s
 fname.add("maxes_mins_dir", "{processed_data_dir}/maxes_and_mins_distributions")
 fname.add("maxes_mins_table", "{maxes_mins_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_{outfile}_table.csv")
 
+# plot_maxes_and_mins_distributions:
+fname.add("maxes_mins_plot", "{maxes_mins_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_{outfile}_plot.png")
+
 # task_threshold_results:
 fname.add("thresholding_results_dir", "{processed_data_dir}/thresholding_results")
 fname.add("threshold_outfile", "{thresholding_results_dir}/variable-{variable}_startvolume-{start_volume}_mask-{mask}_analysis-{analysis}_{outfile}.csv")
