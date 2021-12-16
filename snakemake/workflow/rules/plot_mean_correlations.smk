@@ -50,13 +50,27 @@ rule extract_mean:
     input:
         image="results/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.nii.gz",
     output:
-        image="results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_{analysis}.nii.gz",
+        image="results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-false_{analysis}.nii.gz",
     conda:
         "../envs/neuroimaging.yaml"
     log:
-        "logs/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_{analysis}.log"
+        "logs/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-false_{analysis}.log"
     shell:
         "3dTcat '{input}[0]' -prefix '{output}' 2> {log}"
+
+
+rule copy_baseline_corrected_means:
+    """
+    Copy our baseline corrected means to be with the rest of our files.
+    """
+    input:
+        "../processed/compare_to_canonical/startvolume-{startvolume}_variable-{variable}_{analysis}_baselinecorrected.nii"
+    output:
+        "results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.nii.gz"
+    log:
+        "logs/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.log"
+    shell:
+        "3dcopy '{input}' '{output}' 2> {log}"
 
 
 rule strip_skull:
@@ -65,13 +79,13 @@ rule strip_skull:
     """
     input:
         mask="../data/misc/kastner_cortex_masks/MNI152_T1_2.5mm_full_mask.nii.gz",
-        image="results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_{analysis}.nii.gz"
+        image="results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz"
     output:
-        image="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_{analysis}.nii.gz",
+        image="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
     conda:
         "../envs/neuroimaging.yaml"
     log:
-        "logs/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_{analysis}.log"
+        "logs/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.log"
     shell:
         "3dcalc -float -a {input.image} -b {input.mask} -expr 'a*step(b)' -prefix {output.image} 2> {log}"
 
@@ -82,13 +96,13 @@ rule plot_occipital:
     """
     input:
         underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
-        overlay="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_{analysis}.nii.gz",
+        overlay="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
     output:
-        report(
-            "results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_{analysis}_occipital.png",
+        plot=report(
+            "results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png",
             caption="../report/mean_correlations.rst",
             category="{analysis}",
-            subcategory="{variable}",
+            subcategory="{variable}, baselined={baselined}",
         ),
     params:
         threshold=.08,

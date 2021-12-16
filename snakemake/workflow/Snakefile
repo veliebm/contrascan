@@ -15,10 +15,7 @@ container: "continuumio/miniconda3"
 include: "rules/plot_mean_correlations.smk"
 
 
-def all_inputs(_):
-    """
-    Return all files we want from this analysis.
-    """
+def non_baselined_inputs(_):
     inputs = []
     for analysis in "ssvep alpha".split():
         for volume_type in "continuous trialwise".split():
@@ -32,6 +29,19 @@ def all_inputs(_):
     return inputs
 
 
+def baselined_inputs(_):
+    inputs = []
+    startvolumes = {"alpha": range(1, 5), "ssvep": range(1, 9)}
+    variable = "amplitude"
+    baselined = "true"
+    for analysis, startvolume_range in startvolumes.items():
+        for startvolume in startvolume_range:
+            inputs.append(f"results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png")
+
+    return inputs
+
+
 rule all:
     input:
-        all_inputs
+        non_baselined_inputs,
+        baselined_inputs
