@@ -21,16 +21,18 @@ def main():
         save_to_path=snakemake.output.plot,
         threshold=snakemake.params.threshold,
         coordinates=snakemake.params.coordinates,
+        title=snakemake.params.title,
     )
 
 
-def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: PathLike, threshold: float, coordinates: List[int]) -> None:
+def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: PathLike, threshold: float, coordinates: List[int], title: str) -> None:
     """
     Plot an underlay and overlay.
     """
     view = nilearn.plotting.plot_anat(underlay_path, cut_coords=coordinates, draw_cross=False, annotate=False)
     overlay_image = load_as_nifti(overlay_path)
     view.add_overlay(overlay_image, threshold=threshold, colorbar=True)
+    view.title(title, )
 
     view.savefig(save_to_path)
     view.close()
