@@ -1,6 +1,7 @@
 channels:
   - conda-forge
 dependencies:
+  - matplotlib=3.5
   - pip=21.3
   - pip:
     - nibabel==3.2
