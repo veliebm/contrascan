@@ -1,4 +1,7 @@
 from pathlib import Path
+from os import PathLike
+from typing import List
+
 
 def get_poorly_named_input(wildcards) -> Path:
     """
@@ -115,3 +118,17 @@ rule plot_occipital:
         "../envs/neuroplotting.yaml"
     script:
         "../scripts/plot_fmri.py"
+
+
+rule stitch_together_plots:
+    """
+    Stitch plots together in nice, easy to read order.
+    """
+    input:
+        plots=lambda wildcards: [f"results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{wildcards.variable}_baselined-{wildcards.baselined}_{wildcards.analysis}_occipital.png" for startvolume in config["analyses"][wildcards.analysis]["continuous"]["volumes"]]
+    output:
+        stitched_plot="results/plot_mean_correlations/stitched_plots/variable-{variable}_baselined-{baselined}_{analysis}_occipital.png"
+    conda:
+        "../envs/imagemagick.yaml"
+    shell:
+        "convert {input.plots} -append {output.stitched_plot}"
