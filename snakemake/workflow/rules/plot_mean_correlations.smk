@@ -94,23 +94,6 @@ rule strip_skull:
         "3dcalc -float -a {input.image} -b {input.mask} -expr 'a*step(b)' -prefix {output.image} 2> {log}"
 
 
-def get_threshold(wildcards) -> float:
-    threshold = None
-
-    if wildcards.startvolume == "na":
-        threshold = .04
-    else:
-        if wildcards.analysis == "ssvep":
-            threshold = .05
-        elif wildcards.analysis == "alpha":
-            threshold = .08
-    
-    if threshold is None:
-        raise ValueError("Threshold undefined.")
-    else:
-        return threshold
-
-
 rule plot_occipital:
     """
     Plot the occipital pole for each of our means.
@@ -122,11 +105,11 @@ rule plot_occipital:
         plot=report(
             "results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png",
             caption="../report/mean_correlations.rst",
-            category="{analysis}",
-            subcategory="{variable}, baselined={baselined}",
+            category="startvolume {startvolume}",
+            subcategory="{analysis} {variable}",
         ),
     params:
-        threshold=get_threshold,
+        threshold=.05,
         coordinates=config["occipital coordinates"],
     conda:
         "../envs/neuroplotting.yaml"
