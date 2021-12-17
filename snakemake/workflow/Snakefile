@@ -32,11 +32,12 @@ def non_baselined_inputs(_):
 def baselined_inputs(_):
     inputs = []
     startvolumes = {"alpha": range(1, 5), "ssvep": range(1, 9)}
-    variable = "amplitude"
+    variables = "amplitude SNR".split()
     baselined = "true"
     for analysis, startvolume_range in startvolumes.items():
         for startvolume in startvolume_range:
-            inputs.append(f"results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png")
+            for variable in variables:
+                inputs.append(f"results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png")
 
     return inputs
 
