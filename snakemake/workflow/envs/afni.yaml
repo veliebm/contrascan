@@ -1,0 +1,5 @@
+channels:
+  - hcc
+  - conda-forge
+dependencies:
+  - afni=21.1.06
