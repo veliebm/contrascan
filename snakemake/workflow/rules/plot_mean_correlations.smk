@@ -39,6 +39,8 @@ rule standardize_filenames:
         "results/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.nii.gz"
     log:
         "logs/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.log"
+    conda:
+        "../envs/afni.yaml"
     shell:
         "3dcopy '{input}' '{output}' 2> {log}"
 
@@ -51,10 +53,10 @@ rule extract_mean:
         image="results/plot_mean_correlations/standardize_filenames/startvolume-{startvolume}_variable-{variable}_{analysis}_correlations_ttest.nii.gz",
     output:
         image="results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-false_{analysis}.nii.gz",
-    conda:
-        "../envs/neuroimaging.yaml"
     log:
         "logs/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-false_{analysis}.log"
+    conda:
+        "../envs/afni.yaml"
     shell:
         "3dTcat '{input}[0]' -prefix '{output}' 2> {log}"
 
@@ -69,6 +71,8 @@ rule copy_baseline_corrected_means:
         "results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.nii.gz"
     log:
         "logs/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.log"
+    conda:
+        "../envs/afni.yaml"
     shell:
         "3dcopy '{input}' '{output}' 2> {log}"
 
@@ -82,12 +86,29 @@ rule strip_skull:
         image="results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz"
     output:
         image="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
-    conda:
-        "../envs/neuroimaging.yaml"
     log:
         "logs/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.log"
+    conda:
+        "../envs/afni.yaml"
     shell:
         "3dcalc -float -a {input.image} -b {input.mask} -expr 'a*step(b)' -prefix {output.image} 2> {log}"
+
+
+def get_threshold(wildcards) -> float:
+    threshold = None
+
+    if wildcards.startvolume == "na":
+        threshold = .04
+    else:
+        if wildcards.analysis == "ssvep":
+            threshold = .05
+        elif wildcards.analysis == "alpha":
+            threshold = .08
+    
+    if threshold is None:
+        raise ValueError("Threshold undefined.")
+    else:
+        return threshold
 
 
 rule plot_occipital:
@@ -105,10 +126,9 @@ rule plot_occipital:
             subcategory="{variable}, baselined={baselined}",
         ),
     params:
-        threshold=.08,
+        threshold=get_threshold,
         coordinates=config["occipital coordinates"],
     conda:
         "../envs/neuroimaging.yaml"
     script:
         "../scripts/plot_fmri.py"
- 
