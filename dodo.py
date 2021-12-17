@@ -2477,11 +2477,13 @@ def task_subtract_canonical_bold() -> Dict:
             name=f"analysis--alpha, variable--amplitude, start_volume--{start_volume}",
         )
     for start_volume in EXPANDED_START_VOLUMES:
-        yield create_task(
-            minuend=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable="amplitudes"),
-            out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable="amplitude", analysis="ssvep"),
-            name=f"analysis--ssvep, variable--amplitude, start_volume--{start_volume}",
-        )
+        old_and_new_variables = {"amplitudes": "amplitude", "SNRs": "SNR"}
+        for old_variable, new_variable in old_and_new_variables.items():
+            yield create_task(
+                minuend=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable=old_variable),
+                out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable=new_variable, analysis="ssvep"),
+                name=f"analysis--ssvep, variable--{new_variable}, start_volume--{start_volume}",
+            )
     for permutation in PERMUTATIONS:
         start_volume = 4
         variable = "amplitude"
