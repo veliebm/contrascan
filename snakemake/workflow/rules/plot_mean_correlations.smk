@@ -129,6 +129,6 @@ rule plot_occipital:
         threshold=get_threshold,
         coordinates=config["occipital coordinates"],
     conda:
-        "../envs/neuroimaging.yaml"
+        "../envs/neuroplotting.yaml"
     script:
         "../scripts/plot_fmri.py"

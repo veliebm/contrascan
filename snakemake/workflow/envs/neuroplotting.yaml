@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+dependencies:
+  - pip=21.3
+  - pip:
+    - nibabel==3.2
+    - nilearn==0.8
