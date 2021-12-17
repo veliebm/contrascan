@@ -1,4 +1,3 @@
-name: neuroimaging
 channels:
   - conda-forge
   - bioconda
