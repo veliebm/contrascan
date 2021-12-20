@@ -114,7 +114,7 @@ rule plot_occipital:
     params:
         threshold=(-.05, .05),
         coordinates=config["occipital coordinates"],
-        title="{analysis} {variable}, baselined={baselined}, {startvolume} volumes removed"
+        title="{analysis} {variable}, {startvolume} volumes removed, baselined={baselined}, threshold={params.threshold}"
     conda:
         "../envs/neuroplotting.yaml"
     script:
