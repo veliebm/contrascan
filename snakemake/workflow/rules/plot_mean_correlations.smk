@@ -97,7 +97,7 @@ rule strip_skull:
         "3dcalc -float -a {input.image} -b {input.mask} -expr 'a*step(b)' -prefix {output.image} 2> {log}"
 
 
-rule plot_occipital:
+rule plot_occipital_of_all_means:
     """
     Plot the occipital pole for each of our means.
     """
@@ -133,3 +133,22 @@ rule stitch_together_plots:
         "../envs/imagemagick.yaml"
     shell:
         "convert {input.plots} -append {output.stitched_plot}"
+
+
+rule plot_occipital_special_means:
+    """
+    Plot the occipital pole of the means we want to use in our final paper.
+    """
+    input:
+        underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
+        overlay="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
+    output:
+        plot="results/plot_mean_correlations/permutation_thresholded_plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_percentile-{percentile}_{analysis}_occipital.png",
+    params:
+        threshold=lambda wildcards: config["thresholds"][wildcards.analysis][wildcards.percentile],
+        coordinates=config["occipital coordinates"],
+        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable}, percentile {wildcards.percentile}, crit vals={config['thresholds'][wildcards.analysis][wildcards.percentile]}",
+    conda:
+        "../envs/neuroplotting.yaml"
+    script:
+        "../scripts/plot_fmri.py"

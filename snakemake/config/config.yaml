@@ -18,3 +18,16 @@ analyses:
       volumes: ["na"]
       variables: ["amplitude"]
       compare to baseline: ["false"]
+
+
+thresholds:
+  ssvep:
+    "97.5":
+      [-0.066, 0.063]
+    "95":
+      [-0.064, 0.062]
+  alpha:
+    "97.5":
+      [-0.063, 0.066]
+    "95":
+      [-0.062, 0.063]
