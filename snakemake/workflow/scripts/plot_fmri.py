@@ -45,7 +45,7 @@ def apply_threshold(image: nibabel.Nifti1Image, bottom_threshold: float, top_thr
     Apply a bottom threshold and top threshold to an image.
     """
     image_array = numpy.array(image.dataobj)
-    image_array[(image_array>=top_threshold) | (image_array<=bottom_threshold)] = numpy.nan
+    image_array[(image_array>bottom_threshold) & (image_array<top_threshold)] = numpy.nan
     thresholded_image = nibabel.Nifti1Image(image_array, image.affine, image.header)
     return thresholded_image
 
