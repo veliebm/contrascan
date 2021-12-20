@@ -112,7 +112,7 @@ rule plot_occipital:
             subcategory="{analysis} {variable}",
         ),
     params:
-        threshold=.05,
+        threshold=(-.05, .05),
         coordinates=config["occipital coordinates"],
         title="{analysis} {variable}, baselined={baselined}, {startvolume} volumes removed"
     conda:

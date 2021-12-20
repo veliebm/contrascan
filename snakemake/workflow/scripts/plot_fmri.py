@@ -8,10 +8,11 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 from os import PathLike
-from typing import List
+from typing import List, Tuple
 import nilearn.plotting
 import nilearn.image
 import nibabel
+import numpy
 
 
 def main():
@@ -25,17 +26,28 @@ def main():
     )
 
 
-def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: PathLike, threshold: float, coordinates: List[int], title: str) -> None:
+def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: PathLike, threshold: Tuple[float, float], coordinates: List[int], title: str) -> None:
     """
     Plot an underlay and overlay.
     """
     view = nilearn.plotting.plot_anat(underlay_path, cut_coords=coordinates, draw_cross=False, annotate=False)
     overlay_image = load_as_nifti(overlay_path)
-    view.add_overlay(overlay_image, threshold=threshold, colorbar=True)
+    thresholded_overlay = apply_threshold(overlay_image, threshold[0], threshold[1])
+    view.add_overlay(thresholded_overlay, colorbar=True)
     view.title(title)
 
     view.savefig(save_to_path)
     view.close()
+
+
+def apply_threshold(image: nibabel.Nifti1Image, bottom_threshold: float, top_threshold: float) -> nibabel.Nifti1Image:
+    """
+    Apply a bottom threshold and top threshold to an image.
+    """
+    image_array = numpy.array(image.dataobj)
+    image_array[(image_array>=top_threshold) | (image_array<=bottom_threshold)] = numpy.nan
+    thresholded_image = nibabel.Nifti1Image(image_array, image.affine, image.header)
+    return thresholded_image
 
 
 def load_as_nifti(path_to_image: PathLike) -> nibabel.Nifti1Image:
