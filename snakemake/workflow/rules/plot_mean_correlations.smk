@@ -135,9 +135,9 @@ rule stitch_together_plots:
         "convert {input.plots} -append {output.stitched_plot}"
 
 
-rule plot_occipital_special_means:
+rule plot_occipital_thresholded_means:
     """
-    Plot the occipital pole of the means we want to use in our final paper.
+    Plot the occipital pole of the thresholded means.
     """
     input:
         underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
@@ -147,7 +147,7 @@ rule plot_occipital_special_means:
     params:
         threshold=lambda wildcards: config["thresholds"][wildcards.analysis][wildcards.percentile],
         coordinates=config["occipital coordinates"],
-        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable}, percentile {wildcards.percentile}, crit vals={config['thresholds'][wildcards.analysis][wildcards.percentile]}",
+        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable} mean correlation\ntime lag: {wildcards.startvolume} volumes\nbaseline subtracted: {wildcards.baselined}\ncritical values={config['thresholds'][wildcards.analysis][wildcards.percentile]}\npercentile: {wildcards.percentile}",
     conda:
         "../envs/neuroplotting.yaml"
     script:
