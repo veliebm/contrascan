@@ -13,6 +13,7 @@ import nilearn.plotting
 import nilearn.image
 import nibabel
 import numpy
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -30,7 +31,8 @@ def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: Pat
     """
     Plot an underlay and overlay.
     """
-    view = nilearn.plotting.plot_anat(underlay_path, cut_coords=coordinates, draw_cross=False, annotate=False)
+    view = plt.figure(figsize=(10, 5))
+    view = nilearn.plotting.plot_anat(underlay_path, cut_coords=coordinates, figure=view, draw_cross=False, annotate=False)
     overlay_image = load_as_nifti(overlay_path)
     thresholded_overlay = apply_threshold(overlay_image, threshold[0], threshold[1])
     view.add_overlay(thresholded_overlay, colorbar=True, cmap="cold_hot")
