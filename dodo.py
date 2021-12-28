@@ -2568,7 +2568,7 @@ def task_calculate_variance() -> Dict:
         yield create_task(
             in_correlation_image=fname.correlations_whole_brain_trials_ttest(variable=analysis),
             out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=variable, analysis=analysis),
-            name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}",
+            name=f"analysis--{analysis}, variable--{new_variable}, start_volume--{start_volume}",
         )
 
 
