@@ -417,6 +417,9 @@ fname.add("compared_permutations_to_canonical", "{compared_to_canonical_dir}/per
 fname.add("variance_whole_brain_dir", "{processed_data_dir}/variance_whole_brain")
 fname.add("variance_whole_brain", "{variance_whole_brain_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}.nii.gz")
 
+# task_subtract_canonical_variance:
+fname.add("variance_whole_brain_baselined", "{variance_whole_brain_dir}/startvolume-{start_volume}_variable-{variable}_baselined_{analysis}.nii.gz")
+
 # task_scramble_data:
 fname.add("scrambled_series_dir", "{processed_data_dir}/scrambled_series")
 fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/sub-{subject}_startvolume-{start_volume}_variable-{variable}_{analysis}_scrambled_{permutation}.mat")

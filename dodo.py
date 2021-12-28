@@ -2533,7 +2533,7 @@ def task_calculate_variance() -> Dict:
     # Canonical BOLD.
     start_volume = "na"
     variable = "na"
-    analysis = "canonical"
+    analysis = "baseline"
     yield create_task(
         in_correlation_image=fname.correlations_whole_brain_canonical_ttest,
         out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=variable, analysis=analysis),
@@ -2580,6 +2580,43 @@ def task_calculate_variance() -> Dict:
             out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=new_variable, analysis=analysis),
             name=f"analysis--{analysis}, variable--{new_variable}, start_volume--{start_volume}",
         )
+def task_subtract_canonical_variance():
+    """
+    Subtract the canonical variance from the actual variance.
+    """
+    def create_task(in_actual_variance: PathLike, in_baseline_variance: PathLike, out_corrected_variance: PathLike, name: str) -> Dict:
+        """
+        Subtract baseline variance from actual variance.
+
+        Args:
+            in_actual_variance (PathLike): Path to image containing actual variance.
+            in_baseline_variance (PathLike): Path to image containing baseline variance.
+            out_corrected_variance (PathLike): Where to write corrected variance image.
+            name (str): What to name the task.
+
+        Returns:
+            Dict: Dummy pydoit dict.
+        """
+        out_parent_dir = Path(out_corrected_variance).parent
+        return dict(
+            name=name,
+            file_dep=[in_actual_variance, in_baseline_variance],
+            targets=[out_corrected_variance],
+            actions=[f"mkdir -p '{out_parent_dir}'",
+                    f"3dcalc -float -a '{in_actual_variance}' -b '{in_baseline_variance}' -expr 'a-b' -prefix '{out_corrected_variance}'"]
+        )
+
+    # Continuous alpha.
+    variables = "amplitude SNR".split()
+    analysis = "alpha"
+    for start_volume in START_VOLUMES:
+        for variable in variables:
+            yield create_task(
+                in_actual_variance=fname.variance_whole_brain(start_volume=start_volume, variable=variable, analysis=analysis),
+                in_baseline_variance=fname.variance_whole_brain(start_volume="na", variable="na", analysis="baseline"),
+                out_corrected_variance=fname.variance_whole_brain_baselined(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}",
+            )
 
 
 # Permutation testing.
