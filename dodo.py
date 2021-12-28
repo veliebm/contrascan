@@ -2617,6 +2617,16 @@ def task_subtract_canonical_variance():
                 out_corrected_variance=fname.variance_whole_brain_baselined(start_volume=start_volume, variable=variable, analysis=analysis),
                 name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}",
             )
+    
+    analysis = "ssvep"
+    for start_volume in EXPANDED_START_VOLUMES:
+        for variable in variables:
+            yield create_task(
+                in_actual_variance=fname.variance_whole_brain(start_volume=start_volume, variable=variable, analysis=analysis),
+                in_baseline_variance=fname.variance_whole_brain(start_volume="na", variable="na", analysis="baseline"),
+                out_corrected_variance=fname.variance_whole_brain_baselined(start_volume=start_volume, variable=variable, analysis=analysis),
+                name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}",
+            )
 
 
 # Permutation testing.
