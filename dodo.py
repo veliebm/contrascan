@@ -2530,6 +2530,16 @@ def task_calculate_variance() -> Dict:
                     f"3dcalc -float -a '{in_correlation_image}[0]' -expr 'a^2' -prefix '{out_variance_image}'"]
         )
 
+    # Canonical BOLD.
+    start_volume = "na"
+    variable = "na"
+    analysis = "canonical"
+    yield create_task(
+        in_correlation_image=fname.correlations_whole_brain_canonical_ttest,
+        out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=variable, analysis=analysis),
+        name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}",
+    )
+
     # Trial by trial alpha.
     analysis = "alpha"
     start_volume = "na"
