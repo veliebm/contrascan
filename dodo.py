@@ -2503,6 +2503,41 @@ def task_subtract_canonical_bold() -> Dict:
             out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
             name=f"permutations, analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
         )
+def task_calculate_variance() -> Dict:
+    """
+    Square our correlation images to get them as variance.
+    """
+    def create_task(in_correlation_image: PathLike, out_variance_image: PathLike, name: str) -> Dict:
+        """
+        Square our correlation images to get them as variance.
+
+        Assumes correlations are located in 1st subbrick of correlation image.
+
+        Args:
+            in_correlation_image (PathLike): Path to a correlation image.
+            out_variance_image (PathLike): Where to write the squared image.
+            name (str): What to name the task.
+
+        Returns:
+            Dict: Dummy pydoit dict.
+        """
+        out_parent_dir = Path(out_variance_image).parent
+        return dict(
+            name=name,
+            file_dep=[in_correlation_image],
+            targets=[out_variance_image],
+            actions=[f"mkdir -p '{out_parent_dir}'",
+                    f"3dcalc -float -a '{in_correlation_image}[0]' -expr 'a^2' -prefix '{out_variance_image}'"]
+        )
+    analysis = "alpha"
+    old_and_new_variables = {"values": "amplitude", "SNRs": "SNR"}
+    for start_volume in START_VOLUMES:
+        for old_variable, new_variable in old_and_new_variables.items():
+            yield create_task(
+                in_correlation_image=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=old_variable),
+                out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=new_variable, analysis=analysis),
+                name=f"analysis--{analysis}, variable--{new_variable}, start_volume--{start_volume}",
+            )
 
 
 # Permutation testing.
