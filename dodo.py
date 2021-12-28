@@ -2560,6 +2560,16 @@ def task_calculate_variance() -> Dict:
                 out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=new_variable, analysis=analysis),
                 name=f"analysis--{analysis}, variable--{new_variable}, start_volume--{start_volume}",
             )
+    
+    # Trial by trial ssVEP.
+    start_volume = "na"
+    old_and_new_variables = {"slidewinamp": "amplitude", "slidewinSNR": "SNR"}
+    for old_variable, new_variable in old_and_new_variables.items():
+        yield create_task(
+            in_correlation_image=fname.correlations_whole_brain_trials_ttest(variable=analysis),
+            out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=variable, analysis=analysis),
+            name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}",
+        )
 
 
 # Permutation testing.
