@@ -1,3 +1,7 @@
+"""
+Plot mean correlations.
+"""
+
 from pathlib import Path
 from os import PathLike
 from typing import List
