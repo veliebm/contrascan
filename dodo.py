@@ -2529,7 +2529,7 @@ def task_calculate_variance() -> Dict:
             actions=[f"mkdir -p '{out_parent_dir}'",
                     f"3dcalc -float -a '{in_correlation_image}[0]' -expr 'a^2' -prefix '{out_variance_image}'"]
         )
-    
+
     # Trial by trial alpha.
     analysis = "alpha"
     start_volume = "na"
@@ -2546,6 +2546,17 @@ def task_calculate_variance() -> Dict:
         for old_variable, new_variable in old_and_new_variables.items():
             yield create_task(
                 in_correlation_image=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=old_variable),
+                out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=new_variable, analysis=analysis),
+                name=f"analysis--{analysis}, variable--{new_variable}, start_volume--{start_volume}",
+            )
+
+    # Continuous ssVEP.
+    analysis = "ssVEP"
+    old_and_new_variables = {"amplitudes": "amplitude", "SNRs": "SNR"}
+    for start_volume in EXPANDED_START_VOLUMES:
+        for old_variable, new_variable in old_and_new_variables.items():
+            yield create_task(
+                in_correlation_image=fname.correlations_improved_whole_brain_ttest(start_volume=start_volume, variable=old_variable),
                 out_variance_image=fname.variance_whole_brain(start_volume=start_volume, variable=new_variable, analysis=analysis),
                 name=f"analysis--{analysis}, variable--{new_variable}, start_volume--{start_volume}",
             )
