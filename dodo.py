@@ -2551,7 +2551,7 @@ def task_calculate_variance() -> Dict:
             )
 
     # Continuous ssVEP.
-    analysis = "ssVEP"
+    analysis = "ssvep"
     old_and_new_variables = {"amplitudes": "amplitude", "SNRs": "SNR"}
     for start_volume in EXPANDED_START_VOLUMES:
         for old_variable, new_variable in old_and_new_variables.items():
