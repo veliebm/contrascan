@@ -13,6 +13,7 @@ container: "continuumio/miniconda3"
 
 
 include: "rules/plot_mean_correlations.smk"
+include: "rules/plot_variance.smk"
 
 
 def non_baselined_inputs(_):
