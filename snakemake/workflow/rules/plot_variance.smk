@@ -29,9 +29,9 @@ rule plot_occipital_thresholded_variance:
     output:
         plot="results/plot_variance/permutation_thresholded_plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_percentile-{percentile}_{analysis}_occipital.png",
     params:
-        threshold=lambda wildcards: [number ** 2 for number in config["thresholds"][wildcards.analysis][wildcards.percentile]],
+        threshold=lambda wildcards: (-round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4), round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4)),
         coordinates=config["occipital coordinates"],
-        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable} mean correlation\ntime lag: {wildcards.startvolume} volumes\nbaseline subtracted: {wildcards.baselined}\ncritical values={config['thresholds'][wildcards.analysis][wildcards.percentile]}\npercentile: {wildcards.percentile}",
+        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable} mean variance\ntime lag: {wildcards.startvolume} volumes\nbaseline subtracted: {wildcards.baselined}\ncritical values={(-round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4), round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4))}\npercentile: {wildcards.percentile}",
     conda:
         "../envs/neuroplotting.yaml"
     script:
