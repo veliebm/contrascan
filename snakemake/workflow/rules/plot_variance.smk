@@ -36,3 +36,17 @@ rule plot_occipital_thresholded_variance:
         "../envs/neuroplotting.yaml"
     script:
         "../scripts/plot_fmri.py"
+
+
+rule stitch_thresholded_variance_plots:
+    """
+    Stitch thresholded plots together in nice, easy to read order.
+    """
+    input:
+        plots=lambda wildcards: [f"results/plot_variance/permutation_thresholded_plots/startvolume-{startvolume}_variable-{wildcards.variable}_baselined-{wildcards.baselined}_percentile-{wildcards.percentile}_{wildcards.analysis}_occipital.png" for startvolume in config["analyses"][wildcards.analysis]["continuous"]["volumes"]]
+    output:
+        stitched_plot="results/plot_variance/stitched_thresholded_plots/variable-{variable}_baselined-{baselined}_percentile-{percentile}_{analysis}_occipital.png"
+    conda:
+        "../envs/imagemagick.yaml"
+    shell:
+        "convert {input.plots} -append {output.stitched_plot}"
