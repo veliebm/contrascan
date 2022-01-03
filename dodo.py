@@ -2660,15 +2660,15 @@ def task_scramble_data() -> Dict:
 
     for subject in SUBJECTS:
         for permutation in PERMUTATIONS:
-            variable = "amplitude"
-
             analysis = "alpha"
             start_volume = 4
-            yield create_task(
-                in_series=fname.eeg_alpha(subject=subject, data="values"),
-                out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-                name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
-            )
+            old_and_new_variables = {"values": "amplitude", "SNRs": "SNR"}
+            for old_variable, variable in old_and_new_variables.items():
+                yield create_task(
+                    in_series=fname.eeg_alpha(subject=subject, data=old_variable),
+                    out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+                )
             start_volume = "na"
             yield create_task(
                 in_series=fname.eeg_trial_alpha(subject=subject, data="values"),
@@ -2678,11 +2678,13 @@ def task_scramble_data() -> Dict:
 
             analysis = "ssvep"
             start_volume = 5
-            yield create_task(
-                in_series=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="amplitudes"),
-                out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-                name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
-            )
+            old_and_new_variables = {"amplitudes": "amplitude", "SNRs": "SNR"}
+            for old_variable, variable in old_and_new_variables.items():
+                yield create_task(
+                    in_series=fname.eeg_sliding_sliding_window_improved(subject=subject, variable="amplitudes"),
+                    out_series=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    name=f"subject--{subject}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+                )
             start_volume = "na"
             yield create_task(
                 in_series=fname.freqtag_better_sliding_window_channel(subject=subject, channel=20, variable="trialpow"),
