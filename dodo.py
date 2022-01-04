@@ -2734,26 +2734,25 @@ def task_get_maxes_and_mins() -> Dict:
             file_dep=sources,
             targets=list(targets.values()),
         )
-    
+
     variable = "amplitude"
 
-    analysis = "alpha"
-    start_volume = 4
-    yield create_task(
-        in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
-        out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
-        out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
-        name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
-    )
-
-    analysis = "ssvep"
-    start_volume = 5
-    yield create_task(
-        in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
-        out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
-        out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
-        name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
-    )
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    for analysis, start_volume in start_volume_dict.items():
+        # Get non-baseline-corrected.
+        yield create_task(
+            in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+            out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
+            out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
+            name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+        )
+        # Get baseline corrected.
+        yield create_task(
+            in_permutations=[fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+            out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
+            out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
+            name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+        )
 def task_plot_maxes_and_mins_distributions() -> Dict:
     """
     Plot the distributions of our maxes and mins.
