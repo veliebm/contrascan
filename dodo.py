@@ -1052,6 +1052,7 @@ def task_eeg_get_trial_by_trial_alpha() -> Dict:
             values = [];
             pows = [];
             raw_pows = [];
+            baseline_pows = [];
             SNRs = [];
             for i = 1:numel(dataset(1,1,:))
                 sub_dataset = dataset(:,:,i);
@@ -1069,15 +1070,18 @@ def task_eeg_get_trial_by_trial_alpha() -> Dict:
                 SNRs = [SNRs; SNR];
                 pows = cat(3, pows, pow_difference);
                 raw_pows = cat(3, raw_pows, pow_post);
+                baseline_pows = cat(3, baseline_pows, pow_baseline);
             end
             averagepower =  mean(pows, 3);
             averagerawpower = mean(raw_pows, 3);
+            averagebaselinepower = mean(pow_baseline, 3);
 
             %% Save output variables.
             save('{targets["values"]}', 'values');
             save('{targets["SNRs"]}', 'SNRs');
             save('{targets["averagepower"]}', 'averagepower');
             save('{targets["averagerawpower"]}', 'averagerawpower');
+            save('{targets["averagebaselinepower"]}', 'averagebaselinepower');
 
             function [dataset] = load_dataset(path)
                 % Load a dataset.
@@ -1106,6 +1110,7 @@ def task_eeg_get_trial_by_trial_alpha() -> Dict:
                 SNRs=fname.eeg_trial_alpha(subject=subject, data="SNRs"),
                 averagepower=fname.eeg_trial_alpha(subject=subject, data="averagepower"),
                 averagerawpower=fname.eeg_trial_alpha(subject=subject, data="averagerawpower"),
+                averagebaselinepower=fname.eeg_trial_alpha(subject=subject, data="averagebaselinepower"),
                 write_script_to=fname.eeg_trial_alpha_script(subject=subject),
             ),
             name=f"subject--{subject}",
