@@ -2744,14 +2744,14 @@ def task_get_maxes_and_mins() -> Dict:
             in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
             out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
             out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
-            name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            name=f"non-baselined, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
         )
         # Get baseline corrected.
         yield create_task(
             in_permutations=[fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
             out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="maxes"),
             out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, outfile="mins"),
-            name=f"start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            name=f"baselined, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
         )
 def task_plot_maxes_and_mins_distributions() -> Dict:
     """
