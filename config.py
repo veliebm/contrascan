@@ -426,7 +426,7 @@ fname.add("scrambled_series", "{scrambled_series_dir}/sub-{subject}/{analysis}/s
 
 # task_get_maxes_and_mins:
 fname.add("maxes_mins_dir", "{processed_data_dir}/maxes_and_mins_distributions")
-fname.add("maxes_mins_table", "{maxes_mins_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_{outfile}_table.csv")
+fname.add("maxes_mins_table", "{maxes_mins_dir}/startvolume-{start_volume}_variable-{variable}_baselined-{baselined}_{analysis}_{outfile}_table.csv")
 
 # plot_maxes_and_mins_distributions:
 fname.add("maxes_mins_plot", "{maxes_mins_dir}/startvolume-{start_volume}_variable-{variable}_{analysis}_{outfile}_plot.png")
