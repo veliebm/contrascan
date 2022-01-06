@@ -1851,7 +1851,7 @@ def task_correlate_whole_brain() -> Dict:
         for permutation in PERMUTATIONS:
             start_volume = 4
             analysis = "alpha"
-            for variable in "amplitude SNR".split():
+            for variable in "amplitude".split():
                 yield create_task(
                     eeg_data=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                     out_image=fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
@@ -1869,7 +1869,7 @@ def task_correlate_whole_brain() -> Dict:
 
             start_volume = 5
             analysis = "ssvep"
-            for variable in "amplitude SNR".split():
+            for variable in "amplitude".split():
                 yield create_task(
                     eeg_data=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
                     out_image=fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
@@ -1884,6 +1884,59 @@ def task_correlate_whole_brain() -> Dict:
                 in_image=fname.func_trial_amplitudes(subject=subject),
                 name=f"permutation correlation trials, sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}"
             )
+def task_correlate_whole_brain_permutations_snrs() -> Dict:
+    """
+    This is it! Huzzah! Correlate EEG and fMRI data across the whole brain. EEG data must be a 1xN or Nx1 .mat file.
+
+    Specifically built for our permutation testing of SNRs so we can better specify to pydoit which tasks we want it to do.
+
+    1st subbrick will be the correlation coefficient.
+    2nd subbrick will be its p value.
+    """
+    def create_task(eeg_data: PathLike, in_image: PathLike, out_image: PathLike, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        eeg_data : PathLike
+            Path to a list of numbers in a 1xN or Nx1 MatLab .mat file
+        in_image : PathLike
+            Path to the fMRI image you want to correlate with the EEG data.
+        out_image : PathLike
+            Where you want to write your out image to.
+        name : str
+            Name of the task.
+        """
+        sources = dict(
+            in_image_path=in_image,
+            in_eeg_path=eeg_data,
+        )
+
+        targets = dict(
+            out_image_path=out_image,
+        )
+
+        kwargs = {**sources, **targets}
+
+        return dict(
+            name=name,
+            actions=[(correlate_whole_brain.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
+        )
+
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    for subject in SUBJECTS:
+        for permutation in PERMUTATIONS:
+            for analysis, start_volume in start_volume_dict.items():
+                variable = "SNR"
+                yield create_task(
+                    eeg_data=fname.scrambled_series(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    out_image=fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    in_image=fname.final_func(subject=subject, start_volume=start_volume),
+                    name=f"sub--{subject}, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}"
+                )
 def task_fisher_transform_whole_brain() -> Dict:
     """
     Apply the Fisher Z transform to our whole brain correlation so we can do more valid t-tests.
