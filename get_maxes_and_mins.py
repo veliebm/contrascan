@@ -25,7 +25,11 @@ def main(in_permutations: List[PathLike], out_maxes: PathLike, out_mins: PathLik
     permutation_images = [nibabel.load(path) for path in in_permutations]
 
     # Get data of images as list of numpy arrays.
-    permutation_arrays = [image.dataobj[:, :, :, 0] for image in permutation_images]
+    try:
+        permutation_arrays = [image.dataobj[:, :, :, 0] for image in permutation_images]
+    except IndexError:
+        print("At least one image isn't 4d. Trying to read as 3d images.")
+        permutation_arrays = [image.dataobj[:, :, :] for image in permutation_images]
 
     # Combine list of arrays into one big array. Actual data located in index 0 of array.
     all_permutations_array = numpy.stack(permutation_arrays, 3)
