@@ -2861,6 +2861,47 @@ def task_get_maxes_and_mins() -> Dict:
                 out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, baselined=baselined, outfile="mins"),
                 name=f"baselined--{baselined}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
             )
+def task_get_maxes_and_mins_SNRs() -> Dict:
+    """
+    Get distributions of our maxes and mins for our permutations.
+    """
+    def create_task(in_permutations: List[PathLike], out_maxes: PathLike, out_mins: PathLike, name: str) -> Dict:
+        """
+        Get distributions of our maxes and mins for our permutations.
+
+        Args:
+            in_permutations (List[PathLike]): List of paths to permutation images.
+            out_maxes (PathLike): Table of max values from those images.
+            out_mins (PathLike): Table of min values from those images.
+            name (str): What to name the task.
+
+        Returns:
+            Dict: Dummy pydoit dict.
+        """
+        sources = [*in_permutations]
+        targets = dict(out_maxes=out_maxes, out_mins=out_mins)
+        kwargs = {**targets, "in_permutations": in_permutations}
+
+        return dict(
+            name=name,
+            actions=[(get_maxes_and_mins.main, [], kwargs)],
+            file_dep=sources,
+            targets=list(targets.values()),
+        )
+
+    variable = "SNR"
+
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    baselined_dict = {"true": fname.compared_permutations_to_canonical, "false": fname.correlations_whole_brain_permutations_ttest}
+    for analysis, start_volume in start_volume_dict.items():
+        for baselined, in_file in baselined_dict.items():
+            # Get non-baseline-corrected.
+            yield create_task(
+                in_permutations=[in_file(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+                out_maxes=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, baselined=baselined, outfile="maxes"),
+                out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, baselined=baselined, outfile="mins"),
+                name=f"baselined--{baselined}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
+            )
 def task_plot_maxes_and_mins_distributions() -> Dict:
     """
     Plot the distributions of our maxes and mins.
