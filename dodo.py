@@ -2575,6 +2575,15 @@ def task_subtract_canonical_bold() -> Dict:
             targets=list(targets.values()),
         )
 
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    for variable in "amplitude".split():
+        for permutation in PERMUTATIONS:
+            for analysis, start_volume in start_volume_dict.items():
+                yield create_task(
+                    minuend=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    name=f"permutations, analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
+                )
     for start_volume in START_VOLUMES:
         old_and_new_variables = {"values": "amplitude", "SNRs": "SNR"}
         for old_variable, new_variable in old_and_new_variables.items():
@@ -2591,23 +2600,38 @@ def task_subtract_canonical_bold() -> Dict:
                 out_prefix=fname.compared_to_canonical(start_volume=start_volume, variable=new_variable, analysis="ssvep"),
                 name=f"analysis--ssvep, variable--{new_variable}, start_volume--{start_volume}",
             )
-    for permutation in PERMUTATIONS:
-        start_volume = 4
-        variable = "amplitude"
-        analysis = "alpha"
-        yield create_task(
-            minuend=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-            out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-            name=f"permutations, analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
+def task_subtract_canonical_bold_SNR_permutations() -> Dict:
+    """
+    Subtract the mean canonical BOLD correlation from the mean alpha and mean ssVEP correlations.
+    """
+    def create_task(minuend: PathLike, out_prefix: PathLike, name: str, subtrahend: PathLike = fname.correlations_whole_brain_canonical_ttest) -> Dict:
+        """
+        Make this task generalizable.
+        """
+        sources = dict(minuend=minuend, subtrahend=subtrahend)
+        targets = dict(out_prefix=out_prefix)
+        kwargs = {
+            "minuend": minuend + "[0]",
+            "subtrahend": subtrahend + "[0]",
+            "out_prefix": out_prefix,
+        }
+
+        return dict(
+            name=name,
+            actions=[(compare_images.main, [], kwargs)],
+            file_dep=list(sources.values()),
+            targets=list(targets.values()),
         )
 
-        start_volume = 5
-        analysis = "ssvep"
-        yield create_task(
-            minuend=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-            out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-            name=f"permutations, analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
-        )
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    for variable in "SNR".split():
+        for permutation in PERMUTATIONS:
+            for analysis, start_volume in start_volume_dict.items():
+                yield create_task(
+                    minuend=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    out_prefix=fname.compared_permutations_to_canonical(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    name=f"analysis--{analysis}, variable--{variable}, start_volume--{start_volume}, permutation--{permutation}",
+                )
 def task_calculate_variance() -> Dict:
     """
     Square our correlation images to get them as variance.
