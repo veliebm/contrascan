@@ -2159,23 +2159,62 @@ def task_ttest_whole_brain_correlations() -> Dict:
                 out_path=fname.correlations_whole_brain_alpha_ttest(start_volume=start_volume, data=alpha_data),
                 name=f"alphas, data--{alpha_data}, startvolume--{start_volume}",
             )
-    for permutation in PERMUTATIONS:
-        start_volume = 4
-        variable = "amplitude"
-        analysis = "alpha"
-        yield create_task(
-            images=[fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for subject in SUBJECTS],
-            out_path=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-            name=f"permutation ttest, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+    
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    for analysis, start_volume in start_volume_dict.items():
+        for permutation in PERMUTATIONS:
+            for variable in "amplitude".split():
+                yield create_task(
+                    images=[fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for subject in SUBJECTS],
+                    out_path=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    name=f"permutation ttest, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+                )
+def task_ttest_whole_brain_correlations_SNR_permutations() -> Dict:
+    """
+    ttest the correlations we calculated.
+    """
+    def create_task(images: List[PathLike], out_path: PathLike, name: str) -> dict:
+        """
+        Allows this task to easily be generalizable.
+
+        Parameters
+        ----------
+        images : List[PathLike]
+            List of paths to images to ttest against each other.
+        out_path : PathLike
+            Where to write our ttest results to.
+        name : str
+            Name of the task.
+        """
+        sources = dict(
+            images=images,
         )
 
-        start_volume = 5
-        analysis = "ssvep"
-        yield create_task(
-            images=[fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for subject in SUBJECTS],
-            out_path=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
-            name=f"permutation ttest, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+        targets = dict(
+            ttest=out_path,
         )
+
+        kwargs = dict(
+            images=[f"{path}[0]" for path in sources["images"]],
+            prefix=get_prefix(targets["ttest"])
+        )
+
+        return dict(
+            name=name,
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=list(sources.values())[0],
+            targets=list(targets.values()),
+        )
+
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    for analysis, start_volume in start_volume_dict.items():
+        for permutation in PERMUTATIONS:
+            for variable in "SNR".split():
+                yield create_task(
+                    images=[fname.correlation_whole_brain_permutation(subject=subject, start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for subject in SUBJECTS],
+                    out_path=fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation),
+                    name=f"permutation ttest, startvolume--{start_volume}, variable--{variable}, analysis--{analysis}, permutation--{permutation}",
+                )
 def task_correlate_eeg_with_average_microregion_timeseries() -> Dict:
     """
     Correlate the time series of each microregion with EEG data.
