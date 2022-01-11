@@ -50,7 +50,7 @@ rule plot_rougher_occipital_thresholded_variance:
     params:
         threshold=lambda wildcards: config['thresholds']['variance'][f"baselined {wildcards.baselined}"],
         coordinates=config['occipital coordinates'],
-        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable} mean correlation\ntime lag: {wildcards.startvolume} volumes\nbaseline subtracted: {wildcards.baselined}\ncritical values={config['thresholds']['variance'][f'baselined {wildcards.baselined}']}\npercentile: {wildcards.percentile}",
+        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable} mean variance\ntime lag: {wildcards.startvolume} volumes\nbaseline subtracted: {wildcards.baselined}\nthreshold={config['thresholds']['variance'][f'baselined {wildcards.baselined}']}\npercentile: {wildcards.percentile}",
     conda:
         "../envs/neuroplotting.yaml"
     script:
