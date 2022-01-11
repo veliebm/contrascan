@@ -26,16 +26,16 @@ rule plot_occipital_thresholded_variance:
     input:
         underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
         overlay="results/plot_variance/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
+        mins_distribution="../processed/maxes_and_mins_distributions/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_mins_table.csv",
+        maxes_distribution="../processed/maxes_and_mins_distributions/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_maxes_table.csv",
     output:
         plot="results/plot_variance/permutation_thresholded_plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_percentile-{percentile}_{analysis}_occipital.png",
     params:
-        threshold=lambda wildcards: (-round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4), round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4)),
         coordinates=config["occipital coordinates"],
-        title=lambda wildcards: f"{wildcards.analysis} {wildcards.variable} mean variance\ntime lag: {wildcards.startvolume} volumes\nbaseline subtracted: {wildcards.baselined}\ncritical values={(-round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4), round(max([threshold ** 2 for threshold in config['thresholds'][wildcards.analysis][wildcards.percentile]]), 4))}\npercentile: {wildcards.percentile}",
     conda:
         "../envs/neuroplotting.yaml"
     script:
-        "../scripts/plot_fmri.py"
+        "../scripts/plot_permutation_thresholded_fmri.py"
 
 
 rule stitch_thresholded_variance_plots:
