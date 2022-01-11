@@ -2,7 +2,7 @@
 Plot mean variance images.
 """
 
-rule strip_skull_of_variance:
+rule strip_skull_from_variance:
     """
     Mask out the skull from our variance images.
     """
