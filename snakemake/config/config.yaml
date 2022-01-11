@@ -31,3 +31,8 @@ thresholds:
       [-0.063, 0.066]
     "95":
       [-0.062, 0.063]
+  variance:
+    baselined false:
+      .004
+    baselined true:
+      .018
