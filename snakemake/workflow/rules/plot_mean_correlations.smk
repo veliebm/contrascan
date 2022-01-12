@@ -158,6 +158,26 @@ rule plot_occipital_thresholded_means:
         "../scripts/plot_fmri.py"
 
 
+rule plot_occipital_exactly_thresholded_means:
+    """
+    Plot the occipital pole using EXACT threshold calculations.
+    """
+    input:
+        underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
+        overlay="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
+        mins_distribution="../processed/maxes_and_mins_distributions/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_mins_table.csv",
+        maxes_distribution="../processed/maxes_and_mins_distributions/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_maxes_table.csv",
+    output:
+        plot="results/plot_mean_correlations/exact_permutation_thresholded_plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_percentile-{percentile}_{analysis}_occipital.png",
+    params:
+        coordinates=config["occipital coordinates"],
+        use_variance=False,
+    conda:
+        "../envs/neuroplotting.yaml"
+    script:
+        "../scripts/plot_permutation_thresholded_fmri.py"
+
+
 rule stitch_thresholded_plots:
     """
     Stitch thresholded plots together in nice, easy to read order.
