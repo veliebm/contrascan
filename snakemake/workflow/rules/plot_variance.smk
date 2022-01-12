@@ -32,6 +32,7 @@ rule plot_occipital_thresholded_variance:
         plot="results/plot_variance/exact_permutation_thresholded_plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_percentile-{percentile}_{analysis}_occipital.png",
     params:
         coordinates=config["occipital coordinates"],
+        use_variance=True,
     conda:
         "../envs/neuroplotting.yaml"
     script:
