@@ -33,7 +33,7 @@ def main():
         save_to_path=snakemake.output.plot,
         threshold=conservative_threshold,
         coordinates=snakemake.params.coordinates,
-        title=f"{snakemake.wildcards.analysis} {snakemake.wildcards.variable} mean variance\ntime lag: {snakemake.wildcards.startvolume} volumes\nbaseline subtracted: {snakemake.wildcards.baselined}\ncritical values={conservative_threshold}\npercentile: {snakemake.wildcards.percentile}",
+        title=f"{snakemake.wildcards.analysis} {snakemake.wildcards.variable}\nimage is of variance: {snakemake.params.use_variance}\nbaseline subtracted: {snakemake.wildcards.baselined}\nthreshold={conservative_threshold}",
     )
 
 
@@ -55,7 +55,7 @@ def get_conservative_threshold(percentile: float, mins_distribution: PathLike, m
     upper_threshold = get_threshold(maxes_distribution, upper_percentile, as_variance=as_variance)
     lower_threshold = get_threshold(mins_distribution, lower_percentile, as_variance=as_variance)
     absolute_value_thresholds = [abs(threshold) for threshold in (lower_threshold, upper_threshold)]
-    conservative_threshold = min(absolute_value_thresholds)
+    conservative_threshold = max(absolute_value_thresholds)
 
     print(f"2 available thresholds: {(upper_threshold, lower_threshold)}")
     print(f"Choosing {conservative_threshold}")
