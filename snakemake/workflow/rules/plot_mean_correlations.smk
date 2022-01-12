@@ -84,6 +84,16 @@ rule copy_baseline_corrected_means:
         "3dcopy '{input}' '{output}' 2> {log}"
 
 
+rule copy_final_correlations_to_one_big_folder:
+    """
+    Copy our our correlations into a convenient spot where I can view them all at once.
+    """
+    input: "results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.nii.gz"
+    output: "results/final_images/{analysis}/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_correlations.nii.gz"
+    conda: "../envs/afni.yaml"
+    shell: "3dcopy '{input}' '{output}'"
+
+
 rule strip_skull:
     """
     Mask out the skull from our means.
