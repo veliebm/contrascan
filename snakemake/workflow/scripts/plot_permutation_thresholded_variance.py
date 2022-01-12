@@ -23,7 +23,8 @@ def main():
     conservative_threshold = get_conservative_threshold(
         percentile=float(snakemake.wildcards.percentile),
         mins_distribution=snakemake.input.mins_distribution,
-        maxes_distribution=snakemake.input.maxes_distribution
+        maxes_distribution=snakemake.input.maxes_distribution,
+        as_variance=snakemake.params.use_variance,
     )
 
     make_plot(
@@ -36,7 +37,7 @@ def main():
     )
 
 
-def get_conservative_threshold(percentile: float, mins_distribution: PathLike, maxes_distribution: PathLike) -> float:
+def get_conservative_threshold(percentile: float, mins_distribution: PathLike, maxes_distribution: PathLike, as_variance: bool) -> float:
     """
     Get the variance thresholds from both the mins and maxes distribution. Return the more conservative one.
 
@@ -44,15 +45,17 @@ def get_conservative_threshold(percentile: float, mins_distribution: PathLike, m
         percentile (float): Percentile to read.
         mins_distribution (PathLike): Path to the mins distribution.
         maxes_distribution (PathLike): Path to the maxes distribution.
+        as_variance (bool): Whether to get variance or just correlation.
 
     Returns:
         float: The more conservative threshold of the two.
-    """    
+    """
     upper_percentile = percentile
     lower_percentile = 100 - upper_percentile
-    upper_threshold = get_threshold(maxes_distribution, upper_percentile)
-    lower_threshold = get_threshold(mins_distribution, lower_percentile)
-    conservative_threshold = min([upper_threshold, lower_threshold])
+    upper_threshold = get_threshold(maxes_distribution, upper_percentile, as_variance=as_variance)
+    lower_threshold = get_threshold(mins_distribution, lower_percentile, as_variance=as_variance)
+    absolute_value_thresholds = [abs(threshold) for threshold in (lower_threshold, upper_threshold)]
+    conservative_threshold = min(absolute_value_thresholds)
 
     print(f"2 available thresholds: {(upper_threshold, lower_threshold)}")
     print(f"Choosing {conservative_threshold}")
@@ -60,22 +63,25 @@ def get_conservative_threshold(percentile: float, mins_distribution: PathLike, m
     return conservative_threshold
 
 
-def get_threshold(path_to_table: PathLike, percentile: float) -> float:
+def get_threshold(path_to_table: PathLike, percentile: float, as_variance: bool=True) -> float:    
     """
     Read a table of percentiles and return wanted threshold value after squaring it to turn it into variance.
 
     Args:
         path_to_table (PathLike): Path to distribution table to read.
         percentile (float): What percentile you want to get from the table.
+        as_variance (bool): Whether to get variance or just correlation.
 
     Returns:
         float: Threshold value.
     """
     table = pandas.read_csv(path_to_table, index_col="percentile")
-    correlation_threshold = table["value"][percentile]
-    variance_threshold = correlation_threshold ** 2
+    threshold = table["value"][percentile]
 
-    return variance_threshold
+    if as_variance:
+        threshold = threshold ** 2
+
+    return threshold
 
 
 def make_plot(underlay_path: PathLike, overlay_path: PathLike, save_to_path: PathLike, threshold: float, coordinates: List[int], title: str) -> None:
