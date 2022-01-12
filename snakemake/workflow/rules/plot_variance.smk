@@ -35,7 +35,7 @@ rule plot_occipital_thresholded_variance:
     conda:
         "../envs/neuroplotting.yaml"
     script:
-        "../scripts/plot_permutation_thresholded_variance.py"
+        "../scripts/plot_permutation_thresholded_fmri.py"
 
 
 rule plot_rougher_occipital_thresholded_variance:
