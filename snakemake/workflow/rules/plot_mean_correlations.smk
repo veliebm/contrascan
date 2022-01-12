@@ -84,16 +84,6 @@ rule copy_baseline_corrected_means:
         "3dcopy '{input}' '{output}' 2> {log}"
 
 
-rule copy_final_correlations_to_one_big_folder:
-    """
-    Copy our our correlations into a convenient spot where I can view them all at once.
-    """
-    input: "results/plot_mean_correlations/mean_only/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.nii.gz"
-    output: "results/final_images/{analysis}/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_correlations.nii.gz"
-    conda: "../envs/afni.yaml"
-    shell: "3dcopy '{input}' '{output}'"
-
-
 rule strip_skull:
     """
     Mask out the skull from our means.
@@ -109,6 +99,16 @@ rule strip_skull:
         "../envs/afni.yaml"
     shell:
         "3dcalc -float -a {input.image} -b {input.mask} -expr 'a*step(b)' -prefix {output.image} 2> {log}"
+
+
+rule copy_final_correlations_to_one_big_folder:
+    """
+    Copy our our correlations into a convenient spot where I can view them all at once.
+    """
+    input: "results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz"
+    output: "results/final_images/{analysis}/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_correlations.nii.gz"
+    conda: "../envs/afni.yaml"
+    shell: "3dcopy '{input}' '{output}'"
 
 
 rule plot_occipital_of_all_means:
