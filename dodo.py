@@ -49,6 +49,7 @@ import cat_images
 import calc_percentiles
 import get_maxes_and_mins
 import plot_distribution
+import get_outer_percentiles
 
 
 # Configuration for the pydoit tool.
@@ -2902,6 +2903,46 @@ def task_get_maxes_and_mins_SNRs() -> Dict:
                 out_mins=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, baselined=baselined, outfile="mins"),
                 name=f"baselined--{baselined}, start_volume--{start_volume}, variable--{variable}, analysis--{analysis}",
             )
+def task_get_outer_percentiles_distributions() -> Dict:
+    """
+    Create a distribution of our outer percentiles.
+    """
+    def create_task(in_permutations: List[PathLike], out_distribution: PathLike, percentile: float, name: str) -> Dict:
+        """
+        Get distributions of our maxes and mins for our permutations.
+
+        Args:
+            in_permutations (List[PathLike]): List of paths to permutation images.
+            out_distribution (PathLike): Table of percentiles from those images.
+            percentile (PathLike): What percentile to extract from each image.
+            name (str): What to name the task.
+
+        Returns:
+            Dict: Dummy pydoit dict.
+        """
+        sources = [*in_permutations]
+        targets = dict(out_distribution=out_distribution)
+        kwargs = {**targets, "in_permutations": in_permutations, "percentile": percentile}
+
+        return dict(
+            name=name,
+            actions=[(get_outer_percentiles.main, [], kwargs)],
+            file_dep=sources,
+            targets=list(targets.values()),
+        )
+
+    variables = "SNR amplitude".split()
+    start_volume_dict = {"alpha": 4, "ssvep": 5}
+    percentile_dict = {"upper": 99, "lower": 1}
+    for analysis, start_volume in start_volume_dict.items():
+        for variable in variables:
+            for percentile_name, percentile in percentile_dict.items():
+                yield create_task(
+                    in_permutations=[fname.correlations_whole_brain_permutations_ttest(start_volume=start_volume, variable=variable, analysis=analysis, permutation=permutation) for permutation in PERMUTATIONS],
+                    out_distribution=fname.maxes_mins_table(start_volume=start_volume, variable=variable, analysis=analysis, baselined="false", outfile=percentile_name),
+                    percentile=percentile,
+                    name=f"variable--{variable}, analysis--{analysis}, percentile--{percentile_name}",
+                )
 def task_plot_maxes_and_mins_distributions() -> Dict:
     """
     Plot the distributions of our maxes and mins.
