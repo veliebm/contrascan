@@ -9,8 +9,20 @@ rule move_ssvep_amplitudes:
     """
     input:
         head="../processed/correlation_whole_brain_ttest/startvolume-{startvolume}_variable-amplitudes_improved_correlations_ttest+tlrc.HEAD",
-        brik="../processed/correlation_whole_brain_ttest/startvolume-{startvolume}_variable-amplitudes_improved_correlations_ttest+tlrc.HEAD"
+        brik="../processed/correlation_whole_brain_ttest/startvolume-{startvolume}_variable-amplitudes_improved_correlations_ttest+tlrc.BRIK"
     output: "results/images_for_andreas/ssvep_amplitude_lag-{startvolume}_correlation.nii.gz"
+    conda: "../envs/afni.yaml"
+    shell: "3dTcat '{input.head}[0]' -prefix '{output}'"
+
+
+rule move_ssvep_SNRs:
+    """
+    Standardize our many poorly named filenames into a common template.
+    """
+    input:
+        head="../processed/correlation_whole_brain_ttest/startvolume-{startvolume}_variable-SNRs_improved_correlations_ttest+tlrc.HEAD",
+        brik="../processed/correlation_whole_brain_ttest/startvolume-{startvolume}_variable-SNRs_improved_correlations_ttest+tlrc.BRIK"
+    output: "results/images_for_andreas/ssvep_SNR_lag-{startvolume}_correlation.nii.gz"
     conda: "../envs/afni.yaml"
     shell: "3dTcat '{input.head}[0]' -prefix '{output}'"
 
