@@ -49,3 +49,13 @@ rule move_alpha_SNRs:
     output: "results/images_for_andreas/alpha_SNR_correlation_lag-{startvolume}.nii.gz"
     conda: "../envs/afni.yaml"
     shell: "3dTcat '{input.head}[0]' -prefix '{output}'"
+
+
+rule move_variance_images:
+    """
+    Standardize our many poorly named filenames into a common template.
+    """
+    input: "../processed/variance_whole_brain/startvolume-{startvolume}_variable-{variable}_baselined-true_{analysis}.nii.gz",
+    output: "results/images_for_andreas/{analysis}_{variable}_variance_lag-{startvolume}.nii.gz"
+    conda: "../envs/afni.yaml"
+    shell: "3dcopy '{input}' '{output}'"
