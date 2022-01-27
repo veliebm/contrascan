@@ -8,7 +8,7 @@ posttrial = get_posttrial_spectrums();
 [average_pretrial, SEM_pretrial] = get_average_spectrum(pretrial);
 [average_posttrial, SEM_posttrial] = get_average_spectrum(posttrial);
 
-make_plot(freqs(1:30), average_pretrial(1:30,:), SEM_pretrial(1:30,:), average_posttrial(1:30,:), SEM_posttrial(1:30,:));
+make_plot(freqs(2:30), average_pretrial(2:30,:), SEM_pretrial(2:30,:), average_posttrial(2:30,:), SEM_posttrial(2:30,:));
 
 
 function [pretrial] = get_pretrial_spectrums()
@@ -77,9 +77,11 @@ function make_plot(x_values, pretrial_y, pretrial_SEM, posttrial_y, posttrial_SE
 
     ax.FontSize = 30;
     ax.LineWidth = 3;
+    
+    axis([0 20 0 11])
 
-    text(7, 9, ['Analysis Window'], 'FontSize', 30)
-    text(8, 8, ['8.75-12.5Hz'], 'FontSize', 30)
+    text(8.5, 9, ['Analysis Window'], 'FontSize', 30)
+    text(9, 8, ['8.75-12.5Hz'], 'FontSize', 30)
     
     legend('', 'Post-Onset', 'Pre-Onset')
     legend('boxoff')
