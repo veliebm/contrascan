@@ -7,7 +7,6 @@ Created 1/6/22 by Benjamin Velie.
 from os import PathLike, path
 import matplotlib.pyplot as plt
 import nibabel
-from pathlib import Path
 import numpy
 
 
@@ -15,33 +14,33 @@ def main():
     """
     Entrypoint of program.
     """
-    path_to_irf = Path("processed/IRF_mean/IRF_mean+tlrc.HEAD")
-    representative_voxel_timeseries = get_representative_time_series(path_to_irf)
-    time_vector = [time*2 for time in range(len(representative_voxel_timeseries))]
-    plot_irf(x_values=time_vector, y_values=representative_voxel_timeseries)
+    calcarine_timeseries = [0, -.07243, -.088155, -.171879, -.143361, .037872, .066945, .032208, .013069, 0]
+    occipital_timeseries = [0, -.051867, .238449, .579762, .771096, .711357, .295275, -.034379, 0.182821, 0]
+    time_vector = [time*2 for time in range(len(calcarine_timeseries))]
+
+    plot_irf(x_values=time_vector, calcarine_values=calcarine_timeseries, occipital_values=occipital_timeseries)
 
 
-def plot_irf(x_values, y_values) -> None:
+def plot_irf(x_values, calcarine_values, occipital_values) -> None:
     """
-    Plot the IRF.
-
-    Args:
-        x_values ([type]): [description]
-        y_values ([type]): [description]
+    Plot the IRFs
     """
     fig, ax = plt.subplots()
-    ax.plot(x_values, y_values, linewidth=5, color='black')
+    ax.plot(x_values, calcarine_values, linewidth=5, color='blue')
+    ax.plot(x_values, occipital_values, linewidth=5, color='red')
+    plt.axhline(y=0, color='black', linestyle='--', linewidth=5)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('BOLD Δ%')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
+    ax.tick_params(width=5, length=10)
     fig.set_size_inches(16, 9)
-    plt.xticks(numpy.arange(min(x_values), max(x_values)+1, 2))
-    plt.yticks((-.2, 0, .4))
-    plt.rcParams.update({'font.size': 30})
+    plt.xticks(x_values)
+    plt.yticks(numpy.arange(-.2, 1, .2))
+    plt.rcParams.update({'font.size': 40})
     plt.rcParams['axes.linewidth'] = 5
     plt.tight_layout()
-    plt.savefig('processed/plots/representative_IRF.png')
+    plt.savefig('processed/plots/representative_IRFs.png')
 
 
 def get_representative_time_series(path_to_irf: PathLike) -> numpy.array:
