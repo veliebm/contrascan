@@ -4,7 +4,7 @@
 eeg_analyses = load('./data/misc/eeg_alone_analyses.mat');
 alpha = eeg_analyses.alpha(1:end-10);
 ssvep = eeg_analyses.ssVEP(1:end-10);
-taxis = eeg_analyses.taxis(1:end-10);
+taxis = eeg_analyses.taxis(1:end-10)/1000;
 
 %% Make plot.
 set(0, 'DefaultLineLineWidth', 12);
@@ -15,7 +15,7 @@ plot (taxis, ssvep);
 hold off;
 
 ylabel('Voltage (µV)')
-xlabel('Time (ms)')
+xlabel('Time (s)')
 ax = gca;
 axis(ax, 'tight')
 ax.FontSize = 40;
