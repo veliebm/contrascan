@@ -2,9 +2,9 @@
 
 %% Load variables.
 eeg_analyses = load('./data/misc/eeg_alone_analyses.mat');
-alpha = eeg_analyses.alpha(1:end-10);
-ssvep = eeg_analyses.ssVEP(1:end-10);
-taxis = eeg_analyses.taxis(1:end-10)/1000;
+alpha = eeg_analyses.alpha(1:end-30);
+ssvep = eeg_analyses.ssVEP(1:end-30);
+taxis = eeg_analyses.taxis(1:end-30)/1000;
 
 %% Make plot.
 set(0, 'DefaultLineLineWidth', 12);
