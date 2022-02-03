@@ -14,7 +14,7 @@ hold on;
 plot (taxis, ssvep);
 hold off;
 
-ylabel('Electrical Activity (µV)')
+ylabel('Voltage (µV)')
 xlabel('Time (ms)')
 ax = gca;
 axis(ax, 'tight')
