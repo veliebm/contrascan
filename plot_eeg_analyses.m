@@ -17,6 +17,7 @@ hold off;
 ylabel('Voltage (µV)')
 xlabel('Time (s)')
 ax = gca;
+set(gca,'fontname','calibri')
 axis(ax, 'tight')
 ax.FontSize = 40;
 ax.ColorOrder = [0 0 0; .7 .7 .7; 0 0 0; 0 0 0];
