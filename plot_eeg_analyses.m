@@ -22,6 +22,7 @@ ax.FontSize = 40;
 ax.ColorOrder = [0 0 0; .7 .7 .7; 0 0 0; 0 0 0];
 box off;
 ax.LineWidth = 3;
+xticks([0 1 2 3 4 5])
 
 % Make window size enormous.
 set(gcf, 'Position',  [0, 0, 1000, 800])
