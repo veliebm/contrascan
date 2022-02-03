@@ -24,7 +24,7 @@ box off;
 ax.LineWidth = 3;
 
 % Make window size enormous.
-set(gcf, 'Position',  [0, 0, 2000, 2000])
+set(gcf, 'Position',  [0, 0, 1000, 800])
 
 % Plot a dashed line at y=0.
 yline(0,'k--', 'LineWidth', 3)
