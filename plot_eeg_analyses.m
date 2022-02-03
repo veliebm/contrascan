@@ -30,6 +30,6 @@ set(gcf, 'Position',  [0, 0, 1000, 800])
 % Plot a dashed line at y=0.
 yline(0,'k--', 'LineWidth', 3)
 
-legend('Alpha', 'ssVEP', '')
+legend('Alpha', 'ssVEP', '', 'location','best')
 
 saveas(fig, './processed/plots/eeg_alone_analyses.svg')
