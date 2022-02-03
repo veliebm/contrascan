@@ -31,4 +31,4 @@ yline(0,'k--', 'LineWidth', 3)
 
 legend('Alpha', 'ssVEP', '')
 
-saveas(fig, './processed/plots/eeg_alone_analyses.png')
+saveas(fig, './processed/plots/eeg_alone_analyses.svg')
