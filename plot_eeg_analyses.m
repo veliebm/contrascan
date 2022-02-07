@@ -7,7 +7,7 @@ ssvep = eeg_analyses.ssVEP(1:end-30);
 taxis = eeg_analyses.taxis(1:end-30)/1000;
 
 %% Make plot.
-set(0, 'DefaultLineLineWidth', 12);
+set(0, 'DefaultLineLineWidth', 8);
 fig = plot(taxis, alpha);
 
 hold on;
