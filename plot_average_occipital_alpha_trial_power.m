@@ -52,10 +52,11 @@ end
 
 function make_plot(x_values, pretrial_y, pretrial_SEM, posttrial_y, posttrial_SEM)
     %% Plot data.
+    set(0, 'DefaultLineLineWidth', 6);
     figure;
-    plot(x_values, pretrial_y, 'LineWidth', 3);
+    plot(x_values, pretrial_y);
     hold on;
-    plot(x_values, posttrial_y, 'LineWidth', 3);
+    plot(x_values, posttrial_y);
     hold off;
     
     curve1 = posttrial_y + posttrial_SEM;
