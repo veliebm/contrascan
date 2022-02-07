@@ -33,4 +33,4 @@ yline(0,'k--', 'LineWidth', 3)
 
 legend('Alpha Amplitude', 'ssVEP Amplitude', '', 'location','northwest')
 
-saveas(fig, './processed/plots/eeg_alone_analyses.svg')
+saveas(fig, './processed/plots/eeg_alone_analyses.png')
