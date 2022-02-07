@@ -66,7 +66,7 @@ function make_plot(x_values, pretrial_y, pretrial_SEM, posttrial_y, posttrial_SE
     axis(gca, 'tight')
     box off;
 
-    patch([8.75 8.75 12.5 12.5], [0 7 7 0], [.7 .7 .7])
+    patch([8.75 8.75 12.5 12.5], [0 5 5 0], [.7 .7 .7])
     set(gca,'children',flipud(get(gca,'children')))
     set(gca, 'Layer', 'top')
 
@@ -80,14 +80,14 @@ function make_plot(x_values, pretrial_y, pretrial_SEM, posttrial_y, posttrial_SE
     
     axis([0 20 0 11])
 
-    text(8.5, 9, ['Analysis Window'], 'FontSize', 30)
-    text(9, 8, ['8.75-12.5Hz'], 'FontSize', 30)
+    text(6.5, 7, ['Analysis Window'], 'FontSize', 30)
+    text(7.5, 6, ['8.75-12.5Hz'], 'FontSize', 30)
     
     legend('', 'Post-Onset', 'Pre-Onset')
     legend('boxoff')
 
     % Make window size enormous.
-    set(gcf, 'Position',  [0, 0, 2000, 2000])
+    set(gcf, 'Position',  [0, 0, 1000, 800])
     p = get(gca,'Position');
     set(gca,'Position',[p(1) p(2)+0.1 p(3)-0.1 p(4)-0.2]);
 
