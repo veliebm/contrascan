@@ -11,7 +11,8 @@ set(0, 'DefaultLineLineWidth', 8);
 fig = plot(taxis, alpha);
 
 hold on;
-plot (taxis, ssvep);
+plot(taxis, ssvep);
+plot(taxis, zeros(length(taxis),1), 'k--', 'LineWidth',3)
 hold off;
 
 ylabel('Voltage (µV)')
@@ -28,9 +29,7 @@ xticks([0 1 2 3 4 5])
 % Make window size enormous.
 set(gcf, 'Position',  [0, 0, 1000, 800])
 
-% Plot a dashed line at y=0.
-yline(0,'k--', 'LineWidth', 3)
-
-legend('Alpha Amplitude', 'ssVEP Amplitude', '', 'location','northwest', 'Box','off')
+ax.Children = ax.Children([3 2 1]);
+legend('', 'ssVEP Amplitude', 'Alpha Amplitude', 'location','northwest', 'Box','off')
 
 saveas(fig, './processed/plots/eeg_alone_analyses.svg')
