@@ -422,6 +422,24 @@ def task_ttest_deconvolutions() -> Dict:
             file_dep=sources,
             targets=targets,
         )
+def task_ttest_IRFs() -> Dict:
+    """
+    t-test each subbrick of the IRFs.
+    """
+    for subbrick in range(10):
+        sources = [fname.afniproc_resampled_irf(subject=subject) for subject in SUBJECTS]
+        targets = [fname.ttested_IRF(subbrick=subbrick)]
+
+        kwargs = dict(
+            images=[fname.afniproc_resampled_irf(subject=subject) + f"[{subbrick}]" for subject in SUBJECTS],
+            prefix=get_prefix(fname.ttested_IRF(subbrick=subbrick)),
+        )
+        yield dict(
+            name=f"subbrick--{subbrick}",
+            actions=[(ttest.main, [], kwargs)],
+            file_dep=sources,
+            targets=targets,
+        )
 def task_get_IRF_mean() -> Dict:
     """
     Calculate the mean IRF.

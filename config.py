@@ -114,6 +114,9 @@ fname.add("afniproc_deconvolved_resampled", "{afniproc_subject_dir}/{subject}.re
 # task_ttest_deconvolutions:
 fname.add("afniproc_ttest_result", "{processed_data_dir}/afniproc_ttests/subbrick-{subbrick}+tlrc.HEAD")
 
+# task_ttest_IRFs:
+fname.add("ttested_IRF", "{processed_data_dir}/IRF_ttests/subbrick-{subbrick}+tlrc.HEAD")
+
 # task_align_func_images:
 fname.add("afniproc_template", "{raw_data_dir}/misc/MNI152_T1_2009c+tlrc.HEAD")
 fname.add("alignment_dir", "{processed_data_dir}/func_alignment")
