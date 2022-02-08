@@ -31,6 +31,6 @@ set(gcf, 'Position',  [0, 0, 1000, 800])
 % Plot a dashed line at y=0.
 yline(0,'k--', 'LineWidth', 3)
 
-legend('Alpha Amplitude', 'ssVEP Amplitude', '', 'location','northwest')
+legend('Alpha Amplitude', 'ssVEP Amplitude', '', 'location','northwest', 'Box','off')
 
 saveas(fig, './processed/plots/eeg_alone_analyses.png')
