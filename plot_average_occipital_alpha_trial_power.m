@@ -54,16 +54,17 @@ function make_plot(x_values, pretrial_y, pretrial_SEM, posttrial_y, posttrial_SE
     %% Plot data.
     set(0, 'DefaultLineLineWidth', 6);
     figure;
-    plot(x_values, pretrial_y);
+    plot(x_values, pretrial_y, ':');
     hold on;
     plot(x_values, posttrial_y);
     hold off;
-    
+        
     curve1 = posttrial_y + posttrial_SEM;
     curve2 = posttrial_y - posttrial_SEM;
     
     fig = gcf;
     ax = gca;
+    ax.ColorOrder = [0 0 0; 0 0 0; 0 0 0; 0 0 0];
     axis(gca, 'tight')
     box off;
 
