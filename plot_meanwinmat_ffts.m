@@ -23,9 +23,9 @@ stderror= std(data_array, 0, 3) / sqrt(num_subjects);
 
 
 %% Plot data.
-x_values = freqs(1:15);
-y_values = mean_pow(20, 1:15);
-error = stderror(20, 1:15);
+x_values = freqs(1:11);
+y_values = mean_pow(20, 1:11);
+error = stderror(20, 1:11);
 
 fig = bar(x_values, y_values)
 ax = gca;
