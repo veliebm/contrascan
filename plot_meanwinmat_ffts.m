@@ -32,7 +32,7 @@ ax = gca;
 
 % Edit the ticks.
 yticks([0, .1]);
-xticks([0:6:36])
+xticks([6:6:36])
 ax.XAxis.TickLength = [0, 0];
 ax.LineWidth = 2;
 
