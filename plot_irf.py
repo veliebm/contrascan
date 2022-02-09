@@ -25,20 +25,20 @@ def plot_irf(x_values, calcarine_values, occipital_values) -> None:
     """
     Plot the IRFs
     """
+    plt.rcParams.update({'font.size': 40})
+    plt.rcParams.update({'axes.linewidth': 5})
     fig, ax = plt.subplots()
-    ax.plot(x_values, calcarine_values, linewidth=5, color='blue')
-    ax.plot(x_values, occipital_values, linewidth=5, color='red')
     plt.axhline(y=0, color='black', linestyle='--', linewidth=5)
+    ax.plot(x_values, calcarine_values, linewidth=10, color='blue')
+    ax.plot(x_values, occipital_values, linewidth=10, color='red')
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('BOLD Δ%')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.tick_params(width=5, length=10)
-    fig.set_size_inches(16, 9)
-    plt.xticks(x_values)
-    plt.yticks(numpy.arange(-.2, 1, .2))
-    plt.rcParams.update({'font.size': 40})
-    plt.rcParams['axes.linewidth'] = 5
+    fig.set_size_inches(10, 9)
+    plt.xticks(x_values[::2])
+    plt.yticks([-.2, 0, .8])
     plt.tight_layout()
     plt.savefig('processed/plots/representative_IRFs.png')
 
