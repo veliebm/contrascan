@@ -85,7 +85,7 @@ function make_plot(x_values, pretrial_y, pretrial_SEM, posttrial_y, posttrial_SE
     text(6.5, 7, ['Analysis Window'], 'FontSize', 30)
     text(7.5, 6, ['8.75-12.5Hz'], 'FontSize', 30)
     
-    legend('', 'Post-Onset', 'Pre-Onset')
+    legend('', 'Late Evoked Alpha', 'Baseline')
     legend('boxoff')
 
     % Make window size enormous.
