@@ -16,7 +16,7 @@ num_subjects = 18;
 df = num_subjects;
 
 % run stat_threshold. Last 3 parameters Maeve said to leave at default she specified.
-[peak_threshold_tscore, extent_threshold] = stat_threshold(search_vol,numvox,kernel,df,0.05,0.001,0.05);
+[peak_threshold_tscore, extent_threshold] = stat_threshold(search_vol,numvox,kernel,df);
 
 % peak_threshold_correlation = 7.393187804421838 -> 7.3932
 % extent_threshold = 125.3679030879341 -> 125.3679
