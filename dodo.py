@@ -590,6 +590,28 @@ def task_apply_masks_to_irfs() -> Dict:
                 file_dep=sources,
                 targets=targets,
             )
+def task_get_average_IRF_in_ROIs() -> Dict:
+    """
+    Calculates the average IRFs within our ROIs and writes to disk.
+    """
+    for subject in SUBJECTS:
+        for mask in "occipital".split():
+            sources = dict(
+                IRF=fname.masked_irf(subject=subject, mask=mask)
+            )
+            targets = dict(
+                average=fname.average_irf_in_roi(subject=subject, mask=mask)
+            )
+            parent_dir = Path(targets["average"]).parent
+            yield dict(
+                name=f"sub--{subject}, mask--{mask}",
+                actions=[
+                    f'mkdir -p {parent_dir}',
+                    f'3dmaskave {sources["IRF"]} > {targets["average"]}'
+                ],
+                file_dep=list(sources.values()),
+                targets=list(targets.values()),
+            )
 def task_clusterize_irfs() -> Dict:
     """
     FOR each subject, FOR each masked IRF, GET all clusters.

@@ -339,6 +339,10 @@ fname.add("resampled_mask", "{processed_data_dir}/masks_resampled/mask-{mask}_re
 # task_apply_masks_to_irfs:
 fname.add("masked_irf", "{processed_data_dir}/masked_irfs/sub-{subject}_masked-{mask}_irf+tlrc.HEAD")
 
+# task_get_average_IRF_in_ROTs:
+fname.add("average_irf_in_roi_dir", "{processed_data_dir}/IRF_averages_in_rois")
+fname.add("average_irf_in_roi", "{average_irf_in_roi_dir}/sub-{subject}_masked-{mask}.txt")
+
 # task_clusterize_irfs:
 fname.add("clusters_dir", "{processed_data_dir}/clusters")
 fname.add("clusters", "{clusters_dir}/sub-{subject}_source-{mask}_clusters+tlrc.HEAD")
