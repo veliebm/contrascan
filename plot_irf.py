@@ -4,10 +4,7 @@ Make a nice plot of a representative occipital IRF.
 Created 1/6/22 by Benjamin Velie.
 """
 
-from os import PathLike, path
 import matplotlib.pyplot as plt
-import nibabel
-import numpy
 
 
 def main():
@@ -43,23 +40,6 @@ def plot_irf(x_values, calcarine_values, occipital_values) -> None:
     plt.yticks([-.2, 0, .8])
     plt.tight_layout()
     plt.savefig('processed/plots/representative_IRFs.png')
-
-
-def get_representative_time_series(path_to_irf: PathLike) -> numpy.array:
-    """
-    Extract a time series from a representative voxel in the occipital pole.
-
-    Args:
-        path_to_irf (PathLike): Path to the IRF image.
-
-    Returns:
-        numpy.array: Vector containing time series of voxel from occipital pole.
-    """
-    irf_image = nibabel.load(path_to_irf)
-    representative_voxel_coordinates = (29, 10, 33)
-    representative_voxel_timeseries = irf_image.dataobj[representative_voxel_coordinates]
-
-    return representative_voxel_timeseries
 
 
 if __name__ == "__main__":
