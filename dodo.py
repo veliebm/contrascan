@@ -996,6 +996,8 @@ def task_eeg_get_alphas() -> Dict:
             SNRs=fname.eeg_alpha(subject=subject, data="SNRs"),
             average_power=fname.average_power(subject=subject),
             write_script_to=fname.eeg_alpha_script(subject=subject),
+            pows_timeseries=fname.eeg_pows_timeseries(subject=subject),
+            freqs=fname.eeg_freqs_for_pows_timeseries(subject=subject),
         )
         targets_list = list(targets.values())
 
@@ -1030,6 +1032,8 @@ def task_eeg_get_alphas() -> Dict:
             save('{targets["values"]}', 'values');
             save('{targets["SNRs"]}', 'SNRs');
             save('{targets["average_power"]}', 'average_power');
+            save('{targets["pows_timeseries"]}', 'pows');
+            save('{targets["freqs"]}', 'freqs');
 
             function [dataset] = load_dataset(path)
                 % Load a dataset.

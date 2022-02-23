@@ -192,6 +192,8 @@ fname.add("eeg_alpha_dir", "{processed_data_dir}/eeg_alphas")
 fname.add("eeg_alpha_script", "{scripts_dir}/TEMP_sub{subject}_eeg_get_alphas.m")
 fname.add("eeg_alpha", "{eeg_alpha_dir}/sub-{subject}_data-{data}_alphas.mat")
 fname.add("average_power", "{eeg_alpha_dir}/sub-{subject}_average_power.mat")
+fname.add("eeg_pows_timeseries", "{eeg_alpha_dir}/sub-{subject}_pows_timeseries.mat")
+fname.add("eeg_freqs_for_pows_timeseries", "{eeg_alpha_dir}/sub-{subject}_freqs.mat")
 
 # task_eeg_get_trial_by_trial_alpha:
 fname.add("eeg_trial_alpha_dir", "{processed_data_dir}/eeg_trial_alphas")
