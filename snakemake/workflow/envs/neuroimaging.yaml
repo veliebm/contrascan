@@ -3,13 +3,13 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - numpy=1.20
-  - pandas=1.2
-  - python=3.9
-  - scipy=1.6
-  - matplotlib=3.4
-  - pip=21.1
+  - numpy=1.22
+  - pandas=1.4
+  - python=3.10
+  - scipy=1.8
+  - matplotlib=3.5
+  - pip=22.0
   - pip:
     - nibabel==3.2
     - nilearn==0.8
-    - scikit-learn==0.24
+    - scikit-learn==1.0
