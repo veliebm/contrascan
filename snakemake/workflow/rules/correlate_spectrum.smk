@@ -5,9 +5,9 @@ Created 2/23/22 by Ben Velie.
 """
 
 
-rule get_quadratic_parameters_of_spectrums:
+rule get_quadratic_estimates_of_spectrums:
     """
-    Get time series of quadratic parameters for each TR.
+    Get time series of quadratic estimate coefficients for each TR.
     """
     input:
         pows_timeseries="../processed/eeg_alphas/sub-{id}_pows_timeseries.mat",
