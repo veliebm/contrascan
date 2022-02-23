@@ -19,3 +19,16 @@ rule get_quadratic_estimates_of_spectrums:
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/get_quadratic_estimates.py"
 
+
+rule correlate_quadratic_estimates_with_BOLD:
+    """
+    Correlate our quadratic estimates with BOLD. BOLD series and quadratic estimates begin when first stimulus was presented.
+    BOLD must be trimmed to be same length as quadratic estimates.
+    """
+    input:
+        vector="results/spectrum_quadratics/estimates/sub-{id}_order-{order}_estimate.csv",
+        bold="../processed/funcs_trimmed_to_first_stim/sub-{id}_func_trimmed+tlrc.HEAD",
+    output:
+        correlations="results/spectrum_quadratics/correlations/sub-{id}_order-{order}_correlations.nii"
+    conda: "../envs/neuroimaging.yaml"
+    script: "../scripts/correlate_with_bold.py"
