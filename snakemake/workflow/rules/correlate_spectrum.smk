@@ -29,6 +29,6 @@ rule correlate_quadratic_estimates_with_BOLD:
         vector="results/spectrum_quadratics/estimates/sub-{id}_order-{order}_estimate.csv",
         bold="../processed/funcs_trimmed_to_first_stim/sub-{id}_func_trimmed+tlrc.HEAD",
     output:
-        correlations="results/spectrum_quadratics/correlations/sub-{id}_order-{order}_correlations.nii"
+        correlations="results/spectrum_quadratics/correlations/sub-{id}_order-{order}_correlations.nii.gz"
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/correlate_with_bold.py"
