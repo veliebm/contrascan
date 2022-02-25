@@ -37,3 +37,14 @@ rule trim_resampled_residuals:
     output:
         image="results/prepare_residuals/trim_residuals/sub-{id}.nii.gz",
     shell: "3dTcat {input.image}[4..$] -prefix {output.image}"
+
+
+rule add_lags_to_trimmed_residuals:
+    """
+    Lag our trimmed residuals. Andreas says these should be lagged by 3 to 5 TRs.
+    """
+    input:
+        image="results/prepare_residuals/trim_residuals/sub-{id}.nii.gz",
+    output:
+        image="results/prepare_residuals/lag_residuals/sub-{id}_lag-{lag}.nii.gz",
+    shell: "3dTcat {input.image}[{wildcards.lag}..$] -prefix {output.image}"
