@@ -21,7 +21,8 @@ rule resample_aligned_residuals:
     """
     input:
         image="results/prepare_residuals/align_residuals/sub-{id}.nii.gz",
+        template="../processed/kastner_resample/MNI152_T1_1mm_resampled+tlrc.HEAD",
     output:
         image="results/prepare_residuals/resample_residuals/sub-{id}.nii.gz",
     conda: "../envs/afni.yaml"
-    shell: "3dresample -dxyz 2.5 2.5 2.5 -input {input.image} -prefix {output.image}"
+    shell: "3dresample -master {input.template} -input {input.image} -prefix {output.image}"
