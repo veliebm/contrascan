@@ -17,6 +17,7 @@ include: "rules/plot_mean_correlations.smk"
 include: "rules/plot_variance.smk"
 include: "rules/get_images_to_andreas.smk"
 include: "rules/correlate_spectrum.smk"
+include: "rules/prepare_residuals.smk"
 
 
 def non_baselined_inputs(_):
