@@ -35,8 +35,9 @@ def get_correlation(func_image: nibabel.Nifti1Image, vector: Iterable) -> numpy.
     print(f"Trimmed image from {func_image.dataobj.shape} to {trimmed_array.shape}")
     print("Running Spearman correlation")
     correlation_results = numpy.apply_along_axis(spearmanr, 3, trimmed_array, b=vector)
+    correlation_results_with_p_vals_removed = correlation_results[:, :, :, 0]
 
-    return correlation_results
+    return correlation_results_with_p_vals_removed
 
 
 if __name__ == "__main__":
