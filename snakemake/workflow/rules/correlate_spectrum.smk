@@ -1,7 +1,5 @@
 """
 Workflow to gather quadratic parameters of the spectrums in each TR and correlate those with the BOLD signal.
-
-Created 2/23/22 by Ben Velie.
 """
 
 
