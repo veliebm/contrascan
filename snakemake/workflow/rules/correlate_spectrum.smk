@@ -20,8 +20,8 @@ rule get_quadratic_estimates_of_spectrums:
 
 rule correlate_quadratic_estimates_with_BOLD:
     """
-    Correlate our quadratic estimates with BOLD. BOLD series and quadratic estimates begin when first stimulus was presented.
-    BOLD must be trimmed to be same length as quadratic estimates.
+    Trim BOLD to be same length as quadratic estimates then correlate estimates with BOLD.
+    Input BOLD series and quadratic estimates should begin at about the same time.
     """
     input:
         vector="results/spectrum_quadratics/estimates/sub-{id}_order-{order}_estimate.csv",
