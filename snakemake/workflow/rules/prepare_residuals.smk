@@ -13,3 +13,15 @@ rule align_residuals_made_by_afniproc:
         image="results/prepare_residuals/align_residuals/sub-{id}.nii.gz",
     conda: "../envs/afni.yaml"
     shell: "3dAllineate -cubic -1Dmatrix_apply {input.alignment_matrix} -prefix {output.image} {input.image}"
+
+
+rule resample_aligned_residuals:
+    """
+    Resample our aligned residuals.
+    """
+    input:
+        image="results/prepare_residuals/align_residuals/sub-{id}.nii.gz",
+    output:
+        image="results/prepare_residuals/resample_residuals/sub-{id}.nii.gz",
+    conda: "../envs/afni.yaml"
+    shell: "3dresample -dxyz 2.5 2.5 2.5 -input {input.image} -prefix {output.image}"
