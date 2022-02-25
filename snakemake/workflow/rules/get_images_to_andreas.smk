@@ -1,5 +1,5 @@
 """
-This simple snakefile moves and renames the images Andreas wants to quality check.
+This simple snakefile moves and renames some images Andreas wants to quality check.
 """
 
 
