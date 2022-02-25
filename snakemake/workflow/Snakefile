@@ -17,36 +17,3 @@ include: "rules/plot_variance.smk"
 include: "rules/get_images_to_andreas.smk"
 include: "rules/correlate_spectrum.smk"
 include: "rules/prepare_residuals.smk"
-
-
-def non_baselined_inputs(_):
-    inputs = []
-    for analysis in "ssvep alpha".split():
-        for volume_type in "continuous trialwise".split():
-            inputs += expand("results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png",
-                analysis=analysis,
-                startvolume=config["analyses"][analysis][volume_type]["volumes"],
-                variable=config["analyses"][analysis][volume_type]["variables"],
-                baselined=config["analyses"][analysis][volume_type]["compare to baseline"],
-            )
-
-    return inputs
-
-
-def baselined_inputs(_):
-    inputs = []
-    startvolumes = {"alpha": range(1, 5), "ssvep": range(1, 9)}
-    variables = "amplitude SNR".split()
-    baselined = "true"
-    for analysis, startvolume_range in startvolumes.items():
-        for startvolume in startvolume_range:
-            for variable in variables:
-                inputs.append(f"results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png")
-
-    return inputs
-
-
-rule all:
-    input:
-        non_baselined_inputs,
-        baselined_inputs
