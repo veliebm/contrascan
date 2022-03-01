@@ -44,3 +44,14 @@ rule correlate_quadratic_estimates_with_residuals:
         correlations="results/spectrum_quadratics/correlation_with_residuals/sub-{id}_lag-{lag}_order-{order}.nii.gz"
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/correlate_with_bold.py"
+
+
+rule compute_mean_correlation:
+    """
+    Compute the mean correlation across subjects.
+    """
+    input:
+        images=expand("results/spectrum_quadratics/correlation_with_residuals/sub-{id}_lag-{{lag}}_order-{{order}}.nii.gz", id=config["subjects"])
+    output:
+        mean="results/spectrum_quadratics/correlation_with_residuals_mean/lag-{lag}_order-{order}.nii.gz"
+    shell: "3dMean -prefix {output.mean} {input.images}"
