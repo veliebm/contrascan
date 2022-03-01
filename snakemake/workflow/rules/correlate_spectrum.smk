@@ -11,9 +11,9 @@ rule get_quadratic_estimates_of_spectrums:
         pows_timeseries="../processed/eeg_alphas/sub-{id}_pows_timeseries.mat",
         freqs="../processed/eeg_alphas/sub-{id}_freqs.mat",
     output:
-        zero_order="results/spectrum_quadratics/estimates/sub-{id}_order-0_estimate.csv",
-        first_order="results/spectrum_quadratics/estimates/sub-{id}_order-1_estimate.csv",
-        second_order="results/spectrum_quadratics/estimates/sub-{id}_order-2_estimate.csv",
+        zero_order="results/correlate_spectrum/estimates/sub-{id}_order-0_estimate.csv",
+        first_order="results/correlate_spectrum/estimates/sub-{id}_order-1_estimate.csv",
+        second_order="results/correlate_spectrum/estimates/sub-{id}_order-2_estimate.csv",
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/get_quadratic_estimates.py"
 
@@ -24,10 +24,10 @@ rule correlate_quadratic_estimates_with_residuals:
     Input BOLD series and quadratic estimates should begin at about the same time.
     """
     input:
-        vector="results/spectrum_quadratics/estimates/sub-{id}_order-{order}_estimate.csv",
+        vector="results/correlate_spectrum/estimates/sub-{id}_order-{order}_estimate.csv",
         bold="results/prepare_residuals/lag_residuals/sub-{id}_lag-{lag}.nii.gz",
     output:
-        correlations="results/spectrum_quadratics/correlation_with_residuals/sub-{id}_lag-{lag}_order-{order}.nii.gz"
+        correlations="results/correlate_spectrum/correlation_with_residuals/sub-{id}_lag-{lag}_order-{order}.nii.gz"
     wildcard_constraints:
         lag="[3-5]"
     conda: "../envs/neuroimaging.yaml"
@@ -39,7 +39,7 @@ rule compute_mean_correlation:
     Compute the mean correlation across subjects.
     """
     input:
-        images=expand("results/spectrum_quadratics/correlation_with_residuals/sub-{id}_lag-{{lag}}_order-{{order}}.nii.gz", id=config["subjects"])
+        images=expand("results/correlate_spectrum/correlation_with_residuals/sub-{id}_lag-{{lag}}_order-{{order}}.nii.gz", id=config["subjects"])
     output:
-        mean="results/spectrum_quadratics/correlation_with_residuals_mean/lag-{lag}_order-{order}.nii.gz"
+        mean="results/correlate_spectrum/correlation_with_residuals_mean/lag-{lag}_order-{order}.nii.gz"
     shell: "3dMean -prefix {output.mean} {input.images}"
