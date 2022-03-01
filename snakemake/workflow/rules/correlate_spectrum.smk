@@ -42,6 +42,8 @@ rule correlate_quadratic_estimates_with_residuals:
         bold="results/prepare_residuals/lag_residuals/sub-{id}_lag-{lag}.nii.gz",
     output:
         correlations="results/spectrum_quadratics/correlation_with_residuals/sub-{id}_lag-{lag}_order-{order}.nii.gz"
+    wildcard_constraints:
+        lag="[3-5]"
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/correlate_with_bold.py"
 
