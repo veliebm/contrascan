@@ -48,3 +48,17 @@ rule add_lags_to_trimmed_residuals:
     output:
         image="results/prepare_residuals/lag_residuals/sub-{id}_lag-{lag}.nii.gz",
     shell: "3dTcat {input.image}[{wildcards.lag}..$] -prefix {output.image}"
+
+
+rule adjust_events_file:
+    """
+    Adjust our BOLD events file so it lines up with our trimmed residuals.
+    """
+    input:
+        events="../processed/bids/sub-{id}/func/sub-{id}_task-contrascan_events.tsv",
+    params:
+        adjust_by=-10,
+    output:
+        events="results/prepare_residuals/adjust_events/sub-{id}.tsv",
+    conda: "../envs/neuroimaging.yaml"
+    script: "../scripts/adjust_events_file.py"
