@@ -39,18 +39,7 @@ rule trim_resampled_residuals:
     shell: "3dTcat {input.image}[4..$] -prefix {output.image}"
 
 
-rule add_lags_to_trimmed_residuals:
-    """
-    Lag our trimmed residuals. Andreas says these should be lagged by 3 to 5 TRs.
-    """
-    input:
-        image="results/prepare_residuals/trim_residuals/sub-{id}.nii.gz",
-    output:
-        image="results/prepare_residuals/lag_residuals/sub-{id}_lag-{lag}.nii.gz",
-    shell: "3dTcat {input.image}[{wildcards.lag}..$] -prefix {output.image}"
-
-
-rule adjust_events_file:
+rule adjust_events_file_for_trimmed_residuals:
     """
     Adjust our BOLD events file so it lines up with our trimmed residuals.
     """
@@ -62,3 +51,27 @@ rule adjust_events_file:
         events="results/prepare_residuals/adjust_events/sub-{id}.tsv",
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/adjust_events_file.py"
+
+
+rule add_lags_to_trimmed_residuals:
+    """
+    Lag our trimmed residuals. Andreas says these should be lagged by 3 to 5 TRs.
+    """
+    input:
+        image="results/prepare_residuals/trim_residuals/sub-{id}.nii.gz",
+    output:
+        image="results/prepare_residuals/lag_residuals/sub-{id}_lag-{lag}.nii.gz",
+    shell: "3dTcat {input.image}[{wildcards.lag}..$] -prefix {output.image}"
+
+
+rule remove_trials_from_trimmed_residuals:
+    """
+    Remove trials from trimmed residuals.
+    """
+    input:
+        image="results/prepare_residuals/trim_residuals/sub-{id}.nii.gz",
+        events="results/prepare_residuals/adjust_events/sub-{id}.tsv",
+    output:
+        image="results/prepare_residuals/remove_trials/sub-{id}.nii.gz",
+    conda: "../envs/neuroimaging.yaml"
+    script: "../scripts/remove_trials_from_bold.py"
