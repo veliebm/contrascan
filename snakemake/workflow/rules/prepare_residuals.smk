@@ -73,5 +73,6 @@ rule remove_trials_from_trimmed_residuals:
         events="results/prepare_residuals/adjust_events/sub-{id}.tsv",
     output:
         image="results/prepare_residuals/remove_trials/sub-{id}.nii.gz",
+        quality_control="results/prepare_residuals/remove_trials/sub-{id}_volumes_removed.tsv",
     conda: "../envs/neuroimaging.yaml"
     script: "../scripts/remove_trials_from_bold.py"

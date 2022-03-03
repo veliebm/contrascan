@@ -31,6 +31,7 @@ def main() -> None:
     # Save data.
     out_image = nibabel.Nifti1Image(trimmed_array, input_image.affine)
     out_image.to_filename(snakemake.output.image)
+    numpy.savetxt(snakemake.output.quality_control, volumes_to_remove)
 
 
 def get_volumes_to_remove(events: pandas.DataFrame, bold_length: int) -> numpy.array:
