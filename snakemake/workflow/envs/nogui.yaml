@@ -1,13 +1,10 @@
 channels:
-  - conda-forge
-  - bioconda
   - defaults
+  - conda-forge
 dependencies:
   - numpy=1.22
   - pandas=1.4
   - python=3.10
   - scipy=1.8
   - scikit-learn=1.0
-  - pip=22.0
-  - pip:
-    - nibabel==3.2
+  - nibabel=3.2
