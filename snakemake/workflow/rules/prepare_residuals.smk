@@ -49,7 +49,7 @@ rule adjust_events_file_for_trimmed_residuals:
         adjust_by=-10,
     output:
         events="results/prepare_residuals/adjust_events/sub-{id}.tsv",
-    conda: "../envs/neuroimaging.yaml"
+    conda: "../envs/nogui.yaml"
     script: "../scripts/adjust_events_file.py"
 
 
@@ -74,5 +74,5 @@ rule remove_trials_from_trimmed_residuals:
     output:
         image="results/prepare_residuals/remove_trials/sub-{id}.nii.gz",
         quality_control="results/prepare_residuals/remove_trials/sub-{id}_volumes_removed.tsv",
-    conda: "../envs/neuroimaging.yaml"
+    conda: "../envs/nogui.yaml"
     script: "../scripts/remove_trials_from_bold.py"
