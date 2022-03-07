@@ -27,16 +27,10 @@ def main():
     ]
 
     # Reconstruct quadratic model.
-
-    # Using the coefficients, plot a regression over the original data.
-    # Should work if I use the same input data that was used to create the original data.
-    # i.e., f(x) and f_est(x)
-    # What's the original data?
-    # When I made the polynomial, I used the freqs as the X input, and the spectrum as the Y input.
     model = numpy.polynomial.Polynomial(TR_quadratic_estimates)
     TR_quadratic_fit = model(TR_freqs)
 
-    # Make the plot.
+    # Using the coefficients, plot a regression over the original data.
     fig, ax = plt.subplots()
     ax.plot(TR_freqs, TR_spectrum, 's', color='#377eb8', marker='o')
     ax.plot(TR_freqs, TR_quadratic_fit, color='#ff7f00')
