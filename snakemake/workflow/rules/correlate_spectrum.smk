@@ -18,6 +18,22 @@ rule get_quadratic_estimates_of_spectrums:
     script: "../scripts/get_quadratic_estimates.py"
 
 
+rule plot_estimates_and_spectrums:
+    """
+    For a TR, plot a spectrum and its fitted quadratic curve.
+    """
+    input:
+        zero_order="results/correlate_spectrum/estimates/sub-{id}_order-0_estimate.csv",
+        first_order="results/correlate_spectrum/estimates/sub-{id}_order-1_estimate.csv",
+        second_order="results/correlate_spectrum/estimates/sub-{id}_order-2_estimate.csv",
+        pows_timeseries="../processed/eeg_alphas/sub-{id}_pows_timeseries.mat",
+        freqs="../processed/eeg_alphas/sub-{id}_freqs.mat",
+    output:
+        plot="results/correlate_spectrum/estimates/sub-{id}_TR-{TR}_plot.png",
+    conda: "../envs/neuroimaging.yaml"
+    script: "../scripts/plot_estimates_and_spectrums_qc.py"
+
+
 rule correlate_quadratic_estimates_with_residuals:
     """
     Trim residuals to be same length as quadratic estimates then correlate estimates with BOLD.
