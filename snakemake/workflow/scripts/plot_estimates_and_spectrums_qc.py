@@ -19,7 +19,7 @@ def main():
     TR_spectrum = pows_timeseries[:, TR]
     TR_freqs = scipy.io.loadmat(snakemake.input.freqs)["freqs"].reshape(-1)
 
-    # Trime freqs and spectrum so we only see first 30 Hz.
+    # Trim freqs and spectrum so we only see first 30 Hz.
     TR_trimmed_spectrum = TR_spectrum[:61]
     TR_trmmed_freqs = TR_freqs[:61]
 
