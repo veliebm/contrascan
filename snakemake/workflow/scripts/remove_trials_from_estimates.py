@@ -1,7 +1,7 @@
 """
 Remove trials from our quadratic estimates.
 
-Created 9/30/2022 By Benjamin Velie.
+Create 3/8/22 by Benjamin Velie.
 """
 import numpy
 
