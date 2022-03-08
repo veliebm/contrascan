@@ -19,6 +19,10 @@ def main():
     TR_spectrum = pows_timeseries[:, TR]
     TR_freqs = scipy.io.loadmat(snakemake.input.freqs)["freqs"].reshape(-1)
 
+    # Trime freqs and spectrum so we only see first 30 Hz.
+    TR_trimmed_spectrum = TR_spectrum[:61]
+    TR_trmmed_freqs = TR_freqs[:61]
+
     # Read quadratic coefficients for the given TR.
     TR_quadratic_estimates = [
         numpy.genfromtxt(snakemake.input.zero_order)[TR],
@@ -28,12 +32,12 @@ def main():
 
     # Reconstruct quadratic model.
     model = numpy.polynomial.Polynomial(TR_quadratic_estimates)
-    TR_quadratic_fit = model(TR_freqs)
+    TR_quadratic_fit = model(TR_trmmed_freqs)
 
     # Using the coefficients, plot a regression over the original data.
     fig, ax = plt.subplots()
-    ax.plot(TR_freqs, TR_spectrum, 's', color='#377eb8', marker='o')
-    ax.plot(TR_freqs, TR_quadratic_fit, color='#ff7f00')
+    ax.plot(TR_trmmed_freqs, TR_trimmed_spectrum, 's', color='#377eb8', marker='o')
+    ax.plot(TR_trmmed_freqs, TR_quadratic_fit, color='#ff7f00')
     ax.set_ylabel('Power')
     ax.set_xlabel('Frequency (Hz)')
     ax.spines['top'].set_visible(False)

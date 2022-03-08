@@ -16,10 +16,14 @@ def main():
     oz_electrode = 19
     pows_timeseries = scipy.io.loadmat(snakemake.input.pows_timeseries)["pows"][oz_electrode]
 
+    # Trim freqs and time series to only get first 30 Hz.
+    trimmed_freqs = freqs[:61]
+    trimmed_pows_timeseries = pows_timeseries[:61, :]
+
     # Fit quadratic model for each TR. Example pows_timeseries shape: (500, 345)
     def fit_quadratic(spectrum: numpy.array) -> numpy.array:
-        return numpy.polynomial.polynomial.polyfit(x=freqs, y=spectrum, deg=2)
-    coefficients = numpy.apply_along_axis(fit_quadratic, 0, pows_timeseries)
+        return numpy.polynomial.polynomial.polyfit(x=trimmed_freqs, y=spectrum, deg=2)
+    coefficients = numpy.apply_along_axis(fit_quadratic, 0, trimmed_pows_timeseries)
 
     # Output quadratic parameters.
     numpy.savetxt(snakemake.output.zero_order, coefficients[0])
