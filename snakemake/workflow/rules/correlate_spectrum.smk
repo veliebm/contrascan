@@ -18,6 +18,19 @@ rule get_quadratic_estimates_of_spectrums:
     script: "../scripts/get_quadratic_estimates.py"
 
 
+rule remove_trials_from_quadratic_estimates:
+    """
+    Remove trials from the quadratic estimates so we can correlate them with our trialless BOLD.
+    """
+    input:
+        volumes_containing_trials="results/prepare_residuals/remove_trials/sub-{id}_volumes_removed.tsv",
+        estimate="results/correlate_spectrum/estimates/sub-{id}_order-{order}_estimate.csv",
+    output:
+        trialless_estimate="results/correlate_spectrum/trialless_estimates/sub-{id}_order-{order}_estimate.csv",
+    conda: "../envs/nogui.yaml"
+    script: "../scripts/remove_trials_from_estimates.py"
+
+
 rule plot_estimates_and_spectrums:
     """
     For a TR, plot a spectrum and its fitted quadratic curve.
