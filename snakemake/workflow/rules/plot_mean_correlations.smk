@@ -119,12 +119,7 @@ rule plot_occipital_of_all_means:
         underlay="../data/misc/kastner_cortex_masks/MNI152_T1_1mm_masked.nii.gz",
         overlay="results/plot_mean_correlations/skull_stripped/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}.nii.gz",
     output:
-        plot=report(
-            "results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png",
-            caption="../report/mean_correlations.rst",
-            category="startvolume {startvolume}",
-            subcategory="{analysis} {variable}",
-        ),
+        plot="results/plot_mean_correlations/plots/startvolume-{startvolume}_variable-{variable}_baselined-{baselined}_{analysis}_occipital.png",
     params:
         threshold=(-.05, .05),
         coordinates=config["occipital coordinates"],
