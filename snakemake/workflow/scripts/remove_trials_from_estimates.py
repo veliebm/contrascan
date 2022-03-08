@@ -16,7 +16,7 @@ def main() -> None:
 
     # Trim trials to be same length as estimates.
     trimmed_trials = trials[:len(estimate)]
-    
+
     # Remove trials from data.
     masked_estimate = numpy.ma.array(estimate, mask=trimmed_trials)
     non_trial_values = masked_estimate[~masked_estimate.mask]
